@@ -1,0 +1,96 @@
+---
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ContactEmail from "../../components/ContactEmail.astro";
+import Form from "../../components/form/Form.astro";
+import SectionHeading from "../../components/SectionHeading.astro";
+import { getCopy } from "../../content/copy";
+import { localeStaticPaths, type Locale } from "../../i18n";
+
+export const getStaticPaths = (() => localeStaticPaths()) satisfies GetStaticPaths;
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+const c = copy.contact;
+---
+
+<BaseLayout
+  locale={locale}
+  page="contact"
+  title={copy.meta.contact.title}
+  description={copy.meta.contact.description}
+>
+  <section class="contact-hero grid-paper">
+    <div class="container-site contact-grid">
+      <div>
+        <SectionHeading eyebrow={c.eyebrow} title={c.title} lead={c.lead} level={1} />
+        <dl class="contact-facts">
+          <div>
+            <dt>{c.emailLabel}</dt>
+            <dd>
+              <ContactEmail />
+            </dd>
+          </div>
+        </dl>
+        <p class="contact-pricing" set:html={c.pricing} />
+      </div>
+      <div class="contact-form">
+        <h2 class="contact-form-title">{c.formTitle}</h2>
+        <Form locale={locale} kind="contact" />
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .contact-hero {
+    padding-block: clamp(3rem, 2rem + 4vw, 6rem);
+  }
+
+  .contact-grid {
+    display: grid;
+    gap: 3rem;
+  }
+
+  @media (min-width: 1024px) {
+    .contact-grid {
+      grid-template-columns: 5fr 7fr;
+      gap: 5rem;
+    }
+  }
+
+  .contact-facts {
+    margin: 2.5rem 0 0;
+  }
+
+  .contact-facts dt {
+    color: var(--lc-text-faint);
+    font-size: var(--lc-text-small);
+  }
+
+  .contact-facts dd {
+    margin: 0.25rem 0 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .contact-facts :global(a) {
+    color: var(--lc-signal-bright);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .contact-pricing {
+    margin-block-start: 2rem;
+    color: var(--lc-text);
+  }
+
+  .contact-form-title {
+    margin-block-end: 1.5rem;
+    font-size: 1.5rem;
+  }
+</style>

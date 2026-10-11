@@ -1,0 +1,220 @@
+---
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import CTABand from "../../components/CTABand.astro";
+import Icon from "../../components/Icon.astro";
+import ScreenshotFrame from "../../components/ScreenshotFrame.astro";
+import SectionHeading from "../../components/SectionHeading.astro";
+import { getCopy } from "../../content/copy";
+import { localeStaticPaths, pagePath, useUi, type Locale } from "../../i18n";
+import { isScreenKey } from "../../lib/screens";
+
+export const getStaticPaths = (() => localeStaticPaths()) satisfies GetStaticPaths;
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+const p = copy.product;
+const ui = useUi(locale);
+---
+
+<BaseLayout
+  locale={locale}
+  page="product"
+  title={copy.meta.product.title}
+  description={copy.meta.product.description}
+>
+  <section class="product-hero grid-paper">
+    <div class="container-site">
+      <SectionHeading eyebrow={p.eyebrow} title={p.title} lead={p.lead} level={1} />
+    </div>
+  </section>
+
+  <nav class="subnav" aria-label={ui.productNav} data-scrollspy>
+    <div class="container-site">
+      <ul role="list" class="subnav-list">
+        {p.sections.map((s) => (
+          <li>
+            <a href={`#${s.id}`} data-spy-link={s.id} set:html={s.nav} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container-site product-sections">
+    {p.sections.map((s, index) => (
+      <section class="capability" id={s.id} aria-labelledby={`${s.id}-title`} data-spy-section>
+        <div class="capability-copy">
+          <p class="capability-index tabular" aria-hidden="true">
+            {String(index + 1).padStart(2, "0")}
+          </p>
+          <h2 id={`${s.id}-title`} class="capability-title" set:html={s.title} />
+          <p class="capability-intro" set:html={s.intro} />
+          <ul class="capability-bullets" role="list">
+            {s.bullets.map((b) => (
+              <li>
+                <Icon name="check" size={18} class="capability-check" />
+                <span set:html={b} />
+              </li>
+            ))}
+          </ul>
+          <p class="capability-note">
+            <strong>{ui.goodToKnow}:</strong> <span set:html={s.note} />
+          </p>
+        </div>
+        {isScreenKey(s.screen) && (
+          <div class="capability-visual" data-reveal>
+            <ScreenshotFrame screen={s.screen} locale={locale} />
+          </div>
+        )}
+      </section>
+    ))}
+  </div>
+
+  <CTABand
+    title={p.cta.title}
+    text={p.cta.text}
+    href={`${pagePath(locale, "design-partners")}#apply`}
+    button={p.cta.button}
+  />
+</BaseLayout>
+
+<script>
+  import "../../scripts/scrollspy.ts";
+</script>
+
+<style>
+  .product-hero {
+    padding-block: clamp(3rem, 2rem + 4vw, 6rem) clamp(2.5rem, 2rem + 2vw, 3.5rem);
+  }
+
+  .subnav {
+    position: sticky;
+    inset-block-start: 4.25rem;
+    z-index: 40;
+    border-block: 1px solid var(--lc-hairline);
+    background: rgba(17, 21, 26, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .subnav-list {
+    display: flex;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0.5rem 0;
+    overflow-x: auto;
+    list-style: none;
+    scrollbar-width: none;
+  }
+
+  .subnav-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .subnav-list a {
+    display: inline-block;
+    padding: 0.4rem 0.75rem;
+    border-radius: 999px;
+    color: var(--lc-text-muted);
+    font-size: var(--lc-text-small);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .subnav-list a:hover {
+    color: var(--lc-text);
+  }
+
+  .subnav-list a[aria-current="true"] {
+    background: var(--lc-signal-wash);
+    color: var(--lc-signal-bright);
+  }
+
+  .product-sections {
+    display: grid;
+  }
+
+  .capability {
+    display: grid;
+    gap: 2.5rem;
+    align-items: center;
+    padding-block: clamp(4rem, 2.5rem + 5vw, 7rem);
+    border-block-end: 1px solid var(--lc-hairline);
+    scroll-margin-block-start: 8rem;
+  }
+
+  .capability:last-child {
+    border-block-end: 0;
+  }
+
+  @media (min-width: 960px) {
+    .capability {
+      grid-template-columns: 5fr 7fr;
+      gap: 4rem;
+    }
+
+    .capability:nth-child(even) {
+      grid-template-columns: 7fr 5fr;
+    }
+
+    .capability:nth-child(even) .capability-copy {
+      order: 2;
+    }
+  }
+
+  .capability-index {
+    margin-block-end: 0.75rem;
+    color: var(--lc-signal-bright);
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-text-small);
+  }
+
+  .capability-title {
+    font-size: var(--lc-text-h2);
+  }
+
+  .capability-intro {
+    margin-block-start: 1rem;
+    color: var(--lc-text-muted);
+    font-size: var(--lc-text-lead);
+  }
+
+  .capability-intro :global(code) {
+    color: var(--lc-text);
+  }
+
+  .capability-bullets {
+    display: grid;
+    gap: 0.625rem;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .capability-bullets li {
+    display: flex;
+    gap: 0.625rem;
+  }
+
+  .capability-bullets :global(.capability-check) {
+    flex: none;
+    margin-block-start: 0.25rem;
+    color: var(--lc-signal-bright);
+  }
+
+  .capability-note {
+    margin-block-start: 1.5rem;
+    padding: 0.875rem 1rem;
+    border-inline-start: 2px solid var(--lc-signal);
+    border-start-end-radius: 8px;
+    border-end-end-radius: 8px;
+    background: var(--lc-signal-wash);
+    color: var(--lc-text);
+    font-size: var(--lc-text-small);
+  }
+</style>

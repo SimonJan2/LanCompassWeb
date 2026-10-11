@@ -1,0 +1,140 @@
+---
+import Button from "./Button.astro";
+import LanguageSwitcher from "./LanguageSwitcher.astro";
+import Logo from "./Logo.astro";
+import MobileNav from "./MobileNav.astro";
+import { site } from "../config/site";
+import { pagePath, useUi, type Locale, type PageKey } from "../i18n";
+
+interface Props {
+  locale: Locale;
+  page: PageKey;
+}
+
+const { locale, page } = Astro.props;
+const ui = useUi(locale);
+const links: { page: PageKey; label: string }[] = [
+  { page: "product", label: ui.nav.product },
+  { page: "security", label: ui.nav.security },
+  { page: "design-partners", label: ui.nav.designPartners },
+];
+---
+
+<header class="site-header" data-site-header>
+  <div class="container-site header-inner">
+    <Logo href={pagePath(locale, "home")} label={ui.nav.home} />
+    <nav class="header-nav" aria-label={ui.nav.label}>
+      <ul role="list">
+        {links.map((link) => (
+          <li>
+            <a
+              href={pagePath(locale, link.page)}
+              aria-current={link.page === page ? "page" : undefined}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+        {site.docsUrl && (
+          <li>
+            <a href={site.docsUrl} data-flag="docs">
+              {ui.nav.docs}
+            </a>
+          </li>
+        )}
+      </ul>
+    </nav>
+    <div class="header-actions">
+      <LanguageSwitcher locale={locale} page={page} />
+      <Button href={`${pagePath(locale, "design-partners")}#apply`} class="header-cta">
+        {ui.nav.cta}
+      </Button>
+      <MobileNav locale={locale} page={page} links={links} />
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 50;
+    border-block-end: 1px solid transparent;
+    background: rgba(11, 13, 16, 0.78);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .site-header[data-scrolled="true"] {
+    border-block-end-color: var(--lc-hairline);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .site-header {
+      transition: border-color 200ms ease;
+    }
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    min-block-size: 4.25rem;
+  }
+
+  .header-nav {
+    flex: 1;
+  }
+
+  .header-nav ul {
+    display: flex;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .header-nav a {
+    display: inline-block;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    color: var(--lc-text-muted);
+    font-size: var(--lc-text-small);
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .header-nav a:hover,
+  .header-nav a[aria-current="page"] {
+    color: var(--lc-text);
+  }
+
+  .header-nav a[aria-current="page"] {
+    box-shadow: inset 0 -2px 0 var(--lc-signal);
+    border-radius: 8px 8px 0 0;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .header-actions :global(.header-cta) {
+    min-block-size: 2.5rem;
+    padding: 0.5rem 1rem;
+    font-size: var(--lc-text-small);
+  }
+
+  @media (max-width: 959px) {
+    .header-nav,
+    .header-actions :global(.header-cta),
+    .header-actions > :global(.lang-menu) {
+      display: none;
+    }
+
+    .header-inner {
+      justify-content: space-between;
+    }
+  }
+</style>

@@ -1,0 +1,63 @@
+---
+import Button from "./Button.astro";
+import { uid } from "../lib/uid";
+
+/** A closing call to action on an emerald-lit ink band. */
+interface Props {
+  title: string;
+  text?: string;
+  href: string;
+  button: string;
+}
+
+const { title, text, href, button } = Astro.props;
+const titleId = uid("cta-title");
+---
+
+<section class="cta-band" aria-labelledby={titleId}>
+  <div class="container-site">
+    <div class="cta-inner" data-reveal>
+      <div>
+        <h2 id={titleId} class="cta-title" set:html={title} />
+        {text && <p class="cta-text" set:html={text} />}
+      </div>
+      <Button href={href}>{button}</Button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta-band {
+    padding-block: clamp(3rem, 2rem + 4vw, 5.5rem);
+  }
+
+  .cta-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem 3rem;
+    padding: clamp(2rem, 1.5rem + 2.5vw, 3.5rem);
+    border: 1px solid rgba(52, 211, 153, 0.25);
+    border-radius: calc(var(--lc-radius) + 4px);
+    background:
+      radial-gradient(70% 140% at 0% 0%, rgba(16, 185, 129, 0.16), transparent 60%),
+      var(--lc-ink-raised);
+  }
+
+  [dir="rtl"] .cta-inner {
+    background:
+      radial-gradient(70% 140% at 100% 0%, rgba(16, 185, 129, 0.16), transparent 60%),
+      var(--lc-ink-raised);
+  }
+
+  .cta-title {
+    font-size: var(--lc-text-h2);
+  }
+
+  .cta-text {
+    max-inline-size: 36rem;
+    margin-block-start: 0.75rem;
+    color: var(--lc-text-muted);
+  }
+</style>

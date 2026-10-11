@@ -1,0 +1,108 @@
+---
+import ScreenshotFrame from "./ScreenshotFrame.astro";
+import Icon from "./Icon.astro";
+import type { Locale } from "../i18n";
+import { isScreenKey } from "../lib/screens";
+
+/** The Document → Observe → Reconcile loop: numbered steps, each with a screenshot. */
+interface Props {
+  locale: Locale;
+  steps: { name: string; screen: string; text: string; bullets: string[] }[];
+}
+
+const { locale, steps } = Astro.props;
+---
+
+<ol class="steps" role="list">
+  {steps.map((step, index) => (
+    <li class="step" data-reveal>
+      <div class="step-copy">
+        <p class="step-index tabular" aria-hidden="true">
+          {String(index + 1).padStart(2, "0")}
+        </p>
+        <h3 class="step-name" set:html={step.name} />
+        <p class="step-text" set:html={step.text} />
+        <ul class="step-bullets" role="list">
+          {step.bullets.map((b) => (
+            <li>
+              <Icon name="check" size={18} class="step-check" />
+              <span set:html={b} />
+            </li>
+          ))}
+        </ul>
+      </div>
+      {isScreenKey(step.screen) && (
+        <ScreenshotFrame screen={step.screen} locale={locale} class="step-shot" />
+      )}
+    </li>
+  ))}
+</ol>
+
+<style>
+  .steps {
+    display: grid;
+    gap: clamp(3.5rem, 2rem + 5vw, 6.5rem);
+    margin: clamp(3rem, 2rem + 3vw, 4.5rem) 0 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+  }
+
+  .step {
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  @media (min-width: 900px) {
+    .step {
+      grid-template-columns: 5fr 7fr;
+      gap: 4rem;
+    }
+
+    .step:nth-child(even) {
+      grid-template-columns: 7fr 5fr;
+    }
+
+    .step:nth-child(even) .step-copy {
+      order: 2;
+    }
+  }
+
+  .step-index {
+    margin-block-end: 0.75rem;
+    color: var(--lc-signal-bright);
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-text-small);
+  }
+
+  .step-name {
+    font-size: var(--lc-text-h2);
+  }
+
+  .step-text {
+    margin-block-start: 0.875rem;
+    color: var(--lc-text-muted);
+    font-size: var(--lc-text-lead);
+  }
+
+  .step-bullets {
+    display: grid;
+    gap: 0.625rem;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .step-bullets li {
+    display: flex;
+    gap: 0.625rem;
+    align-items: flex-start;
+  }
+
+  .step-bullets :global(.step-check) {
+    flex: none;
+    margin-block-start: 0.25rem;
+    color: var(--lc-signal-bright);
+  }
+</style>

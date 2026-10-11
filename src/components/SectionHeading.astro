@@ -1,0 +1,50 @@
+---
+import Eyebrow from "./Eyebrow.astro";
+
+/** Eyebrow + h2 + lead. Strings may contain inline HTML authored in the copy files. */
+interface Props {
+  eyebrow?: string;
+  title: string;
+  lead?: string;
+  id?: string;
+  align?: "start" | "center";
+  level?: 1 | 2;
+  class?: string;
+}
+
+const { eyebrow, title, lead, id, align = "start", level = 2, class: className } = Astro.props;
+const Tag = level === 1 ? "h1" : "h2";
+---
+
+<div class:list={["section-heading", `align-${align}`, className]}>
+  {eyebrow && (
+    <Eyebrow>
+      <Fragment set:html={eyebrow} />
+    </Eyebrow>
+  )}
+  <Tag id={id} class:list={[level === 1 ? "heading-1" : "heading-2"]} set:html={title} />
+  {lead && <p class="text-lead section-lead" set:html={lead} />}
+</div>
+
+<style>
+  .section-heading {
+    max-inline-size: 46rem;
+  }
+
+  .align-center {
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .heading-1 {
+    font-size: var(--lc-text-h1);
+  }
+
+  .heading-2 {
+    font-size: var(--lc-text-h2);
+  }
+
+  .section-lead {
+    margin-block-start: 1.25rem;
+  }
+</style>

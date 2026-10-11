@@ -1,0 +1,56 @@
+---
+eyebrow: Security
+title: Your network data stays on your network.
+lead: LanCompass is built to run inside networks that can’t, or shouldn’t, talk to the internet. This page explains what it reads, what it writes, and how it protects what it stores.
+updated: "2026-10-11"
+legalReview: false
+---
+import ContactEmail from "../../../components/ContactEmail.astro";
+
+## Data never leaves your network
+
+LanCompass is self-hosted. It runs on your own Linux host with one `docker compose up`, and it works fully offline: there is no cloud dependency and nothing it needs from the internet to run.
+
+## No telemetry
+
+LanCompass sends no usage data, crash reports or analytics anywhere. Alerts go only to the channels you configure: webhook, email, Discord, Telegram or syslog.
+
+## Read-only by default
+
+LanCompass reads the network. It writes to it in exactly two places, and both are opt-in and off by default:
+
+- **DNS PTR publishing** to PowerDNS or over RFC 2136. Off until you turn it on.
+- **NAC port actions.** NAC starts with detection only. Enforcement is optional and guarded: it is off by default and needs SNMPv3 with encryption.
+
+Everything else — discovery, SNMP, integrations, config backup — only reads.
+
+## Secrets at rest
+
+Stored credentials are encrypted at rest with AES-256-GCM. For the secrets you give LanCompass at install time, each one can be read from a file instead of the environment through the `*_FILE` convention (for example `LANCOMPASS_PASSWORD_FILE`), so it never sits in your environment or Compose file. That works with Docker secrets.
+
+## SSH host-key pinning
+
+Config backups run over SSH, and LanCompass pins each device’s host key. A device that presents a different key is not trusted silently.
+
+## Config secrets are masked
+
+Stored configs have their secrets masked, such as SNMP communities and user and enable secrets. Viewing a stored revision or a diff needs the `config:read` permission, which API tokens must also carry.
+
+## Authentication
+
+- Local accounts with TOTP multi-factor authentication
+- OIDC single sign-on
+- LDAP and Active Directory sign-in
+- Scoped API tokens for automation
+
+## Audit trail
+
+Changes are recorded in an audit trail that you can filter and export, and LanCompass can forward audit events to syslog.
+
+## Offline install and SBOM
+
+For hosts with no internet access there is an offline bundle. It carries the container images, the Compose file, an install script that verifies checksums, a CycloneDX software bill of materials (SBOM) and a manifest. Release downloads are not published on this site yet.
+
+## Reporting a vulnerability
+
+If you find a security problem in LanCompass, please write to <ContactEmail subject="LanCompass security report" /> rather than opening a public issue. Tell us what you found and how to reproduce it. We aim to acknowledge reports within a few days.

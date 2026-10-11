@@ -1,0 +1,93 @@
+---
+import FeatureCard from "./FeatureCard.astro";
+import ScreenshotFrame from "./ScreenshotFrame.astro";
+import type { IconName } from "./Icon.astro";
+import type { Locale } from "../i18n";
+import { isScreenKey } from "../lib/screens";
+
+/** Eight capability tiles: the ones with a screenshot span wide, the rest are compact. */
+interface Props {
+  locale: Locale;
+  tiles: { key: string; title: string; text: string; screen?: string }[];
+}
+
+const { locale, tiles } = Astro.props;
+// On the four-column layout these two fill the last rows beside the second large tile.
+const wide = new Set(["studios", "reports"]);
+const icons: Record<string, IconName> = {
+  ipam: "ipam",
+  discovery: "radar",
+  snmp: "topology",
+  config: "backup",
+  nac: "shield",
+  monitoring: "pulse",
+  studios: "studio",
+  reports: "chart",
+};
+---
+
+<div class="bento">
+  {tiles.map((tile) => (
+    <div
+      class:list={["bento-cell", tile.screen && "is-large", wide.has(tile.key) && "is-wide"]}
+      data-reveal
+    >
+      <FeatureCard icon={icons[tile.key] ?? "check"} title={tile.title} text={tile.text}>
+        {isScreenKey(tile.screen) && (
+          <ScreenshotFrame
+            screen={tile.screen}
+            locale={locale}
+            class="bento-shot"
+            sizes="(min-width: 1200px) 560px, (min-width: 768px) 50vw, 100vw"
+          />
+        )}
+      </FeatureCard>
+    </div>
+  ))}
+</div>
+
+<style>
+  .bento {
+    display: grid;
+    gap: 1rem;
+    margin-block-start: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+  }
+
+  @media (min-width: 700px) {
+    .bento {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .is-large {
+      grid-column: span 2;
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .bento {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .is-large {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+
+    .is-wide {
+      grid-column: span 2;
+    }
+  }
+
+  .bento :global(.bento-shot) {
+    margin-block-start: auto;
+    translate: 0 0.5rem;
+  }
+
+  .is-large :global(.card) {
+    gap: 0.75rem;
+  }
+
+  .is-large :global(.card-text) {
+    margin-block-end: 1.25rem;
+  }
+</style>

@@ -1,0 +1,36 @@
+---
+import { uid } from "../../lib/uid";
+
+interface Props {
+  before: string;
+  linkText: string;
+  after: string;
+  href: string;
+  requiredLabel: string;
+}
+
+const { before, linkText, after, href, requiredLabel } = Astro.props;
+const id = uid("f-consent");
+const errorId = `${id}-error`;
+---
+
+<div class="field consent" data-field>
+  <div class="consent-row">
+    <input
+      id={id}
+      type="checkbox"
+      name="consent"
+      value="yes"
+      required
+      data-error-id={errorId}
+      data-consent
+    />
+    <label for={id}>
+      <span set:html={before} />
+      <a href={href}>{linkText}</a>
+      {after}
+      <span class="visually-hidden">({requiredLabel})</span>
+    </label>
+  </div>
+  <p class="field-error" id={errorId} hidden></p>
+</div>

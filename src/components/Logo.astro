@@ -1,0 +1,37 @@
+---
+import CompassMark from "./CompassMark.astro";
+
+interface Props {
+  href: string;
+  label: string;
+  size?: number;
+}
+
+const { href, label, size = 28 } = Astro.props;
+---
+
+<a href={href} class="logo" aria-label={label}>
+  <CompassMark size={size} />
+  <span class="logo-word" translate="no" dir="ltr">
+    LanCompass
+  </span>
+</a>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    color: var(--lc-text);
+    text-decoration: none;
+    border-radius: 6px;
+  }
+
+  .logo-word {
+    font-family: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+    font-size: 1.125rem;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    unicode-bidi: isolate;
+  }
+</style>

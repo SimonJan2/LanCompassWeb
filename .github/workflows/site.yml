@@ -1,0 +1,89 @@
+name: site
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  site:
+    runs-on: ubuntu-24.04
+    # The same Playwright image used locally: Chromium for the e2e suite and Lighthouse.
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.0-noble
+      options: --user 1001
+    env:
+      ASTRO_TELEMETRY_DISABLED: "1"
+      HOME: /tmp
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install (locked)
+        run: npm ci
+
+      - name: Astro check and types
+        run: npm run check
+
+      - name: Prettier
+        run: npm run format:check
+
+      - name: Build (default flags)
+        run: npm run build
+
+      - name: Internal links
+        run: npm run links
+
+      - name: Playwright — routes, axe (both locales, 390 and 1440 px), RTL, motion, origins, flags, content, forms
+        # pretest builds dist-test and dist-test-flags; origins.spec checks no built page references an external origin.
+        run: npm run test
+
+      - name: Lighthouse CI budgets
+        run: npm run lhci
+
+      - name: Keep reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          path: |
+            playwright-report/
+            test-results/
+            .lighthouseci/
+          if-no-files-found: ignore
+
+  docker:
+    # Builds the production image, runs it the way compose.yaml does, and checks it.
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and start (compose.yaml)
+        run: docker compose up -d --build --wait --wait-timeout 60
+
+      - name: Smoke test (pages, 404s, redirects, headers, caching)
+        run: docker/smoke.sh http://localhost:8088
+
+      - name: Enforced CSP in a real browser
+        run: >
+          docker run --rm --network host -e HOME=/tmp -e DOCKER_BASE_URL=http://localhost:8088
+          -v "$PWD":/app -w /app mcr.microsoft.com/playwright:v1.64.0-noble
+          sh -c "npm ci && npx playwright test tests/container.spec.ts"
+
+      - name: Container logs
+        if: always()
+        run: docker compose logs --no-color
+
+      - name: Stop
+        if: always()
+        run: docker compose down

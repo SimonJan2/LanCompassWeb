@@ -1,0 +1,54 @@
+# LanCompass website.
+#
+#   cp .env.example .env     # optional: set PUBLIC_* and the port
+#   docker compose up -d --build
+#   open http://localhost:8088
+#
+# PUBLIC_* values are build arguments: change them, then rebuild (--build).
+
+name: lancompass-web
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PUBLIC_SITE_URL: ${PUBLIC_SITE_URL:-http://localhost:${LANCOMPASS_WEB_PORT:-8088}}
+        PUBLIC_CONTACT_EMAIL: ${PUBLIC_CONTACT_EMAIL:-}
+        PUBLIC_FORM_ENDPOINT: ${PUBLIC_FORM_ENDPOINT:-}
+        PUBLIC_GITHUB_URL: ${PUBLIC_GITHUB_URL:-}
+        PUBLIC_DOCS_URL: ${PUBLIC_DOCS_URL:-}
+        VERSION: ${LANCOMPASS_WEB_VERSION:-0.1.0}
+        REVISION: ${LANCOMPASS_WEB_REVISION:-unknown}
+    image: lancompass-web:${LANCOMPASS_WEB_VERSION:-0.1.0}
+    container_name: lancompass-web
+    restart: unless-stopped
+    ports:
+      # Bind to 127.0.0.1 when a reverse proxy on the same host terminates TLS:
+      # LANCOMPASS_WEB_BIND=127.0.0.1
+      - "${LANCOMPASS_WEB_BIND:-0.0.0.0}:${LANCOMPASS_WEB_PORT:-8088}:8080"
+    # Static files only: no writes outside /tmp, no capabilities, no privilege escalation.
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 64M
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/healthz"]
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

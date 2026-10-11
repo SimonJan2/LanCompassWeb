@@ -1,0 +1,151 @@
+---
+import Icon from "./Icon.astro";
+import { fill, localeCodes, locales, pagePath, useUi, type Locale, type PageKey } from "../i18n";
+
+/**
+ * A disclosure menu of locales; every entry links to the same page in that
+ * locale. Works without JavaScript (<details>); src/scripts/site.ts adds
+ * Escape and click-outside closing.
+ */
+interface Props {
+  locale: Locale;
+  page: PageKey;
+  variant?: "menu" | "list";
+}
+
+const { locale, page, variant = "menu" } = Astro.props;
+const ui = useUi(locale);
+const current = locales[locale];
+---
+
+{variant === "menu" ? (
+  <details class="lang-menu" data-disclosure>
+    <summary aria-label={fill(ui.language.current, { language: current.label })}>
+      <Icon name="globe" size={18} />
+      <span lang={current.htmlLang}>{current.label}</span>
+      <Icon name="chevron-down" size={16} class="lang-chevron" />
+    </summary>
+    <ul class="lang-list" role="list">
+      {localeCodes.map((code) => (
+        <li>
+          <a
+            href={pagePath(code, page)}
+            hreflang={locales[code].htmlLang}
+            lang={locales[code].htmlLang}
+            aria-current={code === locale ? "true" : undefined}
+            data-locale-link={code}
+          >
+            <span>{locales[code].label}</span>
+            {code === locale && <Icon name="check" size={16} />}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </details>
+) : (
+  <ul class="lang-inline" role="list" aria-label={ui.language.label}>
+    {localeCodes.map((code) => (
+      <li>
+        <a
+          href={pagePath(code, page)}
+          hreflang={locales[code].htmlLang}
+          lang={locales[code].htmlLang}
+          aria-current={code === locale ? "true" : undefined}
+          data-locale-link={code}
+        >
+          {locales[code].label}
+        </a>
+      </li>
+    ))}
+  </ul>
+)}
+
+<style>
+  .lang-menu {
+    position: relative;
+  }
+
+  .lang-menu summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-block-size: 2.5rem;
+    padding: 0.375rem 0.625rem;
+    border-radius: 8px;
+    color: var(--lc-text-muted);
+    font-size: var(--lc-text-small);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .lang-menu summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .lang-menu summary:hover {
+    color: var(--lc-text);
+  }
+
+  .lang-menu[open] :global(.lang-chevron) {
+    rotate: 180deg;
+  }
+
+  .lang-list {
+    position: absolute;
+    inset-inline-end: 0;
+    inset-block-start: calc(100% + 0.375rem);
+    z-index: 60;
+    min-inline-size: 11rem;
+    margin: 0;
+    padding: 0.375rem;
+    list-style: none;
+    border: 1px solid var(--lc-hairline-strong);
+    border-radius: 10px;
+    background: var(--lc-ink-card);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  }
+
+  .lang-list a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem 0.625rem;
+    border-radius: 6px;
+    color: var(--lc-text);
+    font-size: var(--lc-text-small);
+    text-decoration: none;
+  }
+
+  .lang-list a:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .lang-list a[aria-current] {
+    color: var(--lc-signal-bright);
+  }
+
+  .lang-inline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .lang-inline a {
+    color: var(--lc-text-muted);
+    font-size: var(--lc-text-small);
+    text-decoration: none;
+  }
+
+  .lang-inline a:hover {
+    color: var(--lc-text);
+    text-decoration: underline;
+  }
+
+  .lang-inline a[aria-current] {
+    color: var(--lc-text);
+  }
+</style>

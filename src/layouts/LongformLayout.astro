@@ -1,0 +1,85 @@
+---
+/** A long-form page rendered from src/content/pages/<locale>/<page>.mdx. */
+import { getEntry, render } from "astro:content";
+import BaseLayout from "./BaseLayout.astro";
+import Eyebrow from "../components/Eyebrow.astro";
+import Prose from "../components/Prose.astro";
+import { getCopy } from "../content/copy";
+import { locales, useUi, type Locale, type PageKey } from "../i18n";
+
+interface Props {
+  locale: Locale;
+  page: Extract<PageKey, "security" | "privacy" | "accessibility">;
+}
+
+const { locale, page } = Astro.props;
+const entry = await getEntry("pages", `${locale}/${page}`);
+if (!entry) throw new Error(`Missing src/content/pages/${locale}/${page}.mdx`);
+const { Content } = await render(entry);
+const meta = getCopy(locale).meta[page];
+const updatedLabel = useUi(locale).longform.updated;
+const updated = new Intl.DateTimeFormat(locales[locale].htmlLang, {
+  dateStyle: "long",
+  timeZone: "UTC",
+}).format(new Date(`${entry.data.updated}T00:00:00Z`));
+---
+
+<BaseLayout locale={locale} page={page} title={meta.title} description={meta.description}>
+  <section class="longform-hero grid-paper">
+    <div class="container-site">
+      <Eyebrow>{entry.data.eyebrow}</Eyebrow>
+      <h1 class="longform-title" set:html={entry.data.title} />
+      <p class="text-lead longform-lead" set:html={entry.data.lead} />
+      <p class="longform-updated">
+        {updatedLabel}: <time datetime={entry.data.updated}>{updated}</time>
+      </p>
+      {entry.data.legalReview && (
+        <p class="longform-review">
+          <span class="todo-operator">
+            TODO(operator): legal review of this page before going public.
+          </span>
+        </p>
+      )}
+    </div>
+  </section>
+  <section class="section-tight">
+    <div class="container-site longform-body">
+      <Prose>
+        <Content />
+      </Prose>
+      <slot />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .longform-hero {
+    padding-block: clamp(3rem, 2rem + 4vw, 5.5rem) clamp(2.5rem, 2rem + 2vw, 3.5rem);
+    border-block-end: 1px solid var(--lc-hairline);
+  }
+
+  .longform-title {
+    max-inline-size: 48rem;
+    font-size: clamp(2rem, 1.4rem + 2.6vw, 3.5rem);
+  }
+
+  .longform-lead {
+    max-inline-size: 44rem;
+    margin-block-start: 1.25rem;
+  }
+
+  .longform-updated {
+    margin-block-start: 1.5rem;
+    color: var(--lc-text-faint);
+    font-size: var(--lc-text-small);
+  }
+
+  .longform-review {
+    margin-block-start: 1rem;
+  }
+
+  .longform-body {
+    display: grid;
+    gap: 3rem;
+  }
+</style>

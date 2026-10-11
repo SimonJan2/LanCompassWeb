@@ -1,0 +1,11 @@
+node_modules/
+dist/
+dist-*/
+.astro/
+.lighthouseci/
+test-results/
+playwright-report/
+.env
+.env.*
+!.env.example
+.tmp/

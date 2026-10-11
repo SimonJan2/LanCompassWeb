@@ -1,0 +1,240 @@
+@import "tailwindcss";
+@import "./tokens.css";
+@import "./fonts.css";
+
+/* Tailwind reads the design tokens; utilities like bg-ink or text-signal map to them. */
+@theme inline {
+  --color-ink: var(--lc-ink);
+  --color-ink-raised: var(--lc-ink-raised);
+  --color-ink-card: var(--lc-ink-card);
+  --color-hairline: var(--lc-hairline);
+  --color-text: var(--lc-text);
+  --color-muted: var(--lc-text-muted);
+  --color-faint: var(--lc-text-faint);
+  --color-paper: var(--lc-paper);
+  --color-paper-raised: var(--lc-paper-raised);
+  --color-paper-text: var(--lc-paper-text);
+  --color-paper-muted: var(--lc-paper-text-muted);
+  --color-signal: var(--lc-signal);
+  --color-signal-bright: var(--lc-signal-bright);
+  --color-signal-ink: var(--lc-signal-ink);
+  --color-drift: var(--lc-drift);
+  --color-drift-ink: var(--lc-drift-ink);
+  --color-info: var(--lc-info);
+  --font-sans: var(--lc-font-sans);
+  --font-mono: var(--lc-font-mono);
+  --container-content: var(--lc-content);
+}
+
+@layer base {
+  html {
+    background: var(--lc-ink);
+    color: var(--lc-text);
+    font-family: var(--lc-font-sans);
+    font-size: 100%;
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    scroll-padding-block-start: 5.5rem;
+  }
+
+  body {
+    margin: 0;
+    background: var(--lc-ink);
+    color: var(--lc-text);
+    font-size: var(--lc-text-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: 0;
+    font-weight: 620;
+    line-height: 1.12;
+    letter-spacing: var(--lc-tracking-display);
+    text-wrap: balance;
+  }
+
+  /* Hebrew display type reads better without negative tracking. */
+  :lang(he) :is(h1, h2, h3, h4) {
+    letter-spacing: 0;
+    font-weight: 650;
+  }
+
+  p {
+    margin: 0;
+    text-wrap: pretty;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  code,
+  kbd,
+  samp {
+    font-family: var(--lc-font-mono);
+    font-size: 0.9em;
+  }
+
+  /* Code and identifiers are always left-to-right. */
+  code,
+  kbd,
+  samp,
+  .ltr {
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+
+  img,
+  svg,
+  video,
+  picture {
+    display: block;
+    max-width: 100%;
+  }
+
+  img,
+  video {
+    height: auto;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--lc-focus);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: rgba(52, 211, 153, 0.3);
+    color: inherit;
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  .container-site {
+    inline-size: 100%;
+    max-inline-size: calc(var(--lc-content) + 2 * var(--lc-gutter));
+    margin-inline: auto;
+    padding-inline: var(--lc-gutter);
+  }
+
+  .section {
+    padding-block: var(--lc-section);
+  }
+
+  .section-tight {
+    padding-block: calc(var(--lc-section) * 0.6);
+  }
+
+  .surface-raised {
+    background: var(--lc-ink-raised);
+  }
+
+  /* Light "paper" sections. Everything inside switches to ink-on-paper colours. */
+  .surface-paper {
+    --lc-text: var(--lc-paper-text);
+    --lc-text-muted: var(--lc-paper-text-muted);
+    --lc-text-faint: var(--lc-paper-text-muted);
+    --lc-hairline: var(--lc-paper-hairline);
+    --lc-hairline-strong: rgba(11, 13, 16, 0.18);
+    --lc-ink-card: var(--lc-paper-raised);
+    --lc-signal-bright: var(--lc-signal-ink);
+    --lc-drift: var(--lc-drift-ink);
+    --lc-focus: var(--lc-signal-ink);
+    background: var(--lc-paper);
+    color: var(--lc-text);
+    color-scheme: light;
+  }
+
+  .hairline-top {
+    border-block-start: 1px solid var(--lc-hairline);
+  }
+
+  .hairline-bottom {
+    border-block-end: 1px solid var(--lc-hairline);
+  }
+
+  .text-lead {
+    font-size: var(--lc-text-lead);
+    line-height: 1.55;
+    color: var(--lc-text-muted);
+  }
+
+  .visually-hidden {
+    position: absolute !important;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .skip-link {
+    position: absolute;
+    inset-inline-start: 1rem;
+    inset-block-start: -4rem;
+    z-index: 100;
+    padding: 0.75rem 1rem;
+    border-radius: var(--lc-radius-sm);
+    background: var(--lc-signal);
+    color: var(--lc-ink);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .skip-link:focus {
+    inset-block-start: 1rem;
+  }
+
+  /* Directional icons follow the reading direction; logos and screenshots never do. */
+  [dir="rtl"] .rtl-flip {
+    transform: scaleX(-1);
+  }
+
+  .todo-operator {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    border: 1px dashed var(--lc-drift);
+    border-radius: 6px;
+    color: var(--lc-drift);
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-text-xs);
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+
+  /* Grid paper behind the hero and dark bands. */
+  .grid-paper {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    background-size: 48px 48px;
+    background-position: center top;
+  }
+}
+
+/* Section reveal: elements below the fold start 8px low and transparent, once. */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal-armed {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  .reveal-shown {
+    transition:
+      opacity 600ms var(--lc-ease),
+      transform 600ms var(--lc-ease);
+  }
+}

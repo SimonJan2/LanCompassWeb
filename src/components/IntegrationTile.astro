@@ -1,0 +1,51 @@
+---
+/** An integration name (plain text, product names stay untranslated) in a styled tile. No vendor logos. */
+interface Props {
+  name: string;
+  highlight?: boolean;
+  detail?: string;
+}
+
+const { name, highlight = false, detail } = Astro.props;
+---
+
+<li class:list={["tile", highlight && "is-highlight"]}>
+  <span class="tile-name">
+    <bdi translate="no">{name}</bdi>
+  </span>
+  {detail && <span class="tile-detail" set:html={detail} />}
+</li>
+
+<style>
+  .tile {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.25rem;
+    min-block-size: 4rem;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--lc-hairline);
+    border-radius: 10px;
+    background: var(--lc-ink-card);
+  }
+
+  .tile-name {
+    font-size: var(--lc-text-small);
+    font-weight: 600;
+  }
+
+  .tile-detail {
+    color: var(--lc-text-muted);
+    font-size: var(--lc-text-xs);
+  }
+
+  .is-highlight {
+    border-color: rgba(52, 211, 153, 0.4);
+    background:
+      linear-gradient(to bottom, rgba(16, 185, 129, 0.1), transparent), var(--lc-ink-card);
+  }
+
+  .is-highlight .tile-name {
+    color: var(--lc-signal-bright);
+  }
+</style>

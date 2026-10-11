@@ -1,0 +1,72 @@
+---
+/** A fieldset of checkboxes or radios. Latin option labels are bidi-isolated. */
+import { uid } from "../../lib/uid";
+
+interface Props {
+  name: string;
+  legend: string;
+  options: string[];
+  type: "checkbox" | "radio";
+  hint?: string | undefined;
+  required?: boolean;
+  requiredLabel: string;
+  optionalLabel: string;
+}
+
+const {
+  name,
+  legend,
+  options,
+  type,
+  hint,
+  required = false,
+  requiredLabel,
+  optionalLabel,
+} = Astro.props;
+const id = uid(`g-${name}`);
+const hintId = hint ? `${id}-hint` : undefined;
+const errorId = `${id}-error`;
+const latin = /^[\x20-\x7E]+$/;
+---
+
+<fieldset
+  class="field choice-group"
+  data-field
+  data-choice-group={type}
+  role={type === "radio" ? "radiogroup" : undefined}
+  aria-labelledby={`${id}-legend`}
+  data-required={required ? "true" : undefined}
+  data-error-id={errorId}
+  aria-describedby={hintId}
+>
+  <legend class="field-label" id={`${id}-legend`}>
+    <span>{legend}</span>
+    {required ? (
+      <span class="field-req" aria-hidden="true">
+        *
+      </span>
+    ) : (
+      <span class="field-opt">({optionalLabel})</span>
+    )}
+    {required && <span class="visually-hidden">({requiredLabel})</span>}
+  </legend>
+  {hint && (
+    <p class="field-hint" id={hintId}>
+      {hint}
+    </p>
+  )}
+  <div class="choices">
+    {options.map((option, index) => (
+      <label class="choice">
+        <input
+          type={type}
+          name={name}
+          value={option}
+          required={type === "radio" && required && index === 0 ? true : undefined}
+        />
+        {latin.test(option) ? <bdi translate="no">{option}</bdi> : <span>{option}</span>}
+      </label>
+    ))}
+  </div>
+  <p class="field-error" id={errorId} hidden></p>
+</fieldset>

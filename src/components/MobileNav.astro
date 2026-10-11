@@ -1,0 +1,197 @@
+---
+import Button from "./Button.astro";
+import Icon from "./Icon.astro";
+import LanguageSwitcher from "./LanguageSwitcher.astro";
+import { site } from "../config/site";
+import { pagePath, useUi, type Locale, type PageKey } from "../i18n";
+
+/**
+ * Below 960px: a full-height sheet in a modal <dialog> (focus stays inside,
+ * Escape closes). Without JavaScript the button is a link to the footer
+ * navigation, which lists every page.
+ */
+interface Props {
+  locale: Locale;
+  page: PageKey;
+  links: { page: PageKey; label: string }[];
+}
+
+const { locale, page, links } = Astro.props;
+const ui = useUi(locale);
+---
+
+<div class="mobile-nav">
+  <a class="menu-toggle" href="#footer-nav" data-menu-open aria-haspopup="dialog">
+    <Icon name="menu" size={22} />
+    <span>{ui.nav.menu}</span>
+  </a>
+  <dialog class="menu-sheet" aria-label={ui.nav.mobileLabel} data-menu-sheet>
+    <div class="sheet-top">
+      <span class="sheet-title">{ui.nav.menu}</span>
+      <button type="button" class="menu-close" data-menu-close>
+        <Icon name="close" size={22} />
+        <span class="visually-hidden">{ui.nav.closeMenu}</span>
+      </button>
+    </div>
+    <nav aria-label={ui.nav.label}>
+      <ul role="list" class="sheet-links">
+        {links.map((link) => (
+          <li>
+            <a
+              href={pagePath(locale, link.page)}
+              aria-current={link.page === page ? "page" : undefined}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+        {site.docsUrl && (
+          <li>
+            <a href={site.docsUrl} data-flag="docs">
+              {ui.nav.docs}
+            </a>
+          </li>
+        )}
+      </ul>
+    </nav>
+    <div class="sheet-foot">
+      <Button href={`${pagePath(locale, "design-partners")}#apply`} class="sheet-cta">
+        {ui.nav.cta}
+      </Button>
+      <div class="sheet-lang">
+        <span class="sheet-lang-label">{ui.language.label}</span>
+        <LanguageSwitcher locale={locale} page={page} variant="list" />
+      </div>
+    </div>
+  </dialog>
+</div>
+
+<style>
+  .mobile-nav {
+    display: none;
+  }
+
+  @media (max-width: 959px) {
+    .mobile-nav {
+      display: block;
+    }
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-block-size: 2.75rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--lc-hairline-strong);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--lc-text);
+    font: inherit;
+    font-size: var(--lc-text-small);
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .menu-sheet {
+    inline-size: 100%;
+    max-inline-size: 100%;
+    block-size: 100dvh;
+    max-block-size: 100dvh;
+    margin: 0;
+    padding: 1rem var(--lc-gutter) 2rem;
+    border: 0;
+    background: var(--lc-ink);
+    color: var(--lc-text);
+  }
+
+  .menu-sheet[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .menu-sheet::backdrop {
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .sheet-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-block-size: 3.25rem;
+    margin-block-end: 1.5rem;
+  }
+
+  .sheet-title {
+    color: var(--lc-text-muted);
+    font-size: var(--lc-text-small);
+  }
+
+  .menu-close {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border: 1px solid var(--lc-hairline-strong);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--lc-text);
+    cursor: pointer;
+  }
+
+  .sheet-links {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .sheet-links a {
+    display: block;
+    padding: 1rem 0;
+    border-block-end: 1px solid var(--lc-hairline);
+    color: var(--lc-text);
+    font-size: 1.375rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .sheet-links a[aria-current="page"] {
+    color: var(--lc-signal-bright);
+  }
+
+  .sheet-foot {
+    display: grid;
+    gap: 1.5rem;
+    margin-block-start: auto;
+    padding-block-start: 2rem;
+  }
+
+  .sheet-foot :global(.sheet-cta) {
+    inline-size: 100%;
+  }
+
+  .sheet-lang {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .sheet-lang-label {
+    color: var(--lc-text-faint);
+    font-size: var(--lc-text-small);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .menu-sheet[open] {
+      animation: sheet-in 220ms var(--lc-ease);
+    }
+
+    @keyframes sheet-in {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+    }
+  }
+</style>

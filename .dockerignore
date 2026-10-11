@@ -1,0 +1,15 @@
+# Keep the build context small and free of local state.
+.git
+.github
+node_modules
+dist
+dist-*
+.astro
+.lighthouseci
+test-results
+playwright-report
+.tmp
+.env
+.env.*
+!.env.example
+*.log

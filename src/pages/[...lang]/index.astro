@@ -1,0 +1,625 @@
+---
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import BentoGrid from "../../components/BentoGrid.astro";
+import Button from "../../components/Button.astro";
+import ComparisonRow from "../../components/ComparisonRow.astro";
+import DriftMap from "../../components/DriftMap.astro";
+import Eyebrow from "../../components/Eyebrow.astro";
+import FactStrip from "../../components/FactStrip.astro";
+import FeatureCard from "../../components/FeatureCard.astro";
+import Icon, { type IconName } from "../../components/Icon.astro";
+import IntegrationTile from "../../components/IntegrationTile.astro";
+import SectionHeading from "../../components/SectionHeading.astro";
+import StepTimeline from "../../components/StepTimeline.astro";
+import VideoSlot from "../../components/VideoSlot.astro";
+import { getCopy } from "../../content/copy";
+import { absoluteUrl, localeStaticPaths, pagePath, type Locale } from "../../i18n";
+import { isScreenKey } from "../../lib/screens";
+
+export const getStaticPaths = (() => localeStaticPaths()) satisfies GetStaticPaths;
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+const h = copy.home;
+const partnersHref = `${pagePath(locale, "design-partners")}#apply`;
+const offlineIcons: IconName[] = ["offline", "eye", "lock", "key", "users", "log"];
+const softwareApplication = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "LanCompass",
+  applicationCategory: "NetworkingApplication",
+  operatingSystem: "Linux (Docker)",
+  description: copy.meta.home.description,
+  url: absoluteUrl(pagePath(locale, "home")),
+  inLanguage: locale,
+};
+const hebrewScreen = isScreenKey(h.hebrew.screen) ? h.hebrew.screen : "dashboard";
+---
+
+<BaseLayout
+  locale={locale}
+  page="home"
+  title={copy.meta.home.title}
+  description={copy.meta.home.description}
+  jsonLd={[softwareApplication]}
+>
+  <!-- 1. Hero -->
+  <section class="hero grid-paper" aria-labelledby="hero-title">
+    <div class="container-site hero-inner">
+      <div class="hero-copy">
+        <ul class="hero-chips" role="list">
+          {h.hero.chips.map((chip) => (
+            <li set:html={chip} />
+          ))}
+        </ul>
+        <h1 id="hero-title" class="hero-title" set:html={h.hero.title} />
+        <p class="hero-lead" set:html={h.hero.lead} />
+        <div class="hero-ctas">
+          <Button href={partnersHref}>{h.hero.primary}</Button>
+          <Button href="#how-it-works" variant="secondary" arrow>
+            {h.hero.secondary}
+          </Button>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <DriftMap locale={locale} />
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Fact strip -->
+  <section class="facts-section" aria-label={h.hero.chips.join(" · ")}>
+    <div class="container-site">
+      <FactStrip facts={h.facts} />
+    </div>
+  </section>
+
+  <!-- 3. The loop -->
+  <section class="section surface-paper" id="how-it-works" aria-labelledby="loop-title">
+    <div class="container-site">
+      <SectionHeading
+        eyebrow={h.loop.eyebrow}
+        title={h.loop.title}
+        lead={h.loop.lead}
+        id="loop-title"
+      />
+      <StepTimeline locale={locale} steps={h.loop.steps} />
+    </div>
+  </section>
+
+  <!-- 4. Bento -->
+  <section class="section" id="capabilities" aria-labelledby="bento-title">
+    <div class="container-site">
+      <SectionHeading
+        eyebrow={h.bento.eyebrow}
+        title={h.bento.title}
+        lead={h.bento.lead}
+        id="bento-title"
+      />
+      <BentoGrid locale={locale} tiles={h.bento.tiles} />
+      <div class="section-more">
+        <Button href={pagePath(locale, "product")} variant="tertiary">
+          {h.bento.link}
+        </Button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Offline band -->
+  <section class="section offline-band grid-paper" aria-labelledby="offline-title">
+    <div class="container-site">
+      <SectionHeading
+        eyebrow={h.offline.eyebrow}
+        title={h.offline.title}
+        lead={h.offline.lead}
+        id="offline-title"
+      />
+      <ul class="offline-grid" role="list">
+        {h.offline.points.map((point, i) => (
+          <li class="offline-point" data-reveal>
+            <Icon name={offlineIcons[i] ?? "check"} size={22} class="offline-icon" />
+            <h3 class="offline-point-title" set:html={point.title} />
+            <p class="offline-point-text" set:html={point.text} />
+          </li>
+        ))}
+      </ul>
+      <div class="section-more">
+        <Button href={pagePath(locale, "security")} variant="tertiary">
+          {h.offline.link}
+        </Button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Hebrew-native -->
+  <section class="section surface-paper" id="hebrew" aria-labelledby="hebrew-title">
+    <div class="container-site">
+      <SectionHeading
+        eyebrow={h.hebrew.eyebrow}
+        title={h.hebrew.title}
+        lead={h.hebrew.lead}
+        id="hebrew-title"
+      />
+      <ComparisonRow
+        locale={locale}
+        screen={hebrewScreen}
+        items={[
+          { screenLocale: "en", caption: h.hebrew.enCaption },
+          { screenLocale: "he", caption: h.hebrew.heCaption },
+        ]}
+      />
+    </div>
+  </section>
+
+  <!-- 7. Integrations -->
+  <section class="section" id="integrations" aria-labelledby="integrations-title">
+    <div class="container-site">
+      <SectionHeading
+        eyebrow={h.integrations.eyebrow}
+        title={h.integrations.title}
+        lead={h.integrations.lead}
+        id="integrations-title"
+      />
+      <div class="integrations">
+        <div class="integration-highlight" data-reveal>
+          <span class="integration-highlight-icon">
+            <Icon name="plug" size={22} />
+          </span>
+          <h3 class="integration-highlight-title" set:html={h.integrations.highlight.title} />
+          <p class="integration-highlight-text" set:html={h.integrations.highlight.text} />
+        </div>
+        <div class="integration-groups">
+          <div>
+            <h3 class="group-title">{h.integrations.groupIntegrations}</h3>
+            <ul class="tiles" role="list">
+              {h.integrations.items.map((name, i) => (
+                <IntegrationTile name={name} highlight={i === 0} />
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3 class="group-title">{h.integrations.groupDrivers}</h3>
+            <ul class="tiles tiles-drivers" role="list">
+              {h.integrations.drivers.map((name) => (
+                <IntegrationTile name={name} />
+              ))}
+            </ul>
+          </div>
+          <div class="extras">
+            <h3 class="group-title">{h.integrations.extras.title}</h3>
+            <ul class="extras-list" role="list">
+              {h.integrations.extras.items.map((item) => (
+                <li>
+                  <Icon name="check" size={18} class="extras-check" />
+                  <span set:html={item} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. Excel / NetBox -->
+  <section class="section surface-paper" id="migration" aria-labelledby="imports-title">
+    <div class="container-site">
+      <SectionHeading
+        eyebrow={h.imports.eyebrow}
+        title={h.imports.title}
+        lead={h.imports.lead}
+        id="imports-title"
+      />
+      <div class="imports">
+        {h.imports.cards.map((card, i) => (
+          <div data-reveal>
+            <FeatureCard icon={i === 0 ? "excel" : "import"} title={card.title} text={card.text}>
+              <ul class="import-bullets" role="list">
+                {card.bullets.map((b) => (
+                  <li>
+                    <Icon name="check" size={16} />
+                    <span set:html={b} />
+                  </li>
+                ))}
+              </ul>
+            </FeatureCard>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. Videos -->
+  <section class="section" id="videos" aria-labelledby="videos-title">
+    <div class="container-site">
+      <SectionHeading eyebrow={h.videos.eyebrow} title={h.videos.title} id="videos-title" />
+      <div class="videos">
+        {h.videos.items.map((v) => (
+          <VideoSlot locale={locale} videoKey={v.key} title={v.title} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. Design partner band -->
+  <section class="section partners-band" aria-labelledby="partners-title">
+    <div class="container-site">
+      <div class="partners-panel" data-reveal>
+        <div class="partners-intro">
+          <Eyebrow>{h.partners.eyebrow}</Eyebrow>
+          <h2 id="partners-title" class="partners-title" set:html={h.partners.title} />
+          <p class="text-lead partners-lead" set:html={h.partners.lead} />
+          <Button href={partnersHref}>{h.partners.cta}</Button>
+        </div>
+        <div class="partners-lists">
+          <div>
+            <h3 class="group-title">{h.partners.getsTitle}</h3>
+            <ul class="partners-list" role="list">
+              {h.partners.gets.map((item) => (
+                <li>
+                  <Icon name="check" size={18} class="partners-check" />
+                  <span set:html={item} />
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3 class="group-title">{h.partners.asksTitle}</h3>
+            <ul class="partners-list" role="list">
+              {h.partners.asks.map((item) => (
+                <li>
+                  <Icon name="arrow" size={18} class="partners-check" />
+                  <span set:html={item} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Hero */
+  .hero {
+    position: relative;
+    padding-block: clamp(3rem, 2rem + 5vw, 7rem) clamp(3.5rem, 2rem + 5vw, 6.5rem);
+    border-block-end: 1px solid var(--lc-hairline);
+  }
+
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(60% 70% at 70% 30%, rgba(16, 185, 129, 0.08), transparent 70%);
+    pointer-events: none;
+  }
+
+  [dir="rtl"] .hero::before {
+    background: radial-gradient(60% 70% at 30% 30%, rgba(16, 185, 129, 0.08), transparent 70%);
+  }
+
+  .hero-inner {
+    position: relative;
+    display: grid;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  @media (min-width: 1024px) {
+    .hero-inner {
+      grid-template-columns: 6fr 6fr;
+      gap: 4rem;
+    }
+  }
+
+  .hero-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0 0 1.75rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .hero-chips li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.3rem 0.75rem;
+    border: 1px solid var(--lc-hairline-strong);
+    border-radius: 999px;
+    color: var(--lc-text-muted);
+    font-size: var(--lc-text-xs);
+    font-weight: 500;
+  }
+
+  .hero-chips li::before {
+    content: "";
+    inline-size: 6px;
+    block-size: 6px;
+    border-radius: 50%;
+    background: var(--lc-signal);
+  }
+
+  .hero-title {
+    font-size: clamp(2.25rem, 1.45rem + 2.9vw, 3.625rem);
+    font-weight: 640;
+    line-height: 1.04;
+  }
+
+  :lang(he) .hero-title {
+    line-height: 1.12;
+  }
+
+  .hero-lead {
+    max-inline-size: 36rem;
+    margin-block-start: 1.5rem;
+    color: var(--lc-text-muted);
+    font-size: var(--lc-text-lead);
+  }
+
+  .hero-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-block-start: 2.25rem;
+  }
+
+  /* Facts */
+  .facts-section {
+    padding-block: 0;
+    background: var(--lc-ink-raised);
+  }
+
+  .section-more {
+    margin-block-start: 2.5rem;
+  }
+
+  /* Offline band */
+  .offline-band {
+    background-color: var(--lc-ink-raised);
+    border-block: 1px solid var(--lc-hairline);
+  }
+
+  .offline-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+    gap: 0;
+    margin: 3rem 0 0;
+    padding: 0;
+    list-style: none;
+    border-block-start: 1px solid var(--lc-hairline);
+  }
+
+  .offline-point {
+    padding-block: 1.75rem;
+    padding-inline-end: 1.75rem;
+    border-block-end: 1px solid var(--lc-hairline);
+  }
+
+  .offline-point :global(.offline-icon) {
+    color: var(--lc-signal-bright);
+  }
+
+  .offline-point-title {
+    margin-block-start: 1rem;
+    font-size: var(--lc-text-h3);
+    letter-spacing: -0.01em;
+  }
+
+  .offline-point-text {
+    margin-block-start: 0.5rem;
+    color: var(--lc-text-muted);
+    font-size: var(--lc-text-small);
+  }
+
+  .offline-point-text :global(code) {
+    color: var(--lc-text);
+  }
+
+  /* Integrations */
+  .integrations {
+    display: grid;
+    gap: 2rem;
+    margin-block-start: 3rem;
+  }
+
+  @media (min-width: 1024px) {
+    .integrations {
+      grid-template-columns: 4fr 8fr;
+      align-items: start;
+    }
+  }
+
+  .integration-highlight {
+    padding: 2rem;
+    border: 1px solid rgba(52, 211, 153, 0.35);
+    border-radius: var(--lc-radius);
+    background:
+      radial-gradient(90% 80% at 0% 0%, rgba(16, 185, 129, 0.16), transparent 70%),
+      var(--lc-ink-card);
+  }
+
+  .integration-highlight-icon {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border-radius: 10px;
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--lc-signal-bright);
+  }
+
+  .integration-highlight-title {
+    margin-block-start: 1.25rem;
+    font-size: 1.5rem;
+  }
+
+  .integration-highlight-text {
+    margin-block-start: 0.5rem;
+    color: var(--lc-text-muted);
+  }
+
+  .integration-groups {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .group-title {
+    margin-block-end: 0.875rem;
+    color: var(--lc-text-faint);
+    font-size: var(--lc-text-xs);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  :lang(he) .group-title {
+    letter-spacing: 0;
+    font-size: var(--lc-text-small);
+  }
+
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
+    gap: 0.625rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .extras-list {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .extras-list li {
+    display: flex;
+    gap: 0.5rem;
+    color: var(--lc-text-muted);
+    font-size: var(--lc-text-small);
+  }
+
+  .extras-list :global(.extras-check) {
+    flex: none;
+    margin-block-start: 0.15rem;
+    color: var(--lc-signal-bright);
+  }
+
+  /* Imports */
+  .imports {
+    display: grid;
+    gap: 1rem;
+    margin-block-start: 3rem;
+  }
+
+  @media (min-width: 800px) {
+    .imports {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .import-bullets {
+    display: grid;
+    gap: 0.4rem;
+    margin: 0.75rem 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--lc-text-small);
+    font-weight: 500;
+  }
+
+  .import-bullets li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .import-bullets :global(svg) {
+    color: var(--lc-signal-bright);
+  }
+
+  /* Videos */
+  .videos {
+    display: grid;
+    gap: 1.5rem;
+    margin-block-start: 3rem;
+  }
+
+  @media (min-width: 900px) {
+    .videos {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  /* Partners band */
+  .partners-band {
+    padding-block-start: 0;
+  }
+
+  .partners-panel {
+    display: grid;
+    gap: 3rem;
+    padding: clamp(2rem, 1.25rem + 3vw, 4rem);
+    border: 1px solid rgba(52, 211, 153, 0.25);
+    border-radius: calc(var(--lc-radius) + 6px);
+    background:
+      radial-gradient(70% 120% at 0% 0%, rgba(16, 185, 129, 0.14), transparent 60%),
+      var(--lc-ink-raised);
+  }
+
+  [dir="rtl"] .partners-panel {
+    background:
+      radial-gradient(70% 120% at 100% 0%, rgba(16, 185, 129, 0.14), transparent 60%),
+      var(--lc-ink-raised);
+  }
+
+  @media (min-width: 1024px) {
+    .partners-panel {
+      grid-template-columns: 6fr 6fr;
+      align-items: center;
+    }
+  }
+
+  .partners-title {
+    font-size: var(--lc-text-h2);
+  }
+
+  .partners-lead {
+    margin-block: 1rem 2rem;
+  }
+
+  .partners-lists {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .partners-list {
+    display: grid;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .partners-list li {
+    display: flex;
+    gap: 0.625rem;
+  }
+
+  .partners-list :global(.partners-check) {
+    flex: none;
+    margin-block-start: 0.2rem;
+    color: var(--lc-signal-bright);
+  }
+</style>

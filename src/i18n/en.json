@@ -1,0 +1,126 @@
+{
+  "skipLink": "Skip to content",
+  "nav": {
+    "label": "Main",
+    "home": "LanCompass home",
+    "product": "Product",
+    "security": "Security",
+    "designPartners": "Design partners",
+    "docs": "Docs",
+    "cta": "Become a design partner",
+    "menu": "Menu",
+    "closeMenu": "Close menu",
+    "mobileLabel": "Site menu"
+  },
+  "language": {
+    "label": "Language",
+    "current": "Current language: {language}",
+    "switchTo": "Read this page in {language}"
+  },
+  "footer": {
+    "positioning": "Self-hosted network documentation that shows where it disagrees with the network.",
+    "product": "Product",
+    "company": "Company",
+    "legal": "Legal",
+    "overview": "Overview",
+    "howItWorks": "How it works",
+    "integrations": "Integrations",
+    "security": "Security",
+    "designPartners": "Design partners",
+    "contact": "Contact",
+    "privacy": "Privacy",
+    "accessibility": "Accessibility",
+    "source": "Source code",
+    "docs": "Docs",
+    "madeIn": "Made in Israel",
+    "rights": "LanCompass",
+    "navLabel": "Footer"
+  },
+  "drift": {
+    "label": "Animated diagram: a small network as documented, in green. An undocumented link between sw-core-02 and ap-lobby-3 appears as a dashed amber line with a finding, then turns green once it is documented.",
+    "documented": "Documented",
+    "observed": "Observed, not documented",
+    "finding": "Undocumented link",
+    "resolved": "Documented",
+    "pause": "Pause animation"
+  },
+  "screenshot": {
+    "placeholder": "Placeholder for the LanCompass {screen} screen. The screenshot is not captured yet.",
+    "screens": {
+      "dashboard": "dashboard",
+      "ipam-tree": "IP and prefix tree",
+      "rack": "rack elevation",
+      "topology-observed": "topology, observed layer",
+      "review": "drift review",
+      "deep-discovery": "Deep Discovery services",
+      "nac": "NAC overview",
+      "compliance": "compliance findings"
+    },
+    "alt": "The LanCompass {screen} screen, showing the fictional demo network."
+  },
+  "video": {
+    "comingSoon": "Video coming soon",
+    "captions": "Captions in English and Hebrew"
+  },
+  "form": {
+    "required": "Required",
+    "optional": "optional",
+    "name": "Name",
+    "organisation": "Organisation",
+    "role": "Role",
+    "email": "Work email",
+    "country": "Country",
+    "networkSize": "Network size",
+    "networkSizeChoose": "Choose one",
+    "networkSizes": [
+      "Up to 100 devices",
+      "100–500 devices",
+      "500–2,000 devices",
+      "More than 2,000 devices",
+      "Not sure"
+    ],
+    "vendors": "Main vendors",
+    "vendorsHint": "Choose all that apply.",
+    "vendorOptions": ["Check Point", "FortiGate", "Palo Alto", "Cisco", "MikroTik", "Other"],
+    "airGapped": "Is the network air-gapped?",
+    "airGappedOptions": ["Yes", "No", "Partly"],
+    "message": "Message",
+    "messageHintPartner": "What would you like LanCompass to do for your team?",
+    "consentBefore": "I agree that LanCompass stores this information to answer me, as described in the",
+    "consentLink": "privacy notice",
+    "consentAfter": ".",
+    "honeypot": "Leave this field empty",
+    "submitPartner": "Send application",
+    "submitContact": "Send message",
+    "errorSummary": "Please fix the highlighted fields.",
+    "errors": {
+      "valueMissing": "This field is required.",
+      "typeMismatch": "Enter an email address like name@example.com.",
+      "choose": "Choose an option.",
+      "consent": "Please agree before sending."
+    },
+    "mailtoIntro": "Write to us by email. The button opens your mail app with a short template to fill in.",
+    "mailtoButton": "Email {email}",
+    "mailtoSubjectPartner": "LanCompass design partner application",
+    "mailtoSubjectContact": "LanCompass enquiry",
+    "noContact": "TODO(operator): set PUBLIC_CONTACT_EMAIL — there is no contact address yet."
+  },
+  "a11y": {
+    "opensExternal": "(opens in a new tab)",
+    "newWindow": "external link"
+  },
+  "productNav": "Product sections",
+  "goodToKnow": "Good to know",
+  "learnMore": "Read more",
+  "backHome": "Back to the home page",
+  "longform": {
+    "updated": "Last updated"
+  },
+  "verification": {
+    "title": "Verify a release",
+    "lead": "Release artifacts are signed. Check a signature against one of these key fingerprints before you install.",
+    "kid": "Key ID",
+    "purpose": "Purpose",
+    "sha256": "SHA-256 fingerprint"
+  }
+}

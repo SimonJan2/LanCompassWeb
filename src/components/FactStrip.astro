@@ -1,0 +1,68 @@
+---
+/** Four honest facts in place of a logo wall. */
+interface Props {
+  facts: { value: string; label: string }[];
+}
+const { facts } = Astro.props;
+---
+
+<ul class="facts" role="list">
+  {facts.map((fact) => (
+    <li class="fact">
+      <p class="fact-value tabular" set:html={fact.value} />
+      <p class="fact-label" set:html={fact.label} />
+    </li>
+  ))}
+</ul>
+
+<style>
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-block: 1px solid var(--lc-hairline);
+  }
+
+  .fact {
+    padding: 1.75rem 1.5rem;
+    border-inline-start: 1px solid var(--lc-hairline);
+  }
+
+  .fact:first-child {
+    border-inline-start: 0;
+  }
+
+  @media (max-width: 1023px) {
+    .fact {
+      border-inline-start: 0;
+      border-block-end: 1px solid var(--lc-hairline);
+      padding-inline: 0;
+    }
+
+    .fact:last-child {
+      border-block-end: 0;
+    }
+  }
+
+  .fact-value {
+    color: var(--lc-text);
+    font-size: 1.1875rem;
+    font-weight: 620;
+    letter-spacing: -0.01em;
+  }
+
+  .fact-value :global(code) {
+    color: var(--lc-signal-bright);
+    font-size: 0.9em;
+    white-space: nowrap;
+  }
+
+  .fact-label {
+    margin-block-start: 0.375rem;
+    color: var(--lc-text-muted);
+    font-size: var(--lc-text-small);
+    line-height: 1.5;
+  }
+</style>

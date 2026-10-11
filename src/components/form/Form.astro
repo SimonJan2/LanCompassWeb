@@ -1,0 +1,409 @@
+---
+/**
+ * The design-partner application and the contact form. Plain HTML forms that
+ * POST to PUBLIC_FORM_ENDPOINT and work without JavaScript; src/scripts/forms.ts
+ * only adds inline messages. With no endpoint configured the form is replaced
+ * by a mailto: button with a prefilled subject and body.
+ */
+import Button from "../Button.astro";
+import ChoiceGroup from "./ChoiceGroup.astro";
+import ConsentField from "./ConsentField.astro";
+import Field from "./Field.astro";
+import SelectField from "./SelectField.astro";
+import Icon from "../Icon.astro";
+import { site } from "../../config/site";
+import { fill, pagePath, useUi, type Locale } from "../../i18n";
+import { uid } from "../../lib/uid";
+
+interface Props {
+  locale: Locale;
+  kind: "partner" | "contact";
+}
+
+const { locale, kind } = Astro.props;
+const ui = useUi(locale);
+const f = ui.form;
+const req = { requiredLabel: f.required, optionalLabel: f.optional };
+const plain = (s: string) => s.replace(/<[^>]+>/g, "");
+const subject = kind === "partner" ? f.mailtoSubjectPartner : f.mailtoSubjectContact;
+const bodyLines =
+  kind === "partner"
+    ? [
+        `${f.name}:`,
+        `${f.organisation}:`,
+        `${f.role}:`,
+        `${f.country}:`,
+        `${f.networkSize}:`,
+        `${f.vendors}:`,
+        `${f.airGapped}:`,
+        "",
+        `${f.message}:`,
+        "",
+      ]
+    : [`${f.name}:`, `${f.organisation}:`, "", `${f.message}:`, ""];
+const mailto = site.contactEmail
+  ? `mailto:${site.contactEmail}?subject=${encodeURIComponent(plain(subject))}&body=${encodeURIComponent(bodyLines.join("\n"))}`
+  : null;
+const summaryId = uid("form-summary");
+const hpId = uid("f-website");
+const messages = JSON.stringify(f.errors);
+---
+
+{site.formEndpoint ? (
+  <form
+    class="lc-form"
+    method="post"
+    action={site.formEndpoint}
+    accept-charset="utf-8"
+    data-lc-form={kind}
+    data-messages={messages}
+    data-summary-id={summaryId}
+  >
+    <p class="form-summary" id={summaryId} role="alert" hidden>
+      {f.errorSummary}
+    </p>
+    <input type="hidden" name="form" value={kind} />
+    <input type="hidden" name="locale" value={locale} />
+    <div class="hp" aria-hidden="true">
+      <label for={hpId}>{f.honeypot}</label>
+      <input id={hpId} type="text" name="website" tabindex="-1" autocomplete="off" data-honeypot />
+    </div>
+    <div class="form-grid">
+      <Field name="name" label={f.name} required autocomplete="name" {...req} />
+      <Field name="email" label={f.email} type="email" required autocomplete="email" {...req} />
+      <Field
+        name="organisation"
+        label={f.organisation}
+        required={kind === "partner"}
+        autocomplete="organization"
+        {...req}
+      />
+      {kind === "partner" && (
+        <Field name="role" label={f.role} autocomplete="organization-title" {...req} />
+      )}
+      {kind === "partner" && (
+        <Field name="country" label={f.country} required autocomplete="country-name" {...req} />
+      )}
+      {kind === "partner" && (
+        <SelectField
+          name="network_size"
+          label={f.networkSize}
+          options={f.networkSizes}
+          placeholder={f.networkSizeChoose}
+          required
+          requiredLabel={f.required}
+        />
+      )}
+    </div>
+    {kind === "partner" && (
+      <ChoiceGroup
+        name="vendors"
+        legend={f.vendors}
+        hint={f.vendorsHint}
+        options={f.vendorOptions}
+        type="checkbox"
+        {...req}
+      />
+    )}
+    {kind === "partner" && (
+      <ChoiceGroup
+        name="air_gapped"
+        legend={f.airGapped}
+        options={f.airGappedOptions}
+        type="radio"
+        required
+        {...req}
+      />
+    )}
+    <Field
+      name="message"
+      label={f.message}
+      type="textarea"
+      required={kind === "contact"}
+      hint={kind === "partner" ? f.messageHintPartner : undefined}
+      {...req}
+    />
+    <ConsentField
+      before={f.consentBefore}
+      linkText={f.consentLink}
+      after={f.consentAfter}
+      href={pagePath(locale, "privacy")}
+      requiredLabel={f.required}
+    />
+    <div class="form-actions">
+      <button type="submit" class="form-submit">
+        {kind === "partner" ? f.submitPartner : f.submitContact}
+        <Icon name="arrow" size={18} />
+      </button>
+    </div>
+  </form>
+) : (
+  <div class="form-mailto" data-form-fallback={kind}>
+    <p class="mailto-intro">{f.mailtoIntro}</p>
+    {mailto ? (
+      <Button href={mailto} data-mailto={kind}>
+        <span class="mailto-label">
+          <Icon name="mail" size={18} />
+          {fill(f.mailtoButton, { email: "" }).trim()}{" "}
+          <bdi class="mailto-addr">{site.contactEmail}</bdi>
+        </span>
+      </Button>
+    ) : (
+      <p class="todo-operator">{f.noContact}</p>
+    )}
+  </div>
+)}
+
+<style is:global>
+  .lc-form {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .form-grid {
+    display: grid;
+    gap: 1.25rem 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .form-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .field {
+    display: grid;
+    gap: 0.4rem;
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .field-label {
+    display: inline-flex;
+    gap: 0.35rem;
+    padding: 0;
+    color: var(--lc-text);
+    font-size: var(--lc-text-small);
+    font-weight: 600;
+  }
+
+  .field-req {
+    color: var(--lc-signal-bright);
+  }
+
+  .field-opt {
+    color: var(--lc-text-faint);
+    font-weight: 400;
+  }
+
+  .field-hint {
+    color: var(--lc-text-muted);
+    font-size: var(--lc-text-xs);
+  }
+
+  .field-input {
+    inline-size: 100%;
+    min-block-size: 2.875rem;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid var(--lc-hairline-strong);
+    border-radius: 10px;
+    background: var(--lc-ink);
+    color: var(--lc-text);
+    font: inherit;
+    font-size: 1rem;
+  }
+
+  .surface-paper .field-input {
+    background: #fff;
+  }
+
+  textarea.field-input {
+    resize: vertical;
+  }
+
+  .field-input:focus-visible {
+    outline: 2px solid var(--lc-focus);
+    outline-offset: 2px;
+    border-color: transparent;
+  }
+
+  .field-input[aria-invalid="true"],
+  .choice-group[aria-invalid="true"] .choices {
+    border-color: var(--lc-drift);
+  }
+
+  .select-wrap {
+    position: relative;
+  }
+
+  .select-wrap select {
+    appearance: none;
+    padding-inline-end: 2.5rem;
+  }
+
+  .select-wrap::after {
+    content: "";
+    position: absolute;
+    inset-inline-end: 1rem;
+    inset-block-start: 50%;
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    border-inline-end: 1.5px solid var(--lc-text-muted);
+    border-block-end: 1.5px solid var(--lc-text-muted);
+    transform: translateY(-70%) rotate(45deg);
+    pointer-events: none;
+  }
+
+  .choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    border: 1px solid transparent;
+    border-radius: 10px;
+  }
+
+  .choice {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-block-size: 2.75rem;
+    padding: 0.5rem 0.875rem;
+    border: 1px solid var(--lc-hairline-strong);
+    border-radius: 10px;
+    font-size: var(--lc-text-small);
+    cursor: pointer;
+  }
+
+  .choice:has(input:checked) {
+    border-color: var(--lc-signal);
+    background: var(--lc-signal-wash);
+  }
+
+  .choice input,
+  .consent input {
+    inline-size: 1.125rem;
+    block-size: 1.125rem;
+    margin: 0;
+    accent-color: var(--lc-signal);
+  }
+
+  .consent-row {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    font-size: var(--lc-text-small);
+  }
+
+  .consent-row input {
+    flex: none;
+    margin-block-start: 0.25rem;
+  }
+
+  .consent-row a {
+    color: var(--lc-signal-bright);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .field-error {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+    color: var(--lc-drift);
+    font-size: var(--lc-text-small);
+    font-weight: 500;
+  }
+
+  .field-error::before {
+    content: "!" / "";
+    display: inline-grid;
+    place-items: center;
+    inline-size: 1.1rem;
+    block-size: 1.1rem;
+    border-radius: 50%;
+    background: var(--lc-drift);
+    color: var(--lc-ink);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .surface-paper .field-error::before {
+    color: #fff;
+  }
+
+  .field-error[hidden] {
+    display: none;
+  }
+
+  .form-summary {
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--lc-drift);
+    border-radius: 10px;
+    background: var(--lc-drift-wash);
+    color: var(--lc-text);
+    font-weight: 500;
+  }
+
+  .form-summary[hidden] {
+    display: none;
+  }
+
+  .hp {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  .form-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-block-size: 3rem;
+    padding: 0.75rem 1.5rem;
+    border: 0;
+    border-radius: 10px;
+    background: var(--lc-signal);
+    color: #0b0d10;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .form-submit:hover {
+    background: #22c58f;
+  }
+
+  .form-mailto {
+    display: grid;
+    justify-items: start;
+    gap: 1.25rem;
+    padding: 1.75rem;
+    border: 1px solid var(--lc-hairline);
+    border-radius: var(--lc-radius);
+    background: var(--lc-ink-card);
+  }
+
+  .mailto-intro {
+    color: var(--lc-text-muted);
+  }
+
+  .mailto-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: normal;
+  }
+
+  .mailto-addr {
+    font-weight: 600;
+  }
+</style>
+
+<script>
+  import "../../scripts/forms.ts";
+</script>

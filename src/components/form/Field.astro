@@ -1,0 +1,73 @@
+---
+/** A labelled text input or textarea with a hint and an error slot filled by src/scripts/forms.ts. */
+import { uid } from "../../lib/uid";
+
+interface Props {
+  name: string;
+  label: string;
+  type?: "text" | "email" | "textarea";
+  required?: boolean;
+  autocomplete?: string;
+  hint?: string | undefined;
+  requiredLabel: string;
+  optionalLabel: string;
+  rows?: number;
+  dir?: "auto" | "ltr";
+}
+
+const {
+  name,
+  label,
+  type = "text",
+  required = false,
+  autocomplete,
+  hint,
+  requiredLabel,
+  optionalLabel,
+  rows = 5,
+  dir,
+} = Astro.props;
+const id = uid(`f-${name}`);
+const hintId = hint ? `${id}-hint` : undefined;
+const errorId = `${id}-error`;
+---
+
+<div class="field" data-field>
+  <label for={id} class="field-label">
+    <span>{label}</span>
+    {required ? (
+      <span class="field-req" aria-hidden="true">
+        *
+      </span>
+    ) : (
+      <span class="field-opt">({optionalLabel})</span>
+    )}
+    {required && <span class="visually-hidden">({requiredLabel})</span>}
+  </label>
+  {hint && <p class="field-hint" id={hintId} set:html={hint} />}
+  {type === "textarea" ? (
+    <textarea
+      id={id}
+      name={name}
+      rows={rows}
+      required={required}
+      aria-describedby={hintId}
+      data-error-id={errorId}
+      dir={dir ?? "auto"}
+      class="field-input"
+    />
+  ) : (
+    <input
+      id={id}
+      name={name}
+      type={type}
+      required={required}
+      autocomplete={autocomplete}
+      aria-describedby={hintId}
+      data-error-id={errorId}
+      dir={dir ?? (type === "email" ? "ltr" : "auto")}
+      class="field-input"
+    />
+  )}
+  <p class="field-error" id={errorId} hidden></p>
+</div>

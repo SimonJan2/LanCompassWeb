@@ -1,0 +1,126 @@
+{
+  "skipLink": "דילוג לתוכן",
+  "nav": {
+    "label": "ראשי",
+    "home": "דף הבית של LanCompass",
+    "product": "המוצר",
+    "security": "אבטחה",
+    "designPartners": "שותפי פיתוח",
+    "docs": "תיעוד",
+    "cta": "להצטרפות כשותפי פיתוח",
+    "menu": "תפריט",
+    "closeMenu": "סגירת התפריט",
+    "mobileLabel": "תפריט האתר"
+  },
+  "language": {
+    "label": "שפה",
+    "current": "השפה הנוכחית: {language}",
+    "switchTo": "לקריאת הדף ב{language}"
+  },
+  "footer": {
+    "positioning": "תיעוד רשת שמותקן אצלכם ומראה איפה הוא לא תואם את הרשת.",
+    "product": "המוצר",
+    "company": "החברה",
+    "legal": "מידע משפטי",
+    "overview": "סקירה",
+    "howItWorks": "איך זה עובד",
+    "integrations": "אינטגרציות",
+    "security": "אבטחה",
+    "designPartners": "שותפי פיתוח",
+    "contact": "יצירת קשר",
+    "privacy": "פרטיות",
+    "accessibility": "נגישות",
+    "source": "קוד מקור",
+    "docs": "תיעוד",
+    "madeIn": "נבנה בישראל",
+    "rights": "LanCompass",
+    "navLabel": "ניווט תחתון"
+  },
+  "drift": {
+    "label": "תרשים מונפש: רשת קטנה כפי שהיא מתועדת, בירוק. קישור לא מתועד בין sw-core-02 ל־ap-lobby-3 מופיע כקו כתום מקווקו עם ממצא, ואחרי שמתעדים אותו הוא הופך לירוק.",
+    "documented": "מתועד",
+    "observed": "נצפה ברשת, לא מתועד",
+    "finding": "קישור לא מתועד",
+    "resolved": "מתועד",
+    "pause": "עצירת ההנפשה"
+  },
+  "screenshot": {
+    "placeholder": "מקום שמור לצילום המסך של {screen} ב־LanCompass. הצילום עדיין לא נלכד.",
+    "screens": {
+      "dashboard": "לוח הבקרה",
+      "ipam-tree": "עץ הכתובות והתתי־רשתות",
+      "rack": "תצוגת הארון",
+      "topology-observed": "הטופולוגיה, שכבת הנצפה",
+      "review": "תור הסקירה",
+      "deep-discovery": "שירותי הגילוי המעמיק",
+      "nac": "סקירת ה־<bdi>NAC</bdi>",
+      "compliance": "ממצאי התאימות"
+    },
+    "alt": "מסך {screen} ב־LanCompass, עם רשת ההדגמה הבדיונית."
+  },
+  "video": {
+    "comingSoon": "הסרטון יעלה בקרוב",
+    "captions": "כתוביות בעברית ובאנגלית"
+  },
+  "form": {
+    "required": "שדה חובה",
+    "optional": "לא חובה",
+    "name": "שם",
+    "organisation": "ארגון",
+    "role": "תפקיד",
+    "email": "דוא״ל בעבודה",
+    "country": "מדינה",
+    "networkSize": "גודל הרשת",
+    "networkSizeChoose": "בחרו אפשרות",
+    "networkSizes": [
+      "עד 100 רכיבים",
+      "100–500 רכיבים",
+      "500–2,000 רכיבים",
+      "יותר מ־2,000 רכיבים",
+      "לא בטוחים"
+    ],
+    "vendors": "יצרנים עיקריים",
+    "vendorsHint": "אפשר לבחור כמה.",
+    "vendorOptions": ["Check Point", "FortiGate", "Palo Alto", "Cisco", "MikroTik", "אחר"],
+    "airGapped": "האם הרשת מנותקת מהאינטרנט?",
+    "airGappedOptions": ["כן", "לא", "חלקית"],
+    "message": "הודעה",
+    "messageHintPartner": "מה הייתם רוצים ש־<bdi>LanCompass</bdi> תעשה בשביל הצוות שלכם?",
+    "consentBefore": "אני מסכים/ה ש־<bdi>LanCompass</bdi> תשמור את הפרטים כדי לחזור אליי, כמתואר ב",
+    "consentLink": "הודעת הפרטיות",
+    "consentAfter": ".",
+    "honeypot": "נא להשאיר את השדה הזה ריק",
+    "submitPartner": "שליחת הבקשה",
+    "submitContact": "שליחת ההודעה",
+    "errorSummary": "יש לתקן את השדות המסומנים.",
+    "errors": {
+      "valueMissing": "זהו שדה חובה.",
+      "typeMismatch": "יש להזין כתובת דוא״ל, למשל name@example.com.",
+      "choose": "יש לבחור אפשרות.",
+      "consent": "יש לאשר לפני השליחה."
+    },
+    "mailtoIntro": "כתבו לנו בדוא״ל. הכפתור פותח את תוכנת הדואר שלכם עם תבנית קצרה למילוי.",
+    "mailtoButton": "שליחת דוא״ל אל {email}",
+    "mailtoSubjectPartner": "בקשה להצטרף כשותפי פיתוח של LanCompass",
+    "mailtoSubjectContact": "פנייה ל־LanCompass",
+    "noContact": "TODO(operator): set PUBLIC_CONTACT_EMAIL — there is no contact address yet."
+  },
+  "a11y": {
+    "opensExternal": "(נפתח בלשונית חדשה)",
+    "newWindow": "קישור חיצוני"
+  },
+  "productNav": "חלקי המוצר",
+  "goodToKnow": "כדאי לדעת",
+  "learnMore": "לקריאה נוספת",
+  "backHome": "חזרה לדף הבית",
+  "longform": {
+    "updated": "עודכן לאחרונה"
+  },
+  "verification": {
+    "title": "אימות גרסה",
+    "lead": "קובצי הגרסאות חתומים. בדקו חתימה מול אחת מטביעות האצבע של המפתחות האלה לפני ההתקנה.",
+    "kid": "מזהה מפתח",
+    "purpose": "שימוש",
+    "sha256": "טביעת אצבע <bdi>SHA-256</bdi>"
+  }
+}

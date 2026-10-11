@@ -1,0 +1,74 @@
+---
+/** Typography for long-form MDX content. */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<div class:list={["prose", className]}>
+  <slot />
+</div>
+
+<style>
+  .prose {
+    max-inline-size: 44rem;
+    color: var(--lc-text-muted);
+  }
+
+  .prose :global(h2) {
+    margin-block: 3rem 0.875rem;
+    color: var(--lc-text);
+    font-size: clamp(1.375rem, 1.2rem + 0.7vw, 1.75rem);
+    letter-spacing: -0.015em;
+  }
+
+  .prose :global(h2:first-child) {
+    margin-block-start: 0;
+  }
+
+  .prose :global(h3) {
+    margin-block: 2rem 0.5rem;
+    color: var(--lc-text);
+    font-size: var(--lc-text-h3);
+  }
+
+  .prose :global(p),
+  .prose :global(ul),
+  .prose :global(ol) {
+    margin-block: 0 1rem;
+  }
+
+  .prose :global(ul),
+  .prose :global(ol) {
+    padding-inline-start: 1.25rem;
+  }
+
+  .prose :global(li) {
+    margin-block-end: 0.4rem;
+    padding-inline-start: 0.25rem;
+  }
+
+  .prose :global(li::marker) {
+    color: var(--lc-signal-bright);
+  }
+
+  .prose :global(strong) {
+    color: var(--lc-text);
+    font-weight: 600;
+  }
+
+  .prose :global(a) {
+    color: var(--lc-signal-bright);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .prose :global(code) {
+    padding: 0.1em 0.35em;
+    border: 1px solid var(--lc-hairline);
+    border-radius: 5px;
+    background: var(--lc-ink-card);
+    color: var(--lc-text);
+  }
+</style>

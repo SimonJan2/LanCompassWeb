@@ -1,0 +1,93 @@
+---
+/**
+ * /security#verification. Renders only when src/content/fingerprints.json
+ * lists at least one key (kid, purpose, SHA-256). Ships empty.
+ */
+import { useUi, type Locale } from "../i18n";
+import { getFingerprints } from "../lib/fingerprints";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const ui = useUi(locale).verification;
+const keys = getFingerprints();
+---
+
+{keys.length > 0 && (
+  <section
+    id="verification"
+    class="verification"
+    aria-labelledby="verification-title"
+    data-fingerprints
+  >
+    <h2 id="verification-title">{ui.title}</h2>
+    <p class="verification-lead">{ui.lead}</p>
+    <div class="verification-table-wrap">
+      <table class="verification-table">
+        <thead>
+          <tr>
+            <th scope="col">{ui.kid}</th>
+            <th scope="col">{ui.purpose}</th>
+            <th scope="col" set:html={ui.sha256} />
+          </tr>
+        </thead>
+        <tbody>
+          {keys.map((key) => (
+            <tr>
+              <td>
+                <code>{key.kid}</code>
+              </td>
+              <td>{key.purpose}</td>
+              <td>
+                <code class="fp">{key.sha256}</code>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+)}
+
+<style>
+  .verification {
+    max-inline-size: 56rem;
+    padding: 2rem;
+    border: 1px solid var(--lc-hairline-strong);
+    border-radius: var(--lc-radius);
+    background: var(--lc-ink-card);
+  }
+
+  .verification h2 {
+    font-size: 1.5rem;
+  }
+
+  .verification-lead {
+    margin-block: 0.75rem 1.5rem;
+    color: var(--lc-text-muted);
+  }
+
+  .verification-table-wrap {
+    overflow-x: auto;
+  }
+
+  .verification-table {
+    inline-size: 100%;
+    border-collapse: collapse;
+    font-size: var(--lc-text-small);
+  }
+
+  .verification-table th,
+  .verification-table td {
+    padding: 0.625rem 0.75rem;
+    border-block-end: 1px solid var(--lc-hairline);
+    text-align: start;
+    vertical-align: top;
+  }
+
+  .fp {
+    word-break: break-all;
+  }
+</style>

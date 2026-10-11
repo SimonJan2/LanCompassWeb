@@ -1,0 +1,90 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Button from "./Button.astro";
+import CompassMark from "./CompassMark.astro";
+import Eyebrow from "./Eyebrow.astro";
+import { getCopy } from "../content/copy";
+import { pagePath, type Locale } from "../i18n";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+const n = copy.notFound;
+---
+
+<BaseLayout
+  locale={locale}
+  page="home"
+  title={copy.meta.notFound.title}
+  description={copy.meta.notFound.description}
+  notFound
+>
+  <section class="nf grid-paper">
+    <div class="container-site nf-inner">
+      <div class="nf-mark">
+        <CompassMark size={160} heading={137} class="nf-compass" />
+      </div>
+      <div>
+        <Eyebrow>{n.eyebrow}</Eyebrow>
+        <h1 class="nf-title" set:html={n.title} />
+        <p class="text-lead nf-lead" set:html={n.lead} />
+        <div class="nf-actions">
+          <Button href={pagePath(locale, "home")} arrow>
+            {n.home}
+          </Button>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nf {
+    padding-block: clamp(4rem, 3rem + 6vw, 9rem);
+  }
+
+  .nf-inner {
+    display: grid;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  @media (min-width: 800px) {
+    .nf-inner {
+      grid-template-columns: auto 1fr;
+      gap: 5rem;
+    }
+  }
+
+  .nf-title {
+    font-size: var(--lc-text-h1);
+  }
+
+  .nf-lead {
+    max-inline-size: 34rem;
+    margin-block-start: 1.25rem;
+  }
+
+  .nf-actions {
+    margin-block-start: 2rem;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .nf-mark :global(.nf-compass g) {
+      transform-origin: 16px 16px;
+      animation: wander 6s var(--lc-ease) infinite alternate;
+    }
+
+    @keyframes wander {
+      from {
+        rotate: -14deg;
+      }
+      to {
+        rotate: 10deg;
+      }
+    }
+  }
+</style>

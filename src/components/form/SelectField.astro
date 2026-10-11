@@ -1,0 +1,37 @@
+---
+import { uid } from "../../lib/uid";
+
+interface Props {
+  name: string;
+  label: string;
+  options: string[];
+  placeholder: string;
+  required?: boolean;
+  requiredLabel: string;
+}
+
+const { name, label, options, placeholder, required = false, requiredLabel } = Astro.props;
+const id = uid(`f-${name}`);
+const errorId = `${id}-error`;
+---
+
+<div class="field" data-field>
+  <label for={id} class="field-label">
+    <span>{label}</span>
+    {required && (
+      <span class="field-req" aria-hidden="true">
+        *
+      </span>
+    )}
+    {required && <span class="visually-hidden">({requiredLabel})</span>}
+  </label>
+  <div class="select-wrap">
+    <select id={id} name={name} required={required} data-error-id={errorId} class="field-input">
+      <option value="">{placeholder}</option>
+      {options.map((o) => (
+        <option value={o}>{o}</option>
+      ))}
+    </select>
+  </div>
+  <p class="field-error" id={errorId} hidden></p>
+</div>

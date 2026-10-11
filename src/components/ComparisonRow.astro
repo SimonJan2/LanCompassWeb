@@ -1,0 +1,55 @@
+---
+import ScreenshotFrame from "./ScreenshotFrame.astro";
+import type { Locale } from "../i18n";
+import type { ScreenKey } from "../lib/screens";
+
+/**
+ * The same screen side by side in two locales. Each screenshot keeps its own
+ * direction; neither is mirrored.
+ */
+interface Props {
+  locale: Locale;
+  screen: ScreenKey;
+  items: { screenLocale: Locale; caption: string }[];
+}
+
+const { locale, screen, items } = Astro.props;
+---
+
+<div class="compare">
+  {items.map((item) => (
+    <figure class="compare-item" data-reveal>
+      <ScreenshotFrame
+        screen={screen}
+        locale={locale}
+        screenLocale={item.screenLocale}
+        sizes="(min-width: 1200px) 590px, (min-width: 768px) 50vw, 100vw"
+      />
+      <figcaption class="compare-caption">{item.caption}</figcaption>
+    </figure>
+  ))}
+</div>
+
+<style>
+  .compare {
+    display: grid;
+    gap: 1.5rem;
+    margin-block-start: 3rem;
+  }
+
+  @media (min-width: 800px) {
+    .compare {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .compare-item {
+    margin: 0;
+  }
+
+  .compare-caption {
+    margin-block-start: 0.75rem;
+    color: var(--lc-text-muted);
+    font-size: var(--lc-text-small);
+  }
+</style>

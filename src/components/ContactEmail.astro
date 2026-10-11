@@ -1,0 +1,21 @@
+---
+/** The contact address as a mailto: link, or a visible TODO(operator) marker while PUBLIC_CONTACT_EMAIL is empty. */
+import { site } from "../config/site";
+
+interface Props {
+  subject?: string;
+}
+
+const { subject } = Astro.props;
+const href = site.contactEmail
+  ? `mailto:${site.contactEmail}${subject ? `?subject=${encodeURIComponent(subject)}` : ""}`
+  : null;
+---
+
+{href ? (
+  <a href={href} class="contact-email">
+    <bdi>{site.contactEmail}</bdi>
+  </a>
+) : (
+  <span class="todo-operator">TODO(operator): set PUBLIC_CONTACT_EMAIL</span>
+)}

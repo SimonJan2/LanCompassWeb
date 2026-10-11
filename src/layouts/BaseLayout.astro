@@ -1,0 +1,127 @@
+---
+import "../styles/global.css";
+import interFont from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
+import heeboFont from "@fontsource-variable/heebo/files/heebo-hebrew-wght-normal.woff2?url";
+import SiteFooter from "../components/SiteFooter.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import { site } from "../config/site";
+import {
+  absoluteUrl,
+  defaultLocale,
+  localeCodes,
+  locales,
+  pagePath,
+  useUi,
+  type Locale,
+  type PageKey,
+} from "../i18n";
+
+interface Props {
+  locale: Locale;
+  /** The page, for the switcher, hreflang and canonical. */
+  page: PageKey;
+  title: string;
+  description: string;
+  /** Set on the 404 page: no canonical or hreflang, and noindex. */
+  notFound?: boolean;
+  /** Extra JSON-LD objects for this page. */
+  jsonLd?: Record<string, unknown>[];
+}
+
+const { locale, page, title, description, notFound = false, jsonLd = [] } = Astro.props;
+const ui = useUi(locale);
+const meta = locales[locale];
+const canonical = absoluteUrl(pagePath(locale, page));
+const ogImage = absoluteUrl(`/og/${locale}/${notFound ? "404" : page}.png`);
+const organization = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: site.name,
+  url: absoluteUrl("/"),
+  logo: absoluteUrl("/icon-512.png"),
+  ...(site.contactEmail ? { email: site.contactEmail } : {}),
+};
+const structured = [organization, ...jsonLd];
+---
+
+<!doctype html>
+<html lang={meta.htmlLang} dir={meta.dir}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#0B0D10" />
+    {notFound && <meta name="robots" content="noindex" />}
+    {!notFound && <link rel="canonical" href={canonical} />}
+    {!notFound &&
+      localeCodes.map((code) => (
+        <link
+          rel="alternate"
+          hreflang={locales[code].htmlLang}
+          href={absoluteUrl(pagePath(code, page))}
+        />
+      ))}
+    {!notFound && (
+      <link
+        rel="alternate"
+        hreflang="x-default"
+        href={absoluteUrl(pagePath(defaultLocale, page))}
+      />
+    )}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="preload" href={interFont} as="font" type="font/woff2" crossorigin />
+    {locale === "he" && (
+      <link rel="preload" href={heeboFont} as="font" type="font/woff2" crossorigin />
+    )}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={title} />
+    <meta property="og:locale" content={meta.ogLocale} />
+    {localeCodes
+      .filter((code) => code !== locale)
+      .map((code) => (
+        <meta property="og:locale:alternate" content={locales[code].ogLocale} />
+      ))}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(structured.length === 1 ? organization : structured)}
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">
+      {ui.skipLink}
+    </a>
+    <SiteHeader locale={locale} page={page} />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <SiteFooter locale={locale} page={page} />
+    <script>
+      import "../scripts/site.ts";
+    </script>
+  </body>
+</html>
+
+<style>
+  main:focus {
+    outline: none;
+  }
+</style>

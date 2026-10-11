@@ -1,0 +1,108 @@
+---
+/**
+ * A video slot. While public/media/<key>.mp4 (or .webm) is missing it shows a
+ * poster panel with "Video coming soon". With the file present: <video> with
+ * controls, no autoplay, preload="none", poster and en + he caption tracks.
+ */
+import Icon from "./Icon.astro";
+import { locales, useUi, type Locale } from "../i18n";
+import { videoFiles } from "../lib/media";
+
+interface Props {
+  locale: Locale;
+  videoKey: string;
+  title: string;
+}
+
+const { locale, videoKey, title } = Astro.props;
+const ui = useUi(locale);
+const files = videoFiles(videoKey);
+const ready = files.mp4 !== null || files.webm !== null;
+const captionLabels: Record<Locale, string> = Object.fromEntries(
+  Object.entries(locales).map(([code, meta]) => [code, meta.label]),
+) as Record<Locale, string>;
+---
+
+<figure class="video" data-video={videoKey} data-video-ready={ready ? "true" : "false"}>
+  {ready ? (
+    <video
+      controls
+      preload="none"
+      playsinline
+      poster={files.poster ?? undefined}
+      width="1280"
+      height="720"
+      class="video-el"
+    >
+      {files.webm && <source src={files.webm} type="video/webm" />}
+      {files.mp4 && <source src={files.mp4} type="video/mp4" />}
+      {files.captions.map((c) => (
+        <track
+          kind="captions"
+          src={c.src}
+          srclang={locales[c.locale].htmlLang}
+          label={captionLabels[c.locale]}
+          default={c.locale === locale}
+        />
+      ))}
+    </video>
+  ) : (
+    <div class="video-poster">
+      <span class="video-play" aria-hidden="true">
+        <Icon name="play" size={30} />
+      </span>
+      <span class="video-soon">{ui.video.comingSoon}</span>
+    </div>
+  )}
+  <figcaption class="video-title" set:html={title} />
+</figure>
+
+<style>
+  .video {
+    margin: 0;
+  }
+
+  .video-el,
+  .video-poster {
+    inline-size: 100%;
+    aspect-ratio: 16 / 9;
+    border: 1px solid var(--lc-hairline);
+    border-radius: 12px;
+    background: var(--lc-ink-card);
+  }
+
+  .video-poster {
+    position: relative;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 0.75rem;
+    overflow: hidden;
+    background:
+      linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px) 0 0 / 32px 32px,
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px) 0 0 / 32px 32px,
+      radial-gradient(80% 90% at 50% 100%, rgba(16, 185, 129, 0.1), transparent 70%),
+      var(--lc-ink-card);
+  }
+
+  .video-play {
+    display: grid;
+    place-items: center;
+    inline-size: 3.5rem;
+    block-size: 3.5rem;
+    border: 1px solid var(--lc-hairline-strong);
+    border-radius: 50%;
+    color: var(--lc-text-faint);
+  }
+
+  .video-soon {
+    color: var(--lc-text-muted);
+    font-size: var(--lc-text-small);
+  }
+
+  .video-title {
+    margin-block-start: 0.875rem;
+    font-size: var(--lc-text-body);
+    font-weight: 600;
+  }
+</style>
