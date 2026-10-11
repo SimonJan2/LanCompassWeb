@@ -65,8 +65,20 @@ jobs:
   docker:
     # Builds the production image, runs it the way compose.yaml does, and checks it.
     runs-on: ubuntu-24.04
+    env:
+      # Secrets are not available to pull requests from forks; skip the login there.
+      HAS_DOCKERHUB: ${{ secrets.DOCKERHUB_TOKEN != '' }}
     steps:
       - uses: actions/checkout@v4
+
+      # Authenticated pulls of the node and nginx base images avoid Docker Hub's
+      # anonymous rate limit on shared runners. Pull only; nothing is pushed.
+      - name: Log in to Docker Hub
+        if: env.HAS_DOCKERHUB == 'true'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and start (compose.yaml)
         run: docker compose up -d --build --wait --wait-timeout 60

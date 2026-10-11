@@ -18,20 +18,24 @@ export default defineConfig({
     baseURL: "http://127.0.0.1:4321",
     trace: "retain-on-failure",
   },
-  webServer: [
-    {
-      command: "npx astro preview --port 4321 --host 127.0.0.1 --ignore-lock",
-      url: "http://127.0.0.1:4321/",
-      env: { ASTRO_OUT_DIR: "dist-test" },
-      reuseExistingServer: !process.env["CI"],
-      timeout: 60_000,
-    },
-    {
-      command: "npx astro preview --port 4322 --host 127.0.0.1 --ignore-lock",
-      url: "http://127.0.0.1:4322/",
-      env: { ASTRO_OUT_DIR: "dist-test-flags" },
-      reuseExistingServer: !process.env["CI"],
-      timeout: 60_000,
-    },
-  ],
+  // Against the Docker image (DOCKER_BASE_URL) the container is the server; the
+  // preview builds are neither needed nor built in that job.
+  webServer: process.env["DOCKER_BASE_URL"]
+    ? []
+    : [
+        {
+          command: "npx astro preview --port 4321 --host 127.0.0.1 --ignore-lock",
+          url: "http://127.0.0.1:4321/",
+          env: { ASTRO_OUT_DIR: "dist-test" },
+          reuseExistingServer: !process.env["CI"],
+          timeout: 60_000,
+        },
+        {
+          command: "npx astro preview --port 4322 --host 127.0.0.1 --ignore-lock",
+          url: "http://127.0.0.1:4322/",
+          env: { ASTRO_OUT_DIR: "dist-test-flags" },
+          reuseExistingServer: !process.env["CI"],
+          timeout: 60_000,
+        },
+      ],
 });

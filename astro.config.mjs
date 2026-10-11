@@ -10,6 +10,11 @@ import { defaultLocale, localeCodes } from "./src/i18n/locales.ts";
 
 const env = loadEnv(process.env.NODE_ENV ?? "production", process.cwd(), "PUBLIC_");
 const siteUrl = (env.PUBLIC_SITE_URL || "http://localhost:4321").replace(/\/$/, "");
+if (!/^https?:\/\/[^/]/.test(siteUrl)) {
+  throw new Error(
+    `PUBLIC_SITE_URL must be an absolute URL with its scheme, for example https://example.com (got "${siteUrl}").`,
+  );
+}
 const formEndpoint = env.PUBLIC_FORM_ENDPOINT || "";
 
 /**
