@@ -2,6 +2,7 @@ import type { APIRoute, GetStaticPaths } from "astro";
 import { getEntry } from "astro:content";
 import { getCopy } from "../../../content/copy";
 import { localeCodes, locales, pageKeys, type Locale, type PageKey } from "../../../i18n";
+import { site } from "../../../config/site";
 import { renderOgImage } from "../../../lib/og";
 
 type OgPage = PageKey | "404";
@@ -45,6 +46,8 @@ export const GET: APIRoute = async ({ props }) => {
     title: strip(title),
     eyebrow: strip(eyebrow),
     rtl: locales[locale].dir === "rtl",
+    // Social cards have no colour scheme: only a dark build gets the night card.
+    tone: site.theme === "dark" ? "dark" : "light",
   });
   return new Response(new Uint8Array(png), { headers: { "Content-Type": "image/png" } });
 };

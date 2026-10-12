@@ -1,11 +1,14 @@
 import sharp from "sharp";
+import { site } from "../config/site";
 import { compassIconSvg } from "./brand";
+import { palettes } from "./palette";
 
-const PAPER = { r: 0xf4, g: 0xf1, b: 0xea, alpha: 1 };
+/** The square behind the tile: paper, or the night page in a dark build. */
+const ground = palettes[site.theme === "dark" ? "dark" : "light"].page;
 
 /**
  * A square PNG icon in the site's identity: the compass on its app-icon tile
- * (the mark itself is unchanged), centred on survey paper. The 32 px favicon
+ * (the mark itself is unchanged), centred on survey paper (night indigo in a dark build). The 32 px favicon
  * is the tile alone, so it stays legible at that size.
  */
 export async function iconPng(size: number): Promise<Response> {
@@ -17,7 +20,7 @@ export async function iconPng(size: number): Promise<Response> {
   const png =
     tileSize === size
       ? await sharp(tile).png({ compressionLevel: 9 }).toBuffer()
-      : await sharp({ create: { width: size, height: size, channels: 4, background: PAPER } })
+      : await sharp({ create: { width: size, height: size, channels: 4, background: ground } })
           .composite([{ input: tile, gravity: "center" }])
           .png({ compressionLevel: 9 })
           .toBuffer();

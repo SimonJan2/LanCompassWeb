@@ -4,6 +4,7 @@ interface ImportMetaEnv {
   readonly PUBLIC_FORM_ENDPOINT?: string;
   readonly PUBLIC_GITHUB_URL?: string;
   readonly PUBLIC_DOCS_URL?: string;
+  readonly PUBLIC_SITE_THEME?: string;
 }
 
 interface ImportMeta {

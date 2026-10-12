@@ -12,10 +12,10 @@ They never approve, dismiss, edit or save anything in the product.
 2× PNGs at 1440 × 900 (2880 × 1800 px), one per site screenshot slot, in both interface
 languages and two product themes:
 
-| Theme                | Folder               | Use                                                                        |
-| -------------------- | -------------------- | -------------------------------------------------------------------------- |
-| Light                | `screens/light/`     | The set the site uses today (copied into `src/assets/screens/`).           |
-| LanCompass Nightwire | `screens/nightwire/` | The product's default dark theme, kept for a future dark mode of the site. |
+| Theme                | Folder               | Use                                                                |
+| -------------------- | -------------------- | ------------------------------------------------------------------ |
+| Light                | `screens/light/`     | The light site's set (copied into `src/assets/screens/light/`).    |
+| LanCompass Nightwire | `screens/nightwire/` | The dark site's set (copied into `src/assets/screens/nightwire/`). |
 
 | Screen              | Product route                                                                                                        |
 | ------------------- | -------------------------------------------------------------------------------------------------------------------- |
@@ -37,19 +37,20 @@ docker run --rm --network host --user "$(id -u):$(id -g)" -e HOME=/tmp \
   -v "$PWD":/app -w /app mcr.microsoft.com/playwright:v1.64.0-noble node scripts/capture-screenshots.mjs
 ```
 
-## Videos — `videos/<theme>-<ui>/drift-review-queue.*`
+## Videos — `videos/<theme>-<ui>/<key>.*`
 
-The "drift review queue" walkthrough (≈ 30 s, 1280 × 720 WebM), recorded by
-`scripts/record-review-video.mjs`, with a poster (`.jpg`) and captions in English and Hebrew
-(`.en.vtt`, `.he.vtt`) timed to the same steps.
+Product walkthroughs (1280 × 720 WebM) recorded by `scripts/record-video.mjs <key>`, each with a
+poster (`.jpg`) and captions in English and Hebrew (`.en.vtt`, `.he.vtt`) timed to the same
+steps. The site's copies live in `public/media/<theme>/<key>.<ui>.*` (posters as WebP).
 
-| Folder                 | Theme     | Interface language | Use                                            |
-| ---------------------- | --------- | ------------------ | ---------------------------------------------- |
-| `videos/light-en/`     | Light     | English            | The copy the site serves from `public/media/`. |
-| `videos/light-he/`     | Light     | Hebrew             | Alternative for the Hebrew page.               |
-| `videos/nightwire-en/` | Nightwire | English            | Future dark mode.                              |
-| `videos/nightwire-he/` | Nightwire | Hebrew             | Future dark mode.                              |
+| Key                      | Shows                                                                             | Recorded                                                 |
+| ------------------------ | --------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `drift-review-queue`     | The review queue, one ghost link on the topology, back to the queue (≈ 30 s)      | all four: light-en, light-he, nightwire-en, nightwire-he |
+| `documented-vs-observed` | Three ghost links through the review queue's `focus=edge:obs-…` deep links        | not yet (needs the demo login; W1.2)                     |
+| `hebrew-native`          | Dashboard, prefix hierarchy, the DC-A01 rack, the review queue, all in Hebrew RTL | not yet (needs the demo login; W1.2)                     |
 
-Not recorded: the "Hebrew Excel import" and "Check Point gateway pull" videos. Both need a
-write to the demo estate (an import, or enabling the disabled demo source), which the capture
-rules do not allow. Their slots on the home page still show "Video coming soon".
+Folders: `videos/light-en/`, `videos/light-he/`, `videos/nightwire-en/`, `videos/nightwire-he/`.
+
+Not planned for read-only recording: the "Hebrew Excel import" and "Check Point gateway pull"
+videos. Both need a write to the demo estate (an import, or enabling the disabled demo source),
+which the capture rules do not allow; they wait for a later wave with a scratch estate.

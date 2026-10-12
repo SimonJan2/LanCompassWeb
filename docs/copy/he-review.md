@@ -215,13 +215,15 @@ What to look for: anything that sounds translated, any term an Israeli network e
 
 ## `copy.home.videos`
 
-| Key             | Hebrew                              | Back-gloss                                   | Note                |
-| --------------- | ----------------------------------- | -------------------------------------------- | ------------------- |
-| `eyebrow`       | סרטונים                             | Videos                                       | rewritten: voice    |
-| `title`         | שלושה סרטונים קצרים, משימה בכל אחד. | Three short videos, one task in each.        | rewritten: voice    |
-| `items.0.title` | ייבוא קובץ אקסל בעברית              | Importing an Excel file in Hebrew            | kept                |
-| `items.1.title` | משיכת נתונים חיים משער Check Point  | Pulling live data from a Check Point gateway | rewritten: glossary |
-| `items.2.title` | עבודה עם תור הסקירה                 | Working with the review queue                | rewritten: voice    |
+| Key             | Hebrew                           | Back-gloss                                                                 | Note             |
+| --------------- | -------------------------------- | -------------------------------------------------------------------------- | ---------------- |
+| `eyebrow`       | סרטונים                          | Videos                                                                     | rewritten: voice |
+| `title`         | שלושה סרטונים קצרים מרשת ההדגמה. | Three short videos from the demo network.                                  | new (W1.2)       |
+| `items.0.title` | עבודה עם תור הסקירה              | Working with the review queue                                              | kept             |
+| `items.1.title` | קישורים שנצפו ברשת וחסרים בתיעוד | Links that were seen on the network and are missing from the documentation | new (W1.2)       |
+| `items.2.title` | LanCompass בעברית, מימין לשמאל   | LanCompass in Hebrew, from right to left                                   | new (W1.2)       |
+
+W1.2 replaced the lineup: the Excel import and Check Point gateway videos need writes to the demo estate, so they wait for a later wave. Their two rows are removed.
 
 ## `copy.home.partners`
 
@@ -670,7 +672,7 @@ Front matter (eyebrow, title, lead) first, then each heading, paragraph and list
 | 19  | ## פנייה בנושא נגישות                                                                                                                                          | ## Accessibility enquiries                                                                                                                                                                                                     | kept             |
 | 20  | משהו באתר לא נוח לשימוש? ספרו לנו ונתקן. כתבו אל <ContactEmail subject="Accessibility" /> ותארו את הדף ואת הבעיה.                                              | Something on the site isn't easy to use? Tell us and we'll fix it. Write to <address> and describe the page and the problem.                                                                                                   | rewritten: voice |
 
-## `public/media/drift-review-queue.he.vtt` (video captions)
+## `public/media/<set>/drift-review-queue.<ui>.he.vtt` (video captions)
 
 The English captions (`.en.vtt`) are the source of the back-gloss.
 
@@ -681,6 +683,30 @@ The English captions (`.en.vtt`) are the source of the back-gloss.
 | 3   | כל שורה מסבירה למה סומנה, ומקשרת לרכיב או לקישור שהיא נוגעת בו.   | Each row says why it was flagged, and links to the device or the link it concerns. | new  |
 | 4   | קישור רפאים: נצפה ברשת, וחסר בטופולוגיה המתועדת.                  | A ghost link: seen on the wire, missing from the documented topology.              | new  |
 | 5   | חוזרים לתור ומחליטים מה נכון: לתעד, או לדחות.                     | Back in the queue, you decide what is true: document it, or dismiss it.            | new  |
+
+## `scripts/record-video.mjs` → `documented-vs-observed` captions (W1.2)
+
+Written in Hebrew from the same steps as the English; the recorder writes them into the `.he.vtt`
+file. Not recorded yet (the demo login was not available in the W1.2 run).
+
+| #   | Hebrew                                                                    | Back-gloss                                                                                         | Note       |
+| --- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ---------- |
+| 1   | תור הסקירה מציג קישורים שנצפו ברשת ואין להם תיעוד.                        | The review queue shows links that were seen on the network and have no documentation.              | new (W1.2) |
+| 2   | הטופולוגיה עם שכבת ״נצפה״: הקישורים המתועדים, ולידם קישור רפאים.          | The topology with the "observed" layer: the documented links, and next to them a ghost link.       | new (W1.2) |
+| 3   | עוד קישור רפאים: שכן שהמתגים מדווחים עליו ב־LLDP או ב־CDP, ואין לו תיעוד. | Another ghost link: a neighbour the switches report over LLDP or CDP, and it has no documentation. | new (W1.2) |
+| 4   | קישור רפאים שלישי, בחלק אחר של הרשת.                                      | A third ghost link, in another part of the network.                                                | new (W1.2) |
+| 5   | חוזרים לתור ומחליטים מה לתעד.                                             | You go back to the queue and decide what to document.                                              | new (W1.2) |
+
+## `scripts/record-video.mjs` → `hebrew-native` captions (W1.2)
+
+Not recorded yet, as above.
+
+| #   | Hebrew                                                                | Back-gloss                                                                                                   | Note       |
+| --- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ---------- |
+| 1   | כל הממשק בעברית, בפריסה מימין לשמאל.                                  | The whole interface in Hebrew, in a right-to-left layout.                                                    | new (W1.2) |
+| 2   | היררכיית הקידומות, עם שמות אתרים בעברית לצד הכתובות.                  | The prefix hierarchy, with Hebrew site names next to the addresses.                                          | new (W1.2) |
+| 3   | שרטוט ארון, עם תוויות בעברית.                                         | A rack drawing, with labels in Hebrew.                                                                       | new (W1.2) |
+| 4   | ותור הסקירה. הממשק זמין ב־24 שפות, עם עברית וערבית מלאות מימין לשמאל. | And the review queue. The interface is available in 24 languages, with full Hebrew and Arabic right to left. | new (W1.2) |
 
 ## Latin-only strings (unchanged by design)
 

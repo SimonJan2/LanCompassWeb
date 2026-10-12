@@ -1,0 +1,25 @@
+/*
+ * PUBLIC_SITE_THEME=auto: both palettes ship and the visitor's OS picks one, with no
+ * JavaScript. Included only in an `auto` build (astro.config.mjs → themeCss); the dark
+ * mapping follows it inside @media (prefers-color-scheme: dark).
+ */
+:root[data-theme="auto"] {
+  color-scheme: light dark;
+}
+
+/* Videos: <video><source media> is ignored by browsers, so each scheme gets its own player
+   (the dark one carries data-dark) and the one that does not match is not rendered
+   (preload="none": nothing is fetched). */
+.video-frame[data-dark] {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .video-frame:not([data-dark]) {
+    display: none;
+  }
+
+  .video-frame[data-dark] {
+    display: block;
+  }
+}

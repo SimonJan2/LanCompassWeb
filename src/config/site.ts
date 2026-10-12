@@ -16,6 +16,18 @@ function readUrl(value: string | undefined): string {
   }
 }
 
+/** The site's colour theme, chosen at build time (PUBLIC_SITE_THEME). */
+export const siteThemes = ["light", "dark", "auto"] as const;
+export type SiteTheme = (typeof siteThemes)[number];
+
+function readTheme(value: string | undefined): SiteTheme {
+  const raw = read(value).toLowerCase() || "light";
+  if (!(siteThemes as readonly string[]).includes(raw)) {
+    throw new Error(`PUBLIC_SITE_THEME must be one of ${siteThemes.join(", ")} (got "${raw}").`);
+  }
+  return raw as SiteTheme;
+}
+
 const env = import.meta.env;
 
 export const site = {
@@ -29,6 +41,8 @@ export const site = {
   githubUrl: readUrl(env.PUBLIC_GITHUB_URL),
   /** Empty → "Docs" is not rendered in the navigation. */
   docsUrl: readUrl(env.PUBLIC_DOCS_URL),
+  /** light (default): survey paper · dark: Night chart · auto: follows the visitor's OS. */
+  theme: readTheme(env.PUBLIC_SITE_THEME),
   name: "LanCompass",
 } as const;
 

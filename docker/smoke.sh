@@ -1,9 +1,11 @@
 #!/bin/sh
 # Smoke test for the running container: pages, locales, 404s, redirects,
 # security headers, caching and the health endpoint.
-#   docker/smoke.sh [base-url]        default http://localhost:8088
+#   docker/smoke.sh [base-url] [theme]   defaults http://localhost:8088, light
+# The theme (light | dark | auto) is the PUBLIC_SITE_THEME the image was built with.
 set -eu
 BASE="${1:-http://localhost:8088}"
+THEME="${2:-light}"
 fail=0
 
 check() { # description, expected, actual
@@ -20,6 +22,7 @@ for path in /sitemap-index.xml /robots.txt /site.webmanifest /favicon.svg /og/he
   check "GET $path" 200 "$(status "$BASE$path")"
 done
 
+check "<html data-theme> is $THEME" 1 "$(curl -s "$BASE/" | grep -c "<html [^>]*data-theme=\"$THEME\"")"
 check "he page is rtl" 1 "$(curl -s "$BASE/he/" | grep -c '<html lang="he" dir="rtl"')"
 check "unknown URL → 404" 404 "$(status "$BASE/no-such-page/")"
 check "unknown /he/ URL → 404" 404 "$(status "$BASE/he/no-such-page/")"

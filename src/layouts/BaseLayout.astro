@@ -8,6 +8,7 @@ import plexHebrewFont from "@fontsource/ibm-plex-sans-hebrew/files/ibm-plex-sans
 import SiteFooter from "../components/SiteFooter.astro";
 import SiteHeader from "../components/SiteHeader.astro";
 import { site } from "../config/site";
+import { palettes } from "../lib/palette";
 import {
   absoluteUrl,
   defaultLocale,
@@ -45,17 +46,29 @@ const organization = {
   ...(site.contactEmail ? { email: site.contactEmail } : {}),
 };
 const structured = [organization, ...jsonLd];
+const theme = site.theme;
+const lightColour = palettes.light.page.toUpperCase();
+const darkColour = palettes.dark.page.toUpperCase();
 ---
 
 <!doctype html>
-<html lang={meta.htmlLang} dir={meta.dir}>
+<html lang={meta.htmlLang} dir={meta.dir} data-theme={theme}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="color-scheme" content="light" />
-    <meta name="theme-color" content="#F4F1EA" />
+    {theme === "light" && <meta name="color-scheme" content="light" />}
+    {theme === "light" && <meta name="theme-color" content={lightColour} />}
+    {theme === "dark" && <meta name="color-scheme" content="dark" />}
+    {theme === "dark" && <meta name="theme-color" content={darkColour} />}
+    {theme === "auto" && <meta name="color-scheme" content="light dark" />}
+    {theme === "auto" && (
+      <meta name="theme-color" media="(prefers-color-scheme: light)" content={lightColour} />
+    )}
+    {theme === "auto" && (
+      <meta name="theme-color" media="(prefers-color-scheme: dark)" content={darkColour} />
+    )}
     {notFound && <meta name="robots" content="noindex" />}
     {!notFound && <link rel="canonical" href={canonical} />}
     {!notFound &&

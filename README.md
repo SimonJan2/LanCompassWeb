@@ -20,53 +20,84 @@ must match the pinned `@playwright/test`) for tests, Lighthouse and screenshot c
 
 ## Commands
 
-| Command                | What it does                                                                 |
-| ---------------------- | ---------------------------------------------------------------------------- |
-| `npm ci`               | Install the locked dependencies.                                             |
-| `npm run dev`          | Dev server on http://localhost:4321.                                         |
-| `npm run build`        | Static build into `dist/`.                                                   |
-| `npm run preview`      | Serve `dist/` on http://localhost:4321.                                      |
-| `npm run check`        | `astro check`: Astro and TypeScript diagnostics (strictest tsconfig).        |
-| `npm run format:check` | Prettier check (`npm run format` writes).                                    |
-| `npm run test`         | Builds two test sites (`pretest`) and runs the Playwright suite in `tests/`. |
-| `npm run lhci`         | Lighthouse CI budgets (`lighthouserc.json`) against `dist/`. Build first.    |
-| `npm run links`        | `linkinator` over `dist/`, internal links only. Build first.                 |
-| `npm run capture`      | Screenshots from a running LanCompass demo estate (see below).               |
+| Command                        | What it does                                                                  |
+| ------------------------------ | ----------------------------------------------------------------------------- |
+| `npm ci`                       | Install the locked dependencies.                                              |
+| `npm run dev`                  | Dev server on http://localhost:4321.                                          |
+| `npm run build`                | Static build into `dist/`.                                                    |
+| `npm run preview`              | Serve `dist/` on http://localhost:4321.                                       |
+| `npm run check`                | `astro check`: Astro and TypeScript diagnostics (strictest tsconfig).         |
+| `npm run format:check`         | Prettier check (`npm run format` writes).                                     |
+| `npm run test`                 | Builds four test sites (`pretest`) and runs the Playwright suite in `tests/`. |
+| `npm run lhci`                 | Lighthouse CI budgets (`lighthouserc.json`) against `dist/`. Build first.     |
+| `LHCI_THEME=dark npm run lhci` | Builds `dist-lhci-dark` and runs the same URLs and budgets against it.        |
+| `npm run links`                | `linkinator` over `dist/`, internal links only. Build first.                  |
+| `npm run capture`              | Screenshots from a running LanCompass demo estate (see below).                |
 
-Ports: dev and preview use 4321; the test suite serves its second build on 4322.
+Ports: dev and preview use 4321; the test suite also serves the flags build on 4322, the dark
+build on 4323 and the auto build on 4324.
 
 ## Configuration (`PUBLIC_*`)
 
 All optional; copy `.env.example` to `.env` or set them in the build environment. An empty
 value switches the feature off. They are read at build time by `src/config/site.ts`.
 
-| Variable               | Effect                                                                                                        |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `PUBLIC_SITE_URL`      | Origin for canonical URLs, hreflang, sitemap, Open Graph. Default `http://localhost:4321`.                    |
-| `PUBLIC_CONTACT_EMAIL` | mailto fallback for the forms, disclosure and accessibility contact. Empty → visible `TODO(operator)` marker. |
-| `PUBLIC_FORM_ENDPOINT` | Forms POST here. Empty → each form is replaced by a mailto: button. Its origin is added to CSP `form-action`. |
-| `PUBLIC_GITHUB_URL`    | Footer "Source code" link. Empty → not rendered.                                                              |
-| `PUBLIC_DOCS_URL`      | "Docs" in the navigation and footer. Empty → not rendered.                                                    |
+| Variable               | Effect                                                                                                                                |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `PUBLIC_SITE_URL`      | Origin for canonical URLs, hreflang, sitemap, Open Graph. Default `http://localhost:4321`.                                            |
+| `PUBLIC_CONTACT_EMAIL` | mailto fallback for the forms, disclosure and accessibility contact. Empty → visible `TODO(operator)` marker.                         |
+| `PUBLIC_FORM_ENDPOINT` | Forms POST here. Empty → each form is replaced by a mailto: button. Its origin is added to CSP `form-action`.                         |
+| `PUBLIC_GITHUB_URL`    | Footer "Source code" link. Empty → not rendered.                                                                                      |
+| `PUBLIC_DOCS_URL`      | "Docs" in the navigation and footer. Empty → not rendered.                                                                            |
+| `PUBLIC_SITE_THEME`    | `light` (default): survey paper. `dark`: the Night chart. `auto`: both ship, the visitor's OS picks. Any other value fails the build. |
 
+### Theme
+
+The colour theme is a build-time choice, like every `PUBLIC_*` value: set
+`PUBLIC_SITE_THEME` in `.env` (or in the build environment) and rebuild. With Docker,
+`docker compose up -d --build`.
+
+- `light` builds W1.1 exactly: survey paper, paper OG images and icons, light screenshots
+  and videos.
+- `dark` builds the **Night chart**: deep indigo ground, paper-ink type, lamp-lit bands, the
+  product's Nightwire screenshots and videos, night OG images, a night manifest and
+  `theme-color`.
+- `auto` ships both palettes. CSS switches with `prefers-color-scheme`, screenshots switch
+  with `<picture><source media>` (only the matching image is fetched), each video slot
+  renders one player per scheme and hides the other, and there are two `theme-color` metas.
+  Social cards stay paper. There is no JavaScript theme logic and no toggle.
+
+How it is built: `<html data-theme>` carries the theme. `src/styles/tokens.css` holds the light
+tokens and, after its `@night` marker, every dark value once as a tagged `--lc-dark-*` token
+plus the mapping from semantic tokens to them; `src/styles/night.css` holds the few dark
+component rules and `src/styles/auto.css` the auto-only ones. A small Vite plugin in
+`astro.config.mjs` (`themeCss`) assembles the stylesheet per theme, so a light build carries
+no dark CSS at all. Colours outside CSS (OG images, icons, manifest, contour files) come from
+`src/lib/palette.ts`.
 Release-key fingerprints for `/security#verification` live in `src/content/fingerprints.json`
 (`[{ "kid": "...", "purpose": "...", "sha256": "AB:CD:..." }]`). The block renders only when
 the list is not empty; it ships empty.
 
-Videos: drop files into `public/media/` as described in `public/media/README.md`.
+Videos: drop files into `public/media/<light|nightwire>/` as described in
+`public/media/README.md`.
 
 ## Screenshots
 
 `scripts/capture-screenshots.mjs` signs in to a locally running LanCompass, sets the theme
 and language (`en`, `he`) in the capture browser's `localStorage` only, and saves 2× PNGs to
-`src/assets/screens/{en,he}/<screen>.png`. It never changes data or settings.
-`LANCOMPASS_CAPTURE_THEME` picks the product theme: `light` (default, sits on the site's
-paper), `nightwire` (the product's default dark theme) or `dark`. `LANCOMPASS_CAPTURE_DIR`
-writes to another folder instead, for example `media-library/screens/nightwire`.
+`src/assets/screens/<set>/{en,he}/<screen>.png`. It never changes data or settings.
+`LANCOMPASS_CAPTURE_THEME` picks the product theme: `light` (default, the `light/` set the
+light site shows) or `nightwire` (the product's default dark theme, the `nightwire/` set the
+dark site shows); `dark` is also accepted. `LANCOMPASS_CAPTURE_DIR` writes to another folder
+instead, for example `media-library/screens/nightwire`.
 
-`scripts/record-review-video.mjs` records the drift review-queue video the same read-only way
-(navigation and scrolling only) and writes the WebM, a poster and en + he captions. Both
-scripts were used to fill `media-library/` (light and Nightwire, en and he); see
-`media-library/README.md`.
+`scripts/record-video.mjs <key>` records one product video the same read-only way
+(navigation and scrolling only; never a layer toggle, approve, dismiss, save, import, sync or
+enable) and writes the WebM, a poster and en + he captions timed to the same steps. Keys:
+`drift-review-queue`, `documented-vs-observed`, `hebrew-native` (always he UI).
+`LANCOMPASS_VIDEO_UI` (`en` | `he`) and `LANCOMPASS_VIDEO_DIR` choose the variant and folder.
+Both scripts fill `media-library/` (light and Nightwire, en and he); see
+`media-library/README.md`, then copy the site's set into `public/media/`.
 
 ```bash
 docker run --rm --network host --user "$(id -u):$(id -g)" -e HOME=/tmp \
@@ -106,8 +137,8 @@ src/
   styles/          tokens.css (design tokens), global.css (Tailwind + base), fonts.css
   scripts/         the small client scripts (site, two sheets, forms, scroll-spy)
   lib/             build-time helpers: screenshots, OG images, WOFF2 decoding, media
-  assets/          brand/ (compass mark), screens/{en,he}/ (captures)
-scripts/           capture-screenshots.mjs, record-review-video.mjs, build-test.mjs, lhci.mjs
+  assets/          brand/ (compass mark), screens/{light,nightwire}/{en,he}/ (captures)
+scripts/           capture-screenshots.mjs, record-video.mjs, build-test.mjs, lhci.mjs
 media-library/     captured screens and videos (light + Nightwire, en + he), not built
 tests/             Playwright specs
 docs/headers.md    security headers and nginx equivalents
@@ -123,6 +154,13 @@ marginalia) and an editorial page rhythm. The compass emerald appears only in th
 the "documented" state. Every colour token in `src/styles/tokens.css` is tagged
 (`@surface`, `@accent`, `@text`) with its contrast ratios; `tests/identity.spec.ts` checks the
 distance rule. See `docs/design/originality.md`.
+
+"Night chart" (`PUBLIC_SITE_THEME=dark`) is the same chart on the chart table at night: deep
+indigo `#171C3C` ground (never near-black), paper-ink type, lamp-lit raised bands under a
+paper-ink rule, the vellum as a translucent indigo film, drift in survey pink, the observed
+network in periwinkle, and the compass emerald only for "documented" text and lines. No green
+fills, teal, glows or black shadows. Every dark token passes the same ΔE rule; the table is in
+`originality.md` → Night chart.
 
 Motion is native and CSS-only: cross-document View Transitions between pages (the wordmark and
 the page title are shared elements), section reveals with scroll-driven animations, and the
@@ -171,7 +209,8 @@ about 94 MB, runs as uid 101 on port 8080).
 cp .env.example .env              # optional: PUBLIC_* values, host port and bind address
 docker compose up -d --build      # http://localhost:8088
 docker compose ps                 # STATUS shows (healthy) once /healthz answers
-docker/smoke.sh                   # 39 checks: pages, 404s, redirects, headers, caching
+docker/smoke.sh                   # 40 checks: pages, 404s, redirects, headers, caching, theme
+docker/smoke.sh http://localhost:8088 dark   # the same against a dark build
 docker compose down
 ```
 
@@ -186,7 +225,9 @@ docker compose down
 
 `PUBLIC_*` values are **build arguments**: set them in `.env` (compose reads it) and rebuild with
 `--build`. `PUBLIC_SITE_URL` defaults to `http://localhost:<port>`; set the real origin for
-anything other than local use.
+anything other than local use. `PUBLIC_SITE_THEME=dark` in `.env` and
+`docker compose up -d --build` serve the dark site; the image's
+`org.lancompass.site-theme` label records the theme it was built with.
 
 TLS: the container speaks plain HTTP. Put it behind your TLS proxy (set
 `LANCOMPASS_WEB_BIND=127.0.0.1` when the proxy runs on the same host) and forward

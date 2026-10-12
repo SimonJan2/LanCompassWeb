@@ -1,12 +1,21 @@
 # Videos
 
-Drop the three product videos here. Until a file exists, its slot on the home
-page shows "Video coming soon". Rebuild after adding files.
+The home page has three video slots. Each recording lives in the folder of the product theme
+it was recorded in: `light/` (light and auto builds) and `nightwire/` (dark and auto builds).
+Until a file exists in either folder, its slot shows "Video coming soon". Rebuild after adding
+files. `src/lib/media.ts` resolves theme → page language → fallback (the other language, then
+the other folder).
 
-| Slot                        | Video file                           | Captions (WebVTT)                                                  | Poster (optional)             |
-| --------------------------- | ------------------------------------ | ------------------------------------------------------------------ | ----------------------------- |
-| Hebrew Excel import         | `hebrew-excel-import.mp4` or `.webm` | `hebrew-excel-import.en.vtt`, `hebrew-excel-import.he.vtt`         | `hebrew-excel-import.jpg`     |
-| Check Point gateway pull    | `check-point-gateway-pull.mp4`       | `check-point-gateway-pull.en.vtt`, `check-point-gateway-pull.he.vtt` | `check-point-gateway-pull.jpg` |
-| Drift review queue          | `drift-review-queue.mp4`             | `drift-review-queue.en.vtt`, `drift-review-queue.he.vtt`           | `drift-review-queue.jpg`      |
+| Slot                   | Key                      | Recording                 | Poster                    | Captions (WebVTT, timed to that recording)           |
+| ---------------------- | ------------------------ | ------------------------- | ------------------------- | ---------------------------------------------------- |
+| Drift review queue     | `drift-review-queue`     | `<set>/<key>.<ui>.webm`   | `<set>/<key>.<ui>.webp`   | `<set>/<key>.<ui>.en.vtt`, `<set>/<key>.<ui>.he.vtt` |
+| Documented vs observed | `documented-vs-observed` | same pattern              | same pattern              | same pattern                                         |
+| Hebrew, right to left  | `hebrew-native`          | same pattern, `<ui>` = he | same pattern, `<ui>` = he | same pattern                                         |
 
-Videos never autoplay and load nothing until the visitor presses play.
+`<set>` is `light` or `nightwire`; `<ui>` is the product's interface language (`en` or `he`).
+The English page shows the `en` variant and the Hebrew page the `he` variant; `hebrew-native`
+is always `he`. Record them with `scripts/record-video.mjs <key>` (README → Screenshots) into
+`media-library/videos/<set>-<ui>/`, then copy them here under these names (posters as WebP).
+
+Videos never autoplay and load nothing until the visitor scrolls near them or presses play.
+No caption track is marked `default`; both are in the player's menu.

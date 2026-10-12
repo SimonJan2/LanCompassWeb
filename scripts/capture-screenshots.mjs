@@ -7,12 +7,14 @@
  *   LANCOMPASS_CAPTURE_THEME=light npm run capture
  *
  * LANCOMPASS_CAPTURE_THEME: "light" (default, sits on the site's paper), "nightwire" (the
- * product's default dark theme) or "dark". LANCOMPASS_CAPTURE_DIR writes the PNGs to another
- * folder (for example media-library/screens/nightwire) instead of src/assets/screens.
+ * product's default dark theme) or "dark". By default the PNGs go to the site's set for that
+ * theme, src/assets/screens/<light|nightwire>/ (the dark site shows Nightwire).
+ * LANCOMPASS_CAPTURE_DIR writes them to another folder (for example
+ * media-library/screens/nightwire) instead.
  *
  * Read-only: it signs in, sets the theme and language in this browser's
  * localStorage only ("lancompass:prefs"), visits each screen and saves a 2×
- * PNG to src/assets/screens/<locale>/<screen>.png. It never clicks anything
+ * PNG to <set>/<locale>/<screen>.png. It never clicks anything
  * that changes data or settings. Missing screens are reported, not faked.
  * Run it in the Playwright container (see README.md).
  */
@@ -35,10 +37,15 @@ if (!(theme in productThemes)) {
 }
 const productTheme = productThemes[theme];
 const colorScheme = theme === "light" ? "light" : "dark";
-/** Where the PNGs go: the site's screens by default, or a library folder. */
+/** Where the PNGs go: the site's set for this theme by default, or a library folder. */
 const outRoot = process.env.LANCOMPASS_CAPTURE_DIR
   ? `${process.env.LANCOMPASS_CAPTURE_DIR.replace(/\/$/, "")}/`
-  : fileURLToPath(new URL("../src/assets/screens/", import.meta.url));
+  : fileURLToPath(
+      new URL(
+        `../src/assets/screens/${theme === "light" ? "light" : "nightwire"}/`,
+        import.meta.url,
+      ),
+    );
 
 /**
  * Screen key → product route and the element that proves it rendered. Optional steps,

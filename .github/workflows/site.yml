@@ -44,12 +44,19 @@ jobs:
       - name: Internal links
         run: npm run links
 
-      - name: Playwright — routes, axe (both locales, 390 and 1440 px), RTL, motion, origins, flags, content, forms
-        # pretest builds dist-test and dist-test-flags; origins.spec checks no built page references an external origin.
+      - name: Playwright — routes, axe (both locales, 390 and 1440 px), RTL, motion, origins, flags, content, forms, identity, theme, media
+        # pretest builds dist-test, dist-test-flags, dist-test-dark and dist-test-auto; the light
+        # project runs every spec, the dark / auto-dark / auto-light projects run the themed ones.
         run: npm run test
 
-      - name: Lighthouse CI budgets
+      - name: Lighthouse CI budgets (light)
         run: npm run lhci
+
+      - name: Lighthouse CI budgets (dark)
+        # Builds dist-lhci-dark and runs the same four URLs and budgets against it.
+        run: npm run lhci
+        env:
+          LHCI_THEME: dark
 
       - name: Keep reports
         if: always()
@@ -63,9 +70,14 @@ jobs:
           if-no-files-found: ignore
 
   docker:
-    # Builds the production image, runs it the way compose.yaml does, and checks it.
+    # Builds the production image, runs it the way compose.yaml does, and checks it, once per theme.
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        theme: [light, dark]
     env:
+      PUBLIC_SITE_THEME: ${{ matrix.theme }}
       # Secrets are not available to pull requests from forks; skip the login there.
       HAS_DOCKERHUB: ${{ secrets.DOCKERHUB_TOKEN != '' }}
     steps:
@@ -83,8 +95,8 @@ jobs:
       - name: Build and start (compose.yaml)
         run: docker compose up -d --build --wait --wait-timeout 60
 
-      - name: Smoke test (pages, 404s, redirects, headers, caching)
-        run: docker/smoke.sh http://localhost:8088
+      - name: Smoke test (pages, 404s, redirects, headers, caching, theme)
+        run: docker/smoke.sh http://localhost:8088 "$PUBLIC_SITE_THEME"
 
       - name: Enforced CSP in a real browser
         run: >

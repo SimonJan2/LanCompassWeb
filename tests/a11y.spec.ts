@@ -1,6 +1,10 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { FLAGS, pages, pathFor } from "./helpers";
+import { FLAGS, pages, pathFor, siteBase, siteProject } from "./helpers";
+
+/** A build with the form endpoint configured: the light flags build, or the theme build
+ *  itself (the dark and auto test builds set PUBLIC_FORM_ENDPOINT; scripts/build-test.mjs). */
+const formsBase = () => (siteProject().theme === "light" ? FLAGS : siteBase());
 
 const widths = [390, 1440];
 
@@ -25,7 +29,7 @@ test.describe("axe: zero violations", () => {
   test("forms (endpoint configured) have zero violations in both locales", async ({ page }) => {
     for (const locale of ["en", "he"] as const) {
       for (const which of ["design-partners", "contact"] as const) {
-        await page.goto(`${FLAGS}${pathFor(locale, which)}`);
+        await page.goto(`${formsBase()}${pathFor(locale, which)}`);
         // Show every error state too.
         await page.locator("form[data-lc-form] button[type=submit]").click();
         const results = await new AxeBuilder({ page })
@@ -110,7 +114,7 @@ test.describe("keyboard", () => {
     await page.route("https://forms.example.com/**", (route) =>
       route.fulfill({ status: 200, body: "ok" }),
     );
-    await page.goto(`${FLAGS}/design-partners/`);
+    await page.goto(`${formsBase()}/design-partners/`);
     const focusedName = () =>
       page.evaluate(() => {
         const el = document.activeElement as HTMLInputElement | null;

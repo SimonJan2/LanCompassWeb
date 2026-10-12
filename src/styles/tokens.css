@@ -131,3 +131,106 @@
     "IBM Plex Sans Hebrew", "IBM Plex Sans Hebrew Latin", ui-sans-serif, system-ui, sans-serif;
   --lc-font-display: var(--lc-font-sans);
 }
+
+/*
+ * ---- Night chart: the dark theme (PUBLIC_SITE_THEME=dark | auto) ----------------------
+ * The same chart on the chart table at night: deep indigo ground, paper-ink type, the
+ * vellum as a translucent film, drift in survey pink, the observed network in periwinkle,
+ * the compass emerald only where something is documented (text and lines, never a fill).
+ *
+ * Everything from the @night marker to the end of this file is left out of a light build
+ * (astro.config.mjs → themeCss), so the light site is unchanged. Each dark value is
+ * defined once, as a tagged --lc-dark-* token; the mapping block points the semantic
+ * tokens at them, and components only ever read semantic tokens. A `dark` build applies
+ * the mapping to :root[data-theme="dark"]; an `auto` build re-emits the same block as
+ * :root[data-theme="auto"] inside @media (prefers-color-scheme: dark).
+ *
+ * The distance rule is the same as above (ΔE2000 ≥ 15 from each NetBox Labs value), and
+ * the page is not near-black (L* ≥ 10). Translucent dark values are measured composited
+ * over the night page. Contrast ratios read "night / raised / card"; on the sunk table
+ * (#1b2046) ink is 13.24, muted 8.25, faint 6.03, control 4.16, documented 5.97,
+ * drift 6.77, observed 7.76, focus 10.62, Hebrew ink 12.22.
+ */
+/* @night */
+:root {
+  --lc-dark-night: #171c3c; /* @surface ΔE 16.1, L* 11.5 — the page */
+  --lc-dark-sunk: #1b2046; /* @surface ΔE 17.8 — the table: datasheet, footer, alternate sections */
+  --lc-dark-raised: #1f2550; /* @surface ΔE 19.0 — lamp-lit bands, the observed plate */
+  --lc-dark-card: #262c58; /* @surface ΔE 19.1 — cards, plates, the vellum film */
+  --lc-dark-contour: #2a305a; /* @surface ΔE 18.8 — contour lines: 1.32:1 night, faint on purpose */
+  --lc-dark-rule: #3a4170; /* @surface ΔE 21.0 — hairlines (decorative): 1.71 / 1.51 / 1.37 */
+  --lc-dark-rule-strong: #4e5690; /* @surface ΔE 26.1 — section rules, frames: 2.41 / 2.13 / 1.93 */
+  --lc-dark-lamp-rule: #edebf2; /* @surface ΔE 27.5 — the paper-ink top rule of a lamp-lit band */
+  --lc-dark-control: #7880b8; /* @surface ΔE 37.5 — form control borders: 4.40 / 3.88 / 3.52 */
+  --lc-dark-shadow: rgba(17, 22, 58, 0.6); /* @surface ΔE 16.6 over night — indigo, not black */
+  --lc-dark-scrim: rgba(17, 22, 58, 0.72); /* @surface ΔE 16.6 over night — dialog backdrop */
+
+  --lc-dark-ink: #edebf2; /* @text 14.01 / 12.35 / 11.22 */
+  --lc-dark-ink-muted: #b7bbd4; /* @text 8.73 / 7.70 / 6.99 */
+  --lc-dark-ink-faint: #9a9fc0; /* @text 6.38 / 5.63 / 5.11; 4.83 observed wash, 5.48 drift wash */
+  --lc-dark-ink-he: #e4e2ec; /* @text 12.93 / 11.39 / 10.35 — Hebrew body ink (static 400 face) */
+
+  --lc-dark-action: #f4f1ea; /* @accent ΔE 23.8 — paper on night: night text on it 14.68:1 */
+  --lc-dark-action-hover: #ffffff; /* @accent ΔE 25.4 — night text on it 16.56:1 */
+  --lc-dark-action-text: #171c3c; /* @text — the label on a primary action: 14.68:1 */
+  --lc-dark-focus: #c9d3ff; /* @accent ΔE 32.3 — focus ring: 11.24 / 9.90 / 9.00 */
+
+  --lc-dark-documented: #22b583; /* @accent ΔE 15.9 — text: 6.31 / 5.56 / 5.06, 5.15 on its wash */
+  --lc-dark-documented-line: #10b981; /* @accent ΔE 15.2 — strokes and marks: 6.53 / 5.75 / 5.23 */
+  --lc-dark-documented-wash: #232c52; /* @surface ΔE 17.7 — indigo, never a green fill */
+  --lc-dark-drift: #f28ca6; /* @accent ΔE 27.2 — survey pink: 7.16 / 6.31 / 5.73, 6.15 on its wash */
+  --lc-dark-drift-wash: #3a2142; /* @surface ΔE 19.2 */
+  --lc-dark-observed: #9db4ff; /* @accent ΔE 36.8 — periwinkle: 8.21 / 7.23 / 6.57, 6.20 on its wash */
+  --lc-dark-observed-wash: #252f66; /* @surface ΔE 19.2 */
+}
+
+/* @night-rules: the mapping. Semantic token → dark value; nothing here defines a colour. */
+:root[data-theme="dark"] {
+  --lc-paper: var(--lc-dark-night);
+  --lc-paper-raised: var(--lc-dark-card);
+  --lc-paper-sunk: var(--lc-dark-sunk);
+  --lc-rule: var(--lc-dark-rule);
+  --lc-rule-strong: var(--lc-dark-rule-strong);
+  --lc-contour: var(--lc-dark-contour);
+  --lc-control: var(--lc-dark-control);
+  --lc-shadow: var(--lc-dark-shadow);
+  --lc-scrim: var(--lc-dark-scrim);
+  --lc-lamp-rule: var(--lc-dark-lamp-rule);
+
+  /* Night bands become lamp-lit bands: raised indigo, never darker than the page. */
+  --lc-night: var(--lc-dark-raised);
+  --lc-night-raised: var(--lc-dark-card);
+  --lc-night-rule: var(--lc-dark-rule-strong);
+  --lc-night-contour: var(--lc-dark-contour);
+  --lc-night-text: var(--lc-dark-ink);
+  --lc-night-muted: var(--lc-dark-ink-muted);
+
+  --lc-ink: var(--lc-dark-ink);
+  --lc-ink-muted: var(--lc-dark-ink-muted);
+  --lc-ink-faint: var(--lc-dark-ink-faint);
+
+  --lc-action: var(--lc-dark-action);
+  --lc-action-hover: var(--lc-dark-action-hover);
+  --lc-action-text: var(--lc-dark-action-text);
+  --lc-focus: var(--lc-dark-focus);
+  --lc-focus-night: var(--lc-dark-focus);
+
+  --lc-documented: var(--lc-dark-documented);
+  --lc-documented-line: var(--lc-dark-documented-line);
+  --lc-documented-night: var(--lc-dark-documented);
+  --lc-documented-wash: var(--lc-dark-documented-wash);
+  --lc-drift: var(--lc-dark-drift);
+  --lc-drift-night: var(--lc-dark-drift);
+  --lc-drift-wash: var(--lc-dark-drift-wash);
+  --lc-observed: var(--lc-dark-observed);
+  --lc-observed-night: var(--lc-dark-observed);
+  --lc-observed-wash: var(--lc-dark-observed-wash);
+
+  color-scheme: dark;
+}
+
+/* Hebrew body text stays at the static 400 face, so its ink comes down a touch instead. */
+:root[data-theme="dark"]:lang(he) {
+  --lc-ink: var(--lc-dark-ink-he);
+  --lc-night-text: var(--lc-dark-ink-he);
+}

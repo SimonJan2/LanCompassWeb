@@ -1,7 +1,8 @@
 ---
 /**
  * A product screenshot in a device-less window frame drawn in CSS. Serves the
- * capture from src/assets/screens/<locale>/<screen>.png through Astro's image
+ * capture from src/assets/screens/<set>/<locale>/<screen>.png (set: light, or nightwire
+ * in a dark build; an auto build ships both in one <picture>) through Astro's image
  * pipeline (AVIF + WebP at 800 and 1600 px, explicit size; two widths keep the markup short
  * — 800 covers phones, 1600 covers 2× desktop frames). While a capture is missing it
  * renders a schematic placeholder of the same 16:10 shape. Screenshots are never
@@ -9,6 +10,7 @@
  */
 import { Picture, getImage } from "astro:assets";
 import { fill, locales, useUi, type Locale } from "../i18n";
+import { site } from "../config/site";
 import { findScreen, type ScreenKey } from "../lib/screens";
 
 interface Props {
@@ -39,7 +41,33 @@ const {
 } = Astro.props;
 const ui = useUi(locale);
 const name = ui.screenshot.screens[screen];
-const image = findScreen(screenLocale, screen);
+const image = findScreen(site.theme, screenLocale, screen);
+/** auto: the Nightwire capture behind a prefers-color-scheme: dark source, so the browser
+ *  fetches only the one that matches. Kept lean so the Hebrew home page stays inside its first
+ *  round trip (10 TCP segments) and its LCP budget: WebP only (no AVIF sources), and the small
+ *  single-width atlas previews stay light in both schemes. */
+const darkImage = site.theme === "auto" ? findScreen("nightwire", screenLocale, screen) : null;
+const darkMedia = "(prefers-color-scheme: dark)";
+const srcset = async (src: NonNullable<typeof image>, format: "webp") => {
+  const out = await Promise.all(
+    [800, 1600]
+      .filter((w) => w <= src.width)
+      .map(async (w) => `${(await getImage({ src, width: w, format })).src} ${w}w`),
+  );
+  return out.join(", ");
+};
+const autoPicture =
+  image && darkImage && !single
+    ? {
+        dark: await srcset(darkImage, "webp"),
+        light: await srcset(image, "webp"),
+        fallback: await getImage({
+          src: image,
+          width: Math.min(1600, image.width),
+          format: "webp",
+        }),
+      }
+    : null;
 const pattern =
   screen === "rack"
     ? "rack"
@@ -66,7 +94,22 @@ const plainName = name.replace(/<[^>]+>/g, "");
     <span></span>
     <span></span>
   </div>
-  {image && singleImage ? (
+  {image && autoPicture ? (
+    <picture>
+      <source media={darkMedia} srcset={autoPicture.dark} sizes={sizes} />
+      <img
+        src={autoPicture.fallback.src}
+        srcset={autoPicture.light}
+        sizes={sizes}
+        alt={fill(ui.screenshot.alt, { screen: plainName })}
+        loading={eager ? "eager" : "lazy"}
+        decoding="async"
+        width={image.width}
+        height={image.height}
+        class="shot-img"
+      />
+    </picture>
+  ) : image && singleImage ? (
     <img
       src={singleImage.src}
       width={singleImage.attributes.width}

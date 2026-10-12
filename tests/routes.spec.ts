@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { DEFAULT, defaultLocale, localeCodes, locales, pages, pathFor } from "./helpers";
+import { defaultLocale, localeCodes, locales, pages, pathFor, siteBase } from "./helpers";
 
 test.describe("routes and locales", () => {
   for (const p of pages) {
@@ -11,16 +11,16 @@ test.describe("routes and locales", () => {
       await expect(html).toHaveAttribute("dir", p.dir);
       await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
         "href",
-        `${DEFAULT}${p.path}`,
+        `${siteBase()}${p.path}`,
       );
       for (const code of localeCodes) {
         await expect(
           page.locator(`link[rel="alternate"][hreflang="${locales[code].htmlLang}"]`),
-        ).toHaveAttribute("href", `${DEFAULT}${pathFor(code, p.page)}`);
+        ).toHaveAttribute("href", `${siteBase()}${pathFor(code, p.page)}`);
       }
       await expect(page.locator('link[rel="alternate"][hreflang="x-default"]')).toHaveAttribute(
         "href",
-        `${DEFAULT}${pathFor(defaultLocale, p.page)}`,
+        `${siteBase()}${pathFor(defaultLocale, p.page)}`,
       );
       await expect(page.locator("h1")).toHaveCount(1);
       expect(await page.title()).not.toBe("");
@@ -39,7 +39,7 @@ test.describe("routes and locales", () => {
       }
       const other = localeCodes.find((c) => c !== p.locale)!;
       await page.locator(`footer [data-locale-link="${other}"]`).click();
-      await expect(page).toHaveURL(`${DEFAULT}${pathFor(other, p.page)}`);
+      await expect(page).toHaveURL(`${siteBase()}${pathFor(other, p.page)}`);
       await expect(page.locator("html")).toHaveAttribute("lang", locales[other].htmlLang);
     });
   }
@@ -76,6 +76,6 @@ test.describe("routes and locales", () => {
       expect(og.headers()["content-type"]).toContain("image/png");
     }
     const robots = await (await request.get("/robots.txt")).text();
-    expect(robots).toContain(`Sitemap: ${DEFAULT}/sitemap-index.xml`);
+    expect(robots).toContain(`Sitemap: ${siteBase()}/sitemap-index.xml`);
   });
 });

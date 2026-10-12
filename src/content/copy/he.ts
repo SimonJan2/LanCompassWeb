@@ -283,14 +283,11 @@ export const he: Copy = {
     },
     videos: {
       eyebrow: "סרטונים",
-      title: "שלושה סרטונים קצרים, משימה בכל אחד.",
+      title: "שלושה סרטונים קצרים מרשת ההדגמה.",
       items: [
-        { key: "hebrew-excel-import", title: "ייבוא קובץ אקסל בעברית" },
-        {
-          key: "check-point-gateway-pull",
-          title: "משיכת נתונים חיים משער <bdi>Check Point</bdi>",
-        },
         { key: "drift-review-queue", title: "עבודה עם תור הסקירה" },
+        { key: "documented-vs-observed", title: "קישורים שנצפו ברשת וחסרים בתיעוד" },
+        { key: "hebrew-native", title: "<bdi>LanCompass</bdi> בעברית, מימין לשמאל" },
       ],
     },
     partners: {

@@ -29,11 +29,14 @@ ARG PUBLIC_CONTACT_EMAIL=""
 ARG PUBLIC_FORM_ENDPOINT=""
 ARG PUBLIC_GITHUB_URL=""
 ARG PUBLIC_DOCS_URL=""
+# light (default) | dark | auto — see README → Configuration.
+ARG PUBLIC_SITE_THEME=light
 ENV PUBLIC_SITE_URL=${PUBLIC_SITE_URL} \
     PUBLIC_CONTACT_EMAIL=${PUBLIC_CONTACT_EMAIL} \
     PUBLIC_FORM_ENDPOINT=${PUBLIC_FORM_ENDPOINT} \
     PUBLIC_GITHUB_URL=${PUBLIC_GITHUB_URL} \
-    PUBLIC_DOCS_URL=${PUBLIC_DOCS_URL}
+    PUBLIC_DOCS_URL=${PUBLIC_DOCS_URL} \
+    PUBLIC_SITE_THEME=${PUBLIC_SITE_THEME}
 
 RUN npx astro build \
  && node docker/render-nginx-headers.mjs dist/_headers /app/security-headers.conf \
@@ -44,11 +47,13 @@ FROM ${NGINX_IMAGE} AS runtime
 
 ARG VERSION=0.1.0
 ARG REVISION=unknown
+ARG PUBLIC_SITE_THEME=light
 LABEL org.opencontainers.image.title="LanCompass website" \
       org.opencontainers.image.description="Static bilingual (en/he) marketing site for LanCompass, served by nginx." \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.revision="${REVISION}" \
-      org.opencontainers.image.source="https://github.com/SimonJan2/LanCompassWeb"
+      org.opencontainers.image.source="https://github.com/SimonJan2/LanCompassWeb" \
+      org.lancompass.site-theme="${PUBLIC_SITE_THEME}"
 
 # Our config replaces the image defaults, so the entrypoint's IPv6 and template steps have nothing to edit.
 USER root

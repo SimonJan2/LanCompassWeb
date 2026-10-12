@@ -10,20 +10,23 @@
  *  - otherwise: a CSS background from a cached same-origin file (src/pages/contours/),
  *    so the coordinates are not repeated in every page's HTML.
  */
+import { site } from "../../config/site";
 import { contourMaps, type ContourMap, type ContourTone } from "../../lib/contour-maps";
 import { contourPaths } from "../../lib/contours";
 
 interface Props {
   /** Which map to draw; each is a fixed, deterministic set of hills. */
   map?: ContourMap;
-  /** "night" on a night band. */
+  /** "night" on a night band (and everywhere in a dark build). */
   tone?: ContourTone;
   /** The first, above-the-fold section: drawn inline (see above). */
   eager?: boolean;
   class?: string;
 }
 
-const { map = "hero", tone = "paper", eager = false, class: className } = Astro.props;
+const { map = "hero", tone: requested = "paper", eager = false, class: className } = Astro.props;
+// A dark page is night everywhere: every contour file it uses is the night tone.
+const tone: ContourTone = site.theme === "dark" ? "night" : requested;
 const paths = eager ? contourPaths(contourMaps[map], 10) : [];
 ---
 

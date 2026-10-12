@@ -1,5 +1,6 @@
 // @ts-check
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
@@ -16,6 +17,55 @@ if (!/^https?:\/\/[^/]/.test(siteUrl)) {
   );
 }
 const formEndpoint = env.PUBLIC_FORM_ENDPOINT || "";
+const siteTheme = (env.PUBLIC_SITE_THEME || "light").trim().toLowerCase() || "light";
+if (!["light", "dark", "auto"].includes(siteTheme)) {
+  throw new Error(
+    `PUBLIC_SITE_THEME must be one of light, dark, auto (got "${env.PUBLIC_SITE_THEME}").`,
+  );
+}
+
+/**
+ * Builds the theme's stylesheet from one source of truth. src/styles/tokens.css holds the
+ * light tokens, then (after the @night marker) the --lc-dark-* tokens and, after
+ * @night-rules, the mapping from semantic tokens to them, scoped to
+ * :root[data-theme="dark"]. src/styles/night.css holds the few dark component rules.
+ *  - light: the light tokens only, so the light site is unchanged;
+ *  - dark:  everything, as written;
+ *  - auto:  light tokens, dark tokens, src/styles/auto.css, and the mapping plus night.css
+ *           re-emitted as :root[data-theme="auto"] inside @media (prefers-color-scheme: dark).
+ * Tailwind reads imported stylesheets from disk, so this runs on global.css, before Tailwind.
+ * @returns {import("vite").Plugin}
+ */
+function themeCss() {
+  const styles = fileURLToPath(new URL("./src/styles/", import.meta.url));
+  const read = (/** @type {string} */ name) => readFile(join(styles, name), "utf8");
+  return {
+    name: "lancompass:theme-css",
+    enforce: "pre",
+    async transform(code, id) {
+      if (!id.split("?")[0]?.endsWith("/src/styles/global.css")) return null;
+      for (const name of ["tokens.css", "night.css", "auto.css"])
+        this.addWatchFile(join(styles, name));
+      const tokens = await read("tokens.css");
+      const [light = "", night = ""] = tokens.split("/* @night */");
+      const cut = night.indexOf("/* @night-rules");
+      const darkTokens = night.slice(0, cut);
+      const mapping = night.slice(cut);
+      let css = light;
+      if (siteTheme === "dark") css = `${tokens}\n${await read("night.css")}`;
+      if (siteTheme === "auto") {
+        const rules = `${mapping}\n${await read("night.css")}`.replaceAll(
+          '[data-theme="dark"]',
+          '[data-theme="auto"]',
+        );
+        css = `${light}\n${darkTokens}\n${await read("auto.css")}\n@media (prefers-color-scheme: dark) {\n${rules}\n}`;
+      }
+      const marker = '@import "./tokens.css";';
+      if (!code.includes(marker)) throw new Error(`themeCss: ${marker} not found in global.css`);
+      return { code: code.replace(marker, () => css), map: null };
+    },
+  };
+}
 
 /**
  * Moves /<locale>/404/index.html to /<locale>/404.html, where static hosts that
@@ -88,7 +138,7 @@ export default defineConfig({
   devToolbar: { enabled: false },
   prefetch: false,
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [themeCss(), tailwindcss()],
     // Never inline scripts into HTML: the CSP has no 'unsafe-inline' for scripts.
     build: { assetsInlineLimit: 0 },
   },

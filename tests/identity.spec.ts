@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { pages } from "./helpers";
+import { pages, rendersDark, siteProject } from "./helpers";
 
 /**
  * The originality guard. Every @surface and @accent colour token in
@@ -26,6 +26,8 @@ const NETBOX = [
 ];
 const MIN_DELTA_E = 15;
 const PAPER: RGB = [0xf4, 0xf1, 0xea];
+/** The Night chart page (--lc-dark-night): translucent dark tokens are measured over it. */
+const NIGHT: RGB = [0x17, 0x1c, 0x3c];
 
 type RGB = [number, number, number];
 type Lab = [number, number, number];
@@ -99,14 +101,14 @@ function hexToRgb(hex: string): RGB {
   return [0, 2, 4].map((i) => parseInt(full.slice(i, i + 2), 16)) as RGB;
 }
 
-/** A colour value as opaque RGB; translucent colours are composited over paper. */
-function parseColour(value: string): RGB | null {
+/** A colour value as opaque RGB; translucent colours are composited over paper (or `over`). */
+function parseColour(value: string, over: RGB = PAPER): RGB | null {
   const v = value.trim().toLowerCase();
   if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/.test(v)) return hexToRgb(v);
   const m = v.match(/^rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)(?:[\s,/]+([\d.]+))?\s*\)$/);
   if (!m) return null;
   const alpha = m[4] === undefined ? 1 : Number(m[4]);
-  return [1, 2, 3].map((i, k) => Math.round(Number(m[i]) * alpha + PAPER[k]! * (1 - alpha))) as RGB;
+  return [1, 2, 3].map((i, k) => Math.round(Number(m[i]) * alpha + over[k]! * (1 - alpha))) as RGB;
 }
 
 interface Token {
@@ -115,8 +117,12 @@ interface Token {
   tag: string | null;
 }
 
+const tokensCss = () => readFileSync(join(process.cwd(), "src", "styles", "tokens.css"), "utf8");
+
+/** Token definitions. The dark theme's mapping block (after @night-rules) only points
+ *  semantic tokens at --lc-dark-* values and defines no colour; it is checked separately. */
 function readTokens(): Token[] {
-  const css = readFileSync(join(process.cwd(), "src", "styles", "tokens.css"), "utf8");
+  const css = tokensCss().split("/* @night-rules")[0]!;
   const tokens: Token[] = [];
   for (const line of css.split("\n")) {
     const m = line.match(/^\s*(--lc-[\w-]+):\s*([^;]+);(.*)$/);
@@ -140,6 +146,14 @@ function resolve(tokens: Token[], value: string, depth = 0): string {
 
 test.describe("identity: distance from NetBox Labs", () => {
   const tokens = readTokens();
+  // Source and light-build checks: once, in the light project.
+  // (The per-page grid-paper and band checks below run in every project.)
+  test.beforeEach(() => {
+    test.skip(
+      siteProject().theme !== "light" && !test.info().title.includes("night bands"),
+      "light project only",
+    );
+  });
 
   test("tokens.css has colour tokens, and every one is tagged", () => {
     const colours = tokens.filter((t) => parseColour(resolve(tokens, t.value)) !== null);
@@ -152,7 +166,8 @@ test.describe("identity: distance from NetBox Labs", () => {
     let checked = 0;
     for (const token of tokens) {
       if (token.tag !== "surface" && token.tag !== "accent") continue;
-      const rgb = parseColour(resolve(tokens, token.value));
+      const over = /^--lc-dark-/.test(token.name) ? NIGHT : PAPER;
+      const rgb = parseColour(resolve(tokens, token.value), over);
       if (!rgb) {
         failures.push(`${token.name}: unparseable colour "${token.value}"`);
         continue;
@@ -208,6 +223,144 @@ test.describe("identity: distance from NetBox Labs", () => {
       await page.goto(p.path);
       await expect(page.locator(".grid-paper")).toHaveCount(0);
       expect(await page.locator(".surface-night").count()).toBeLessThanOrEqual(2);
+    });
+  }
+});
+
+test.describe("identity: the Night chart (dark theme)", () => {
+  const tokens = readTokens();
+
+  test("every dark token is tagged and ΔE2000 ≥ 15 from every NetBox Labs colour", () => {
+    test.skip(siteProject().theme !== "light", "a source check: light project only");
+    const dark = tokens.filter((t) => t.name.startsWith("--lc-dark-"));
+    expect(dark.length).toBeGreaterThan(20);
+    expect(dark.filter((t) => !t.tag).map((t) => t.name)).toEqual([]);
+    const failures: string[] = [];
+    for (const token of dark) {
+      if (token.tag !== "surface" && token.tag !== "accent") continue;
+      const rgb = parseColour(resolve(tokens, token.value), NIGHT);
+      if (!rgb) failures.push(`${token.name}: unparseable "${token.value}"`);
+      else
+        for (const ref of NETBOX) {
+          const d = deltaE2000(toLab(rgb), toLab(hexToRgb(ref)));
+          if (d < MIN_DELTA_E)
+            failures.push(`${token.name} ${token.value} vs ${ref}: ΔE ${d.toFixed(1)}`);
+        }
+    }
+    expect(failures).toEqual([]);
+    // The night page is not near-black.
+    const night = tokens.find((t) => t.name === "--lc-dark-night")!;
+    expect(toLab(parseColour(night.value)!)[0]).toBeGreaterThanOrEqual(10);
+  });
+
+  test("the dark mapping only points semantic tokens at --lc-dark-* tokens", () => {
+    test.skip(siteProject().theme !== "light", "a source check: light project only");
+    const mapping = tokensCss().split("/* @night-rules")[1] ?? "";
+    const lines = [...mapping.matchAll(/^\s*(--lc-[\w-]+):\s*([^;]+);/gm)];
+    expect(lines.length).toBeGreaterThan(20);
+    const names = new Set(tokens.map((t) => t.name));
+    const bad = lines
+      .filter(([, , value]) => {
+        const target = value!.trim().match(/^var\((--lc-dark-[\w-]+)\)$/)?.[1];
+        return !target || !names.has(target);
+      })
+      .map(([line]) => line!.trim());
+    expect(bad).toEqual([]);
+  });
+
+  test("no component reads a --lc-dark-* token", () => {
+    test.skip(siteProject().theme !== "light", "a source check: light project only");
+    const offenders: string[] = [];
+    const walk = (dir: string) => {
+      for (const name of readdirSync(dir, { withFileTypes: true })) {
+        const full = join(dir, name.name);
+        if (name.isDirectory()) walk(full);
+        // tokens.css defines them; palette.ts (non-CSS colour constants) names them in comments.
+        else if (/\.(astro|ts|css)$/.test(name.name) && !/(tokens\.css|palette\.ts)$/.test(full))
+          if (readFileSync(full, "utf8").includes("--lc-dark-")) offenders.push(full);
+      }
+    };
+    walk(join(process.cwd(), "src"));
+    expect(offenders).toEqual([]);
+  });
+
+  test("the home hero is indigo night (10 ≤ L* ≤ 25), not a NetBox value", async ({ page }) => {
+    test.skip(!rendersDark(), "dark rendering only");
+    for (const path of ["/", "/he/"]) {
+      await page.goto(path);
+      const colour = await page.locator(".hero").evaluate((el) => {
+        let node: Element | null = el;
+        while (node) {
+          const bg = getComputedStyle(node).backgroundColor;
+          if (bg && bg !== "transparent" && !/rgba\(.*,\s*0\)$/.test(bg)) return bg;
+          node = node.parentElement;
+        }
+        return "rgb(255, 255, 255)";
+      });
+      const rgb = parseColour(colour, NIGHT)!;
+      const L = toLab(rgb)[0];
+      expect(L, `${path} hero L*`).toBeGreaterThanOrEqual(10);
+      expect(L, `${path} hero L*`).toBeLessThanOrEqual(25);
+      for (const ref of NETBOX)
+        expect(deltaE2000(toLab(rgb), toLab(hexToRgb(ref))), ref).toBeGreaterThanOrEqual(
+          MIN_DELTA_E,
+        );
+    }
+  });
+
+  test("the home hero stays light (L* ≥ 80) where the page renders light", async ({ page }) => {
+    test.skip(rendersDark() || siteProject().theme === "light", "auto-light only");
+    await page.goto("/");
+    const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    expect(toLab(parseColour(bg)!)[0]).toBeGreaterThanOrEqual(80);
+  });
+
+  for (const p of pages) {
+    test(`${p.path}: no background or box-shadow colour within ΔE 15 of NetBox (dark)`, async ({
+      page,
+    }) => {
+      test.skip(!rendersDark(), "dark rendering only");
+      await page.goto(p.path);
+      // Screenshots and video frames are product imagery, not site colours.
+      const colours = await page.evaluate(() => {
+        // Normalise any computed colour (color(srgb …), color-mix results) to #rrggbb / rgba().
+        const ctx = document.createElement("canvas").getContext("2d")!;
+        const norm = (c: string) => {
+          const m = c.match(/^color\(srgb ([\d.]+) ([\d.]+) ([\d.]+)(?: \/ ([\d.]+))?\)$/);
+          if (m) {
+            const [r, g, b] = [m[1], m[2], m[3]].map((v) => Math.round(Number(v) * 255));
+            return `rgba(${r}, ${g}, ${b}, ${m[4] ?? 1})`;
+          }
+          ctx.fillStyle = "#010203";
+          ctx.fillStyle = c;
+          const out = String(ctx.fillStyle);
+          return out === "#010203" ? c : out;
+        };
+        const out: { where: string; colour: string }[] = [];
+        const skip = "picture, img, video, .shot-img, .video-frame, .compass-mark, svg.mark";
+        for (const el of document.body.querySelectorAll<HTMLElement>("*")) {
+          if (el.closest(skip)) continue;
+          const style = getComputedStyle(el);
+          if (style.display === "none" || style.visibility === "hidden") continue;
+          const where = `${el.tagName.toLowerCase()}.${[...el.classList].join(".")}`;
+          const bg = style.backgroundColor;
+          if (bg && !/^rgba\(.*,\s*0\)$/.test(bg) && bg !== "transparent")
+            out.push({ where, colour: norm(bg) });
+          for (const m of style.boxShadow.matchAll(/(?:rgba?|color)\([^)]*\)/g))
+            out.push({ where: `${where} [box-shadow]`, colour: norm(m[0]) });
+        }
+        return out;
+      });
+      const failures = new Set<string>();
+      for (const { where, colour } of colours) {
+        const rgb = parseColour(colour, NIGHT);
+        if (!rgb) continue;
+        for (const ref of NETBOX) {
+          const d = deltaE2000(toLab(rgb), toLab(hexToRgb(ref)));
+          if (d < MIN_DELTA_E) failures.add(`${where} ${colour} vs ${ref}: ΔE ${d.toFixed(1)}`);
+        }
+      }
+      expect([...failures]).toEqual([]);
     });
   }
 });

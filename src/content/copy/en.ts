@@ -269,11 +269,14 @@ export const en = {
     },
     videos: {
       eyebrow: "Watch",
-      title: "Three short videos, one task each.",
+      title: "Three short videos from the demo network.",
       items: [
-        { key: "hebrew-excel-import", title: "Import a Hebrew Excel workbook" },
-        { key: "check-point-gateway-pull", title: "Pull runtime data from a Check Point gateway" },
         { key: "drift-review-queue", title: "Work through the drift review queue" },
+        {
+          key: "documented-vs-observed",
+          title: "Links seen on the wire, missing from the documentation",
+        },
+        { key: "hebrew-native", title: "LanCompass in Hebrew, right to left" },
       ],
     },
     partners: {

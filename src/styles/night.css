@@ -1,0 +1,76 @@
+/*
+ * Night chart: the few component rules the dark theme needs beyond the token mapping in
+ * tokens.css. Included only in `dark` and `auto` builds (astro.config.mjs → themeCss).
+ * Every rule is scoped to :root[data-theme="dark"]; an `auto` build re-emits this file as
+ * :root[data-theme="auto"] inside @media (prefers-color-scheme: dark). Colours come from
+ * semantic tokens only.
+ */
+
+/* Typography: light ink on a dark ground reads heavier (research §4). English uses the
+   variable Plex Sans, so the compensation is exact: body 370, display 520. */
+:root[data-theme="dark"] body {
+  font-weight: 370;
+}
+
+:root[data-theme="dark"] :is(h1, h2, h3, h4) {
+  font-weight: 520;
+}
+
+/* Hebrew is set in static faces (400 and 600): the display cut stays 600, and body text
+   keeps 400 with its ink lowered a touch instead (tokens.css; the Hebrew 300 face was
+   measured and not kept: docs/design/originality.md → Night chart). */
+:root[data-theme="dark"]:lang(he) body {
+  font-weight: 400;
+}
+
+:root[data-theme="dark"]:lang(he) :is(h1, h2, h3, h4) {
+  font-weight: 600;
+}
+
+/* Lamp-lit bands: the light theme's night bands become raised indigo under a paper-ink
+   top rule. Actions inside keep the page's paper-on-night pair. */
+:root[data-theme="dark"] .surface-night {
+  --lc-action: inherit;
+  --lc-action-hover: inherit;
+  --lc-action-text: inherit;
+  border-block-start: 1px solid var(--lc-lamp-rule);
+}
+
+/* Product screenshots (Nightwire, near-black) sit on the table as objects: a mat of card
+   indigo inside the strong hairline, with a little more room around the window. */
+:root[data-theme="dark"] .shot {
+  padding: 0 0.625rem 0.625rem;
+}
+
+:root[data-theme="dark"] .shot .shot-bar {
+  margin-inline: -0.625rem;
+  margin-block-end: 0.625rem;
+}
+
+:root[data-theme="dark"] .shot :is(picture, .shot-img) {
+  border-radius: 2px;
+}
+
+:root[data-theme="dark"] :is(.video-el, .video-poster) {
+  border-color: var(--lc-rule-strong);
+}
+
+/* Two sheets: the observed sheet is a raised indigo plate (the lamp-lit tone), the vellum a
+   translucent card film over it. */
+:root[data-theme="dark"] .sheet-paper {
+  fill: var(--lc-night);
+}
+
+/* Two sheets: registration marks in paper ink at reduced opacity. */
+:root[data-theme="dark"] .reg-vellum {
+  opacity: 0.6;
+}
+
+:root[data-theme="dark"] .reg-mark {
+  opacity: 0.7;
+}
+
+/* The mobile menu's backdrop: an indigo scrim, never black. */
+:root[data-theme="dark"] .menu-sheet::backdrop {
+  background: var(--lc-scrim);
+}

@@ -1,3 +1,4 @@
+import { test } from "@playwright/test";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import {
@@ -59,3 +60,29 @@ export function builtHtml(dir: string): { file: string; html: string }[] {
 
 /** Pages allowed to show a TODO(operator) marker in visible text (listed in the W1 session report). */
 export const todoAllowed = new Set<PageKey>(["privacy", "accessibility"]);
+
+/** What a Playwright project serves (playwright.config.ts → projects[].metadata). */
+export interface SiteProject {
+  /** The build's PUBLIC_SITE_THEME. */
+  theme: "light" | "dark" | "auto";
+  /** The colour scheme the browser emulates (auto builds run under both). */
+  scheme: "light" | "dark";
+  /** The built site this project serves. */
+  dist: string;
+}
+
+/** The site under test in this project. */
+export function siteProject(): SiteProject {
+  return test.info().project.metadata as SiteProject;
+}
+
+/** The origin of the site under test (DEFAULT for the light build). */
+export function siteBase(): string {
+  return String(test.info().project.use.baseURL ?? DEFAULT).replace(/\/$/, "");
+}
+
+/** Whether the page renders the Night chart palette in this project. */
+export function rendersDark(): boolean {
+  const { theme, scheme } = siteProject();
+  return theme === "dark" || (theme === "auto" && scheme === "dark");
+}

@@ -1,4 +1,5 @@
 import { contourPaths, type Hill } from "./contours";
+import { palettes } from "./palette";
 
 /** The fixed contour maps used behind sections. Deterministic: same seed, same map. */
 export const contourMaps = {
@@ -16,10 +17,14 @@ export const contourMaps = {
 export type ContourMap = keyof typeof contourMaps;
 
 /**
- * Stroke colours, repeated from src/styles/tokens.css (--lc-contour and
- * --lc-night-contour) because a standalone SVG file cannot read CSS variables.
+ * Stroke colours (src/lib/palette.ts, from --lc-contour and --lc-night-contour), because a
+ * standalone SVG file cannot read CSS variables. The night tone is also the Night chart's
+ * contour (the same value in palette.ts): a dark page uses it everywhere.
  */
-export const contourTones = { paper: "#e3dccd", night: "#2a305a" } as const;
+export const contourTones = {
+  paper: palettes.light.contour,
+  night: palettes.light.nightContour,
+} as const;
 
 export type ContourTone = keyof typeof contourTones;
 

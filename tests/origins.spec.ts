@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { builtHtml, DEFAULT, FLAGS, FLAG_VALUES, pages } from "./helpers";
+import { builtHtml, DEFAULT, FLAGS, FLAG_VALUES, pages, siteBase, siteProject } from "./helpers";
 
 test.describe("no third parties", () => {
   for (const p of pages) {
@@ -12,21 +12,25 @@ test.describe("no third parties", () => {
       await page.goto(p.path, { waitUntil: "networkidle" });
       await page.mouse.wheel(0, 20000);
       await page.waitForLoadState("networkidle");
-      expect([...origins]).toEqual([DEFAULT]);
+      expect([...origins]).toEqual([siteBase()]);
       expect(await page.context().cookies()).toEqual([]);
     });
   }
 
   test("built HTML references no external origin except configured PUBLIC_* links", () => {
     const attr = /\s(?:src|href|srcset|poster|action|content)=["']([^"']+)["']/g;
-    const checks = [
-      { dir: "dist-test", site: DEFAULT, allowed: [] as string[] },
-      {
-        dir: "dist-test-flags",
-        site: FLAGS,
-        allowed: [FLAG_VALUES.docs, FLAG_VALUES.github, FLAG_VALUES.form],
-      },
-    ];
+    const { theme, dist } = siteProject();
+    const checks =
+      theme === "light"
+        ? [
+            { dir: "dist-test", site: DEFAULT, allowed: [] as string[] },
+            {
+              dir: "dist-test-flags",
+              site: FLAGS,
+              allowed: [FLAG_VALUES.docs, FLAG_VALUES.github, FLAG_VALUES.form],
+            },
+          ]
+        : [{ dir: dist, site: siteBase(), allowed: [FLAG_VALUES.form] }];
     for (const { dir, site, allowed } of checks) {
       const offenders: string[] = [];
       for (const { file, html } of builtHtml(dir)) {
