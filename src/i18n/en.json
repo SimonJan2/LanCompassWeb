@@ -37,9 +37,10 @@
     "navLabel": "Footer"
   },
   "drift": {
-    "label": "Animated diagram: a small network as documented, in green. An undocumented link between sw-core-02 and ap-lobby-3 appears as a dashed amber line with a finding, then turns green once it is documented.",
+    "label": "Animated diagram: the documented network, drawn on a translucent sheet, lies over the network as observed on the wire. The sheets start out of register. The observed sheet has a link the documentation lacks, between sw-core-02 and ap-lobby-3, marked in red as a finding. The sheets settle into register, the link is drawn onto the documentation and the finding turns green: documented.",
     "documented": "Documented",
-    "observed": "Observed, not documented",
+    "observed": "Observed on the wire",
+    "drift": "Not documented",
     "finding": "Undocumented link",
     "resolved": "Documented",
     "pause": "Pause animation"

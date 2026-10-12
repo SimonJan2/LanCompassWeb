@@ -1,7 +1,10 @@
 ---
 import "../styles/global.css";
-import interFont from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
-import heeboFont from "@fontsource-variable/heebo/files/heebo-hebrew-wght-normal.woff2?url";
+import plexSansFont from "@fontsource-variable/ibm-plex-sans/files/ibm-plex-sans-latin-wght-normal.woff2?url";
+import plexHebrewDisplayFont from "@fontsource/ibm-plex-sans-hebrew/files/ibm-plex-sans-hebrew-hebrew-600-normal.woff2?url";
+import plexHebrewLatinDisplayFont from "@fontsource/ibm-plex-sans-hebrew/files/ibm-plex-sans-hebrew-latin-600-normal.woff2?url";
+import plexHebrewLatinFont from "@fontsource/ibm-plex-sans-hebrew/files/ibm-plex-sans-hebrew-latin-400-normal.woff2?url";
+import plexHebrewFont from "@fontsource/ibm-plex-sans-hebrew/files/ibm-plex-sans-hebrew-hebrew-400-normal.woff2?url";
 import SiteFooter from "../components/SiteFooter.astro";
 import SiteHeader from "../components/SiteHeader.astro";
 import { site } from "../config/site";
@@ -51,8 +54,8 @@ const structured = [organization, ...jsonLd];
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="color-scheme" content="dark light" />
-    <meta name="theme-color" content="#0B0D10" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#F4F1EA" />
     {notFound && <meta name="robots" content="noindex" />}
     {!notFound && <link rel="canonical" href={canonical} />}
     {!notFound &&
@@ -75,9 +78,26 @@ const structured = [organization, ...jsonLd];
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <link rel="preload" href={interFont} as="font" type="font/woff2" crossorigin />
+    {locale !== "he" && (
+      <link rel="preload" href={plexSansFont} as="font" type="font/woff2" crossorigin />
+    )}
     {locale === "he" && (
-      <link rel="preload" href={heeboFont} as="font" type="font/woff2" crossorigin />
+      <link rel="preload" href={plexHebrewLatinFont} as="font" type="font/woff2" crossorigin />
+    )}
+    {locale === "he" && (
+      <link
+        rel="preload"
+        href={plexHebrewLatinDisplayFont}
+        as="font"
+        type="font/woff2"
+        crossorigin
+      />
+    )}
+    {locale === "he" && (
+      <link rel="preload" href={plexHebrewDisplayFont} as="font" type="font/woff2" crossorigin />
+    )}
+    {locale === "he" && (
+      <link rel="preload" href={plexHebrewFont} as="font" type="font/woff2" crossorigin />
     )}
 
     <meta property="og:type" content="website" />

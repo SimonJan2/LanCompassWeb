@@ -2,25 +2,21 @@
 @import "./tokens.css";
 @import "./fonts.css";
 
-/* Tailwind reads the design tokens; utilities like bg-ink or text-signal map to them. */
+/* Tailwind reads the design tokens; utilities like bg-paper or text-drift map to them. */
 @theme inline {
-  --color-ink: var(--lc-ink);
-  --color-ink-raised: var(--lc-ink-raised);
-  --color-ink-card: var(--lc-ink-card);
-  --color-hairline: var(--lc-hairline);
-  --color-text: var(--lc-text);
-  --color-muted: var(--lc-text-muted);
-  --color-faint: var(--lc-text-faint);
   --color-paper: var(--lc-paper);
   --color-paper-raised: var(--lc-paper-raised);
-  --color-paper-text: var(--lc-paper-text);
-  --color-paper-muted: var(--lc-paper-text-muted);
-  --color-signal: var(--lc-signal);
-  --color-signal-bright: var(--lc-signal-bright);
-  --color-signal-ink: var(--lc-signal-ink);
+  --color-paper-sunk: var(--lc-paper-sunk);
+  --color-rule: var(--lc-rule);
+  --color-night: var(--lc-night);
+  --color-night-raised: var(--lc-night-raised);
+  --color-ink: var(--lc-ink);
+  --color-ink-muted: var(--lc-ink-muted);
+  --color-ink-faint: var(--lc-ink-faint);
+  --color-action: var(--lc-action);
+  --color-documented: var(--lc-documented);
   --color-drift: var(--lc-drift);
-  --color-drift-ink: var(--lc-drift-ink);
-  --color-info: var(--lc-info);
+  --color-observed: var(--lc-observed);
   --font-sans: var(--lc-font-sans);
   --font-mono: var(--lc-font-mono);
   --container-content: var(--lc-content);
@@ -28,19 +24,21 @@
 
 @layer base {
   html {
-    background: var(--lc-ink);
-    color: var(--lc-text);
+    background: var(--lc-paper);
+    color: var(--lc-ink);
     font-family: var(--lc-font-sans);
     font-size: 100%;
     -webkit-text-size-adjust: 100%;
     text-rendering: optimizeLegibility;
     scroll-padding-block-start: 5.5rem;
+    /* Every weight in use ships as a real face; never fake a bolder one (Plex Mono is 400 only). */
+    font-synthesis-weight: none;
   }
 
   body {
     margin: 0;
-    background: var(--lc-ink);
-    color: var(--lc-text);
+    background: var(--lc-paper);
+    color: var(--lc-ink);
     font-size: var(--lc-text-body);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
@@ -53,16 +51,24 @@
   h3,
   h4 {
     margin: 0;
-    font-weight: 620;
-    line-height: 1.12;
+    font-family: var(--lc-font-display);
+    font-weight: 560;
+    line-height: 1.08;
     letter-spacing: var(--lc-tracking-display);
     text-wrap: balance;
   }
 
-  /* Hebrew display type reads better without negative tracking. */
+  h3,
+  h4 {
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+
+  /* Hebrew display: no tracking, open line height (≥ 1.15), the 600 cut of Plex Sans Hebrew. */
   :lang(he) :is(h1, h2, h3, h4) {
     letter-spacing: 0;
-    font-weight: 650;
+    font-weight: 600;
+    line-height: 1.2;
   }
 
   p {
@@ -74,11 +80,15 @@
     color: inherit;
   }
 
+  strong {
+    font-weight: 600;
+  }
+
   code,
   kbd,
   samp {
     font-family: var(--lc-font-mono);
-    font-size: 0.9em;
+    font-size: 0.88em;
   }
 
   /* Code and identifiers are always left-to-right. */
@@ -106,12 +116,12 @@
   :focus-visible {
     outline: 2px solid var(--lc-focus);
     outline-offset: 3px;
-    border-radius: 4px;
+    border-radius: 2px;
   }
 
   ::selection {
-    background: rgba(52, 211, 153, 0.3);
-    color: inherit;
+    background: var(--lc-observed-wash);
+    color: var(--lc-ink);
   }
 
   .tabular {
@@ -135,38 +145,59 @@
     padding-block: calc(var(--lc-section) * 0.6);
   }
 
-  .surface-raised {
-    background: var(--lc-ink-raised);
+  /* Below-the-fold sections skip layout until they come near the viewport; their lazy
+     images then wait too, instead of competing with the first paint. */
+  .defer-render {
+    content-visibility: auto;
+    /* Block size only: a width here would stretch grid parents past the viewport. */
+    contain-intrinsic-block-size: auto 900px;
   }
 
-  /* Light "paper" sections. Everything inside switches to ink-on-paper colours. */
-  .surface-paper {
-    --lc-text: var(--lc-paper-text);
-    --lc-text-muted: var(--lc-paper-text-muted);
-    --lc-text-faint: var(--lc-paper-text-muted);
-    --lc-hairline: var(--lc-paper-hairline);
-    --lc-hairline-strong: rgba(11, 13, 16, 0.18);
-    --lc-ink-card: var(--lc-paper-raised);
-    --lc-signal-bright: var(--lc-signal-ink);
-    --lc-drift: var(--lc-drift-ink);
-    --lc-focus: var(--lc-signal-ink);
-    background: var(--lc-paper);
-    color: var(--lc-text);
-    color-scheme: light;
+  .surface-sunk {
+    background: var(--lc-paper-sunk);
   }
 
-  .hairline-top {
-    border-block-start: 1px solid var(--lc-hairline);
+  /* Night: the deliberate dark accent band. Everything inside switches to paper-on-night. */
+  .surface-night {
+    --lc-ink: var(--lc-night-text);
+    --lc-ink-muted: var(--lc-night-muted);
+    --lc-ink-faint: var(--lc-night-muted);
+    --lc-rule: var(--lc-night-rule);
+    --lc-rule-strong: var(--lc-night-rule);
+    --lc-contour: var(--lc-night-contour);
+    --lc-paper-raised: var(--lc-night-raised);
+    --lc-action: var(--lc-paper);
+    --lc-action-hover: #ffffff;
+    --lc-action-text: var(--lc-night);
+    --lc-focus: var(--lc-focus-night);
+    --lc-documented: var(--lc-documented-night);
+    --lc-documented-line: var(--lc-documented-night);
+    --lc-drift: var(--lc-drift-night);
+    --lc-observed: var(--lc-observed-night);
+    background: var(--lc-night);
+    color: var(--lc-ink);
+    color-scheme: dark;
   }
 
-  .hairline-bottom {
-    border-block-end: 1px solid var(--lc-hairline);
+  .rule-top {
+    border-block-start: 1px solid var(--lc-rule);
+  }
+
+  .rule-bottom {
+    border-block-end: 1px solid var(--lc-rule);
   }
 
   .text-lead {
     font-size: var(--lc-text-lead);
     line-height: 1.55;
-    color: var(--lc-text-muted);
+    color: var(--lc-ink-muted);
+  }
+
+  /* Identifiers, specs and marginal notes are set in Plex Mono. */
+  .mono {
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-text-mono);
+    letter-spacing: 0;
   }
 
   .visually-hidden {
@@ -188,8 +219,8 @@
     z-index: 100;
     padding: 0.75rem 1rem;
     border-radius: var(--lc-radius-sm);
-    background: var(--lc-signal);
-    color: var(--lc-ink);
+    background: var(--lc-action);
+    color: var(--lc-paper);
     font-weight: 600;
     text-decoration: none;
   }
@@ -207,34 +238,62 @@
     display: inline-block;
     padding: 0.125rem 0.5rem;
     border: 1px dashed var(--lc-drift);
-    border-radius: 6px;
+    border-radius: var(--lc-radius-sm);
     color: var(--lc-drift);
     font-family: var(--lc-font-mono);
     font-size: var(--lc-text-xs);
     direction: ltr;
     unicode-bidi: isolate;
   }
+}
 
-  /* Grid paper behind the hero and dark bands. */
-  .grid-paper {
-    background-image:
-      linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
-    background-size: 48px 48px;
-    background-position: center top;
+/*
+ * Motion. Everything below runs only for people who have not asked for less motion.
+ *  - Cross-page navigation: native cross-document View Transitions, no JavaScript.
+ *    The header wordmark and each page's title carry a shared-element name.
+ *  - Section reveal: CSS scroll-driven animation, once the element enters the viewport.
+ * With reduced motion (or a browser without support) the page is simply static.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+
+  .site-header .logo-word {
+    view-transition-name: lc-wordmark;
+  }
+
+  main h1 {
+    view-transition-name: lc-page-title;
+  }
+
+  ::view-transition-group(*) {
+    animation-duration: 320ms;
+    animation-timing-function: var(--lc-spring-calm);
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 180ms;
+  }
+
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: lc-reveal linear both;
+    }
+
+    /* A separate rule on purpose: the CSS minifier would otherwise fold the timeline into
+       the animation shorthand, which browsers reject, and the reveal would never run. */
+    [class~="reveal"] {
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
   }
 }
 
-/* Section reveal: elements below the fold start 8px low and transparent, once. */
-@media (prefers-reduced-motion: no-preference) {
-  .reveal-armed {
+@keyframes lc-reveal {
+  from {
     opacity: 0;
-    transform: translateY(8px);
-  }
-
-  .reveal-shown {
-    transition:
-      opacity 600ms var(--lc-ease),
-      transform 600ms var(--lc-ease);
+    translate: 0 14px;
   }
 }

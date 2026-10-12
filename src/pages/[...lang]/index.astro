@@ -1,18 +1,21 @@
 ---
 import type { GetStaticPaths } from "astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import BentoGrid from "../../components/BentoGrid.astro";
+import AtlasIndex from "../../components/AtlasIndex.astro";
 import Button from "../../components/Button.astro";
 import ComparisonRow from "../../components/ComparisonRow.astro";
-import DriftMap from "../../components/DriftMap.astro";
+import Datasheet from "../../components/Datasheet.astro";
 import Eyebrow from "../../components/Eyebrow.astro";
-import FactStrip from "../../components/FactStrip.astro";
 import FeatureCard from "../../components/FeatureCard.astro";
 import Icon, { type IconName } from "../../components/Icon.astro";
-import IntegrationTile from "../../components/IntegrationTile.astro";
+import MapLegend from "../../components/MapLegend.astro";
 import SectionHeading from "../../components/SectionHeading.astro";
 import StepTimeline from "../../components/StepTimeline.astro";
+import TwoSheets from "../../components/TwoSheets.astro";
 import VideoSlot from "../../components/VideoSlot.astro";
+import BearingScale from "../../components/motifs/BearingScale.astro";
+import Contours from "../../components/motifs/Contours.astro";
+import Marginalia from "../../components/motifs/Marginalia.astro";
 import { getCopy } from "../../content/copy";
 import { absoluteUrl, localeStaticPaths, pagePath, type Locale } from "../../i18n";
 import { isScreenKey } from "../../lib/screens";
@@ -27,6 +30,7 @@ const { locale } = Astro.props;
 const copy = getCopy(locale);
 const h = copy.home;
 const partnersHref = `${pagePath(locale, "design-partners")}#apply`;
+const productHref = pagePath(locale, "product");
 const offlineIcons: IconName[] = ["offline", "eye", "lock", "key", "users", "log"];
 const softwareApplication = {
   "@context": "https://schema.org",
@@ -39,6 +43,13 @@ const softwareApplication = {
   inLanguage: locale,
 };
 const hebrewScreen = isScreenKey(h.hebrew.screen) ? h.hebrew.screen : "dashboard";
+const atlasRows = h.atlas.rows.map((row) => ({
+  key: row.key,
+  title: row.title,
+  text: row.text,
+  screen: row.screen,
+  href: `${productHref}#${row.section}`,
+}));
 ---
 
 <BaseLayout
@@ -48,8 +59,9 @@ const hebrewScreen = isScreenKey(h.hebrew.screen) ? h.hebrew.screen : "dashboard
   description={copy.meta.home.description}
   jsonLd={[softwareApplication]}
 >
-  <!-- 1. Hero -->
-  <section class="hero grid-paper" aria-labelledby="hero-title">
+  <!-- Hero: light, survey paper. -->
+  <section class="hero" aria-labelledby="hero-title">
+    <Contours map="hero" eager />
     <div class="container-site hero-inner">
       <div class="hero-copy">
         <ul class="hero-chips" role="list">
@@ -67,53 +79,70 @@ const hebrewScreen = isScreenKey(h.hebrew.screen) ? h.hebrew.screen : "dashboard
         </div>
       </div>
       <div class="hero-visual">
-        <DriftMap locale={locale} />
+        <TwoSheets locale={locale} />
       </div>
     </div>
+    <div class="container-site hero-margin">
+      <Marginalia notes={h.hero.marginalia} class="hero-notes" />
+    </div>
+    <BearingScale mark={0} class="hero-scale" />
   </section>
 
-  <!-- 2. Fact strip -->
-  <section class="facts-section" aria-label={h.hero.chips.join(" · ")}>
+  <!-- Datasheet, in place of a logo wall. -->
+  <section class="datasheet-section" aria-labelledby="datasheet-title">
     <div class="container-site">
-      <FactStrip facts={h.facts} />
+      <Datasheet
+        id="datasheet-title"
+        title={h.datasheet.title}
+        note={h.datasheet.note}
+        rows={h.datasheet.rows}
+      />
     </div>
   </section>
 
-  <!-- 3. The loop -->
-  <section class="section surface-paper" id="how-it-works" aria-labelledby="loop-title">
+  <!-- 045° The loop -->
+  <section class="section defer-render" id="how-it-works" aria-labelledby="loop-title">
     <div class="container-site">
       <SectionHeading
+        bearing={45}
         eyebrow={h.loop.eyebrow}
         title={h.loop.title}
         lead={h.loop.lead}
         id="loop-title"
       />
-      <StepTimeline locale={locale} steps={h.loop.steps} />
+      <StepTimeline locale={locale} steps={h.loop.steps} figure={h.loop.figure} />
     </div>
   </section>
 
-  <!-- 4. Bento -->
-  <section class="section" id="capabilities" aria-labelledby="bento-title">
+  <!-- 090° Atlas index -->
+  <section
+    class="section defer-render surface-sunk"
+    id="capabilities"
+    aria-labelledby="atlas-title"
+  >
     <div class="container-site">
       <SectionHeading
-        eyebrow={h.bento.eyebrow}
-        title={h.bento.title}
-        lead={h.bento.lead}
-        id="bento-title"
+        bearing={90}
+        eyebrow={h.atlas.eyebrow}
+        title={h.atlas.title}
+        lead={h.atlas.lead}
+        id="atlas-title"
       />
-      <BentoGrid locale={locale} tiles={h.bento.tiles} />
+      <AtlasIndex locale={locale} rows={atlasRows} previewLabel={h.atlas.previewLabel} />
       <div class="section-more">
-        <Button href={pagePath(locale, "product")} variant="tertiary">
-          {h.bento.link}
+        <Button href={productHref} variant="tertiary">
+          {h.atlas.link}
         </Button>
       </div>
     </div>
   </section>
 
-  <!-- 5. Offline band -->
-  <section class="section offline-band grid-paper" aria-labelledby="offline-title">
+  <!-- 135° Night band: offline -->
+  <section class="section defer-render surface-night offline-band" aria-labelledby="offline-title">
+    <Contours map="band" tone="night" />
     <div class="container-site">
       <SectionHeading
+        bearing={135}
         eyebrow={h.offline.eyebrow}
         title={h.offline.title}
         lead={h.offline.lead}
@@ -121,10 +150,12 @@ const hebrewScreen = isScreenKey(h.hebrew.screen) ? h.hebrew.screen : "dashboard
       />
       <ul class="offline-grid" role="list">
         {h.offline.points.map((point, i) => (
-          <li class="offline-point" data-reveal>
-            <Icon name={offlineIcons[i] ?? "check"} size={22} class="offline-icon" />
-            <h3 class="offline-point-title" set:html={point.title} />
-            <p class="offline-point-text" set:html={point.text} />
+          <li class="offline-point reveal">
+            <Icon name={offlineIcons[i] ?? "check"} size={20} class="offline-icon" />
+            <div>
+              <h3 class="offline-point-title" set:html={point.title} />
+              <p class="offline-point-text" set:html={point.text} />
+            </div>
           </li>
         ))}
       </ul>
@@ -136,10 +167,11 @@ const hebrewScreen = isScreenKey(h.hebrew.screen) ? h.hebrew.screen : "dashboard
     </div>
   </section>
 
-  <!-- 6. Hebrew-native -->
-  <section class="section surface-paper" id="hebrew" aria-labelledby="hebrew-title">
+  <!-- 180° Hebrew-native -->
+  <section class="section defer-render" id="hebrew" aria-labelledby="hebrew-title">
     <div class="container-site">
       <SectionHeading
+        bearing={180}
         eyebrow={h.hebrew.eyebrow}
         title={h.hebrew.title}
         lead={h.hebrew.lead}
@@ -156,60 +188,46 @@ const hebrewScreen = isScreenKey(h.hebrew.screen) ? h.hebrew.screen : "dashboard
     </div>
   </section>
 
-  <!-- 7. Integrations -->
-  <section class="section" id="integrations" aria-labelledby="integrations-title">
+  <!-- 225° Map legend: integrations -->
+  <section
+    class="section defer-render rule-top"
+    id="integrations"
+    aria-labelledby="integrations-title"
+  >
     <div class="container-site">
       <SectionHeading
+        bearing={225}
         eyebrow={h.integrations.eyebrow}
         title={h.integrations.title}
         lead={h.integrations.lead}
         id="integrations-title"
       />
-      <div class="integrations">
-        <div class="integration-highlight" data-reveal>
-          <span class="integration-highlight-icon">
-            <Icon name="plug" size={22} />
-          </span>
-          <h3 class="integration-highlight-title" set:html={h.integrations.highlight.title} />
-          <p class="integration-highlight-text" set:html={h.integrations.highlight.text} />
-        </div>
-        <div class="integration-groups">
-          <div>
-            <h3 class="group-title">{h.integrations.groupIntegrations}</h3>
-            <ul class="tiles" role="list">
-              {h.integrations.items.map((name, i) => (
-                <IntegrationTile name={name} highlight={i === 0} />
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h3 class="group-title">{h.integrations.groupDrivers}</h3>
-            <ul class="tiles tiles-drivers" role="list">
-              {h.integrations.drivers.map((name) => (
-                <IntegrationTile name={name} />
-              ))}
-            </ul>
-          </div>
-          <div class="extras">
-            <h3 class="group-title">{h.integrations.extras.title}</h3>
-            <ul class="extras-list" role="list">
-              {h.integrations.extras.items.map((item) => (
-                <li>
-                  <Icon name="check" size={18} class="extras-check" />
-                  <span set:html={item} />
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
+      <MapLegend
+        title={h.integrations.legendTitle}
+        highlight={h.integrations.highlight}
+        groups={[
+          {
+            title: h.integrations.groupIntegrations,
+            symbol: "square",
+            items: h.integrations.items,
+          },
+          { title: h.integrations.groupDrivers, symbol: "triangle", items: h.integrations.drivers },
+          {
+            title: h.integrations.extras.title,
+            symbol: "circle",
+            items: h.integrations.extras.items,
+            kind: "html",
+          },
+        ]}
+      />
     </div>
   </section>
 
-  <!-- 8. Excel / NetBox -->
-  <section class="section surface-paper" id="migration" aria-labelledby="imports-title">
+  <!-- 270° Migration -->
+  <section class="section defer-render surface-sunk" id="migration" aria-labelledby="imports-title">
     <div class="container-site">
       <SectionHeading
+        bearing={270}
         eyebrow={h.imports.eyebrow}
         title={h.imports.title}
         lead={h.imports.lead}
@@ -217,7 +235,7 @@ const hebrewScreen = isScreenKey(h.hebrew.screen) ? h.hebrew.screen : "dashboard
       />
       <div class="imports">
         {h.imports.cards.map((card, i) => (
-          <div data-reveal>
+          <div class="reveal">
             <FeatureCard icon={i === 0 ? "excel" : "import"} title={card.title} text={card.text}>
               <ul class="import-bullets" role="list">
                 {card.bullets.map((b) => (
@@ -234,10 +252,15 @@ const hebrewScreen = isScreenKey(h.hebrew.screen) ? h.hebrew.screen : "dashboard
     </div>
   </section>
 
-  <!-- 9. Videos -->
-  <section class="section" id="videos" aria-labelledby="videos-title">
+  <!-- 315° Videos -->
+  <section class="section defer-render" id="videos" aria-labelledby="videos-title">
     <div class="container-site">
-      <SectionHeading eyebrow={h.videos.eyebrow} title={h.videos.title} id="videos-title" />
+      <SectionHeading
+        bearing={315}
+        eyebrow={h.videos.eyebrow}
+        title={h.videos.title}
+        id="videos-title"
+      />
       <div class="videos">
         {h.videos.items.map((v) => (
           <VideoSlot locale={locale} videoKey={v.key} title={v.title} />
@@ -246,39 +269,44 @@ const hebrewScreen = isScreenKey(h.hebrew.screen) ? h.hebrew.screen : "dashboard
     </div>
   </section>
 
-  <!-- 10. Design partner band -->
-  <section class="section partners-band" aria-labelledby="partners-title">
-    <div class="container-site">
-      <div class="partners-panel" data-reveal>
-        <div class="partners-intro">
-          <Eyebrow>{h.partners.eyebrow}</Eyebrow>
-          <h2 id="partners-title" class="partners-title" set:html={h.partners.title} />
-          <p class="text-lead partners-lead" set:html={h.partners.lead} />
-          <Button href={partnersHref}>{h.partners.cta}</Button>
+  <!-- 360° Night band: design partners -->
+  <section
+    class="section defer-render surface-night partners-band"
+    aria-labelledby="partners-title"
+  >
+    <Contours map="quiet" tone="night" />
+    <div class="container-site partners-panel">
+      <div class="partners-intro">
+        <p class="partners-bearing" aria-hidden="true" dir="ltr">
+          360°
+        </p>
+        <Eyebrow>{h.partners.eyebrow}</Eyebrow>
+        <h2 id="partners-title" class="partners-title" set:html={h.partners.title} />
+        <p class="text-lead partners-lead" set:html={h.partners.lead} />
+        <Button href={partnersHref}>{h.partners.cta}</Button>
+      </div>
+      <div class="partners-lists">
+        <div>
+          <h3 class="group-title">{h.partners.getsTitle}</h3>
+          <ul class="partners-list" role="list">
+            {h.partners.gets.map((item) => (
+              <li>
+                <Icon name="check" size={18} class="partners-check" />
+                <span set:html={item} />
+              </li>
+            ))}
+          </ul>
         </div>
-        <div class="partners-lists">
-          <div>
-            <h3 class="group-title">{h.partners.getsTitle}</h3>
-            <ul class="partners-list" role="list">
-              {h.partners.gets.map((item) => (
-                <li>
-                  <Icon name="check" size={18} class="partners-check" />
-                  <span set:html={item} />
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h3 class="group-title">{h.partners.asksTitle}</h3>
-            <ul class="partners-list" role="list">
-              {h.partners.asks.map((item) => (
-                <li>
-                  <Icon name="arrow" size={18} class="partners-check" />
-                  <span set:html={item} />
-                </li>
-              ))}
-            </ul>
-          </div>
+        <div>
+          <h3 class="group-title">{h.partners.asksTitle}</h3>
+          <ul class="partners-list" role="list">
+            {h.partners.asks.map((item) => (
+              <li>
+                <Icon name="arrow" size={18} class="partners-check" />
+                <span set:html={item} />
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>
@@ -289,32 +317,20 @@ const hebrewScreen = isScreenKey(h.hebrew.screen) ? h.hebrew.screen : "dashboard
   /* Hero */
   .hero {
     position: relative;
-    padding-block: clamp(3rem, 2rem + 5vw, 7rem) clamp(3.5rem, 2rem + 5vw, 6.5rem);
-    border-block-end: 1px solid var(--lc-hairline);
-  }
-
-  .hero::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(60% 70% at 70% 30%, rgba(16, 185, 129, 0.08), transparent 70%);
-    pointer-events: none;
-  }
-
-  [dir="rtl"] .hero::before {
-    background: radial-gradient(60% 70% at 30% 30%, rgba(16, 185, 129, 0.08), transparent 70%);
+    isolation: isolate;
+    overflow: hidden;
+    padding-block: clamp(3rem, 2rem + 4.5vw, 6.5rem) 0;
   }
 
   .hero-inner {
-    position: relative;
     display: grid;
-    gap: 3rem;
+    gap: 3.5rem;
     align-items: center;
   }
 
   @media (min-width: 1024px) {
     .hero-inner {
-      grid-template-columns: 6fr 6fr;
+      grid-template-columns: 13fr 12fr;
       gap: 4rem;
     }
   }
@@ -322,8 +338,8 @@ const hebrewScreen = isScreenKey(h.hebrew.screen) ? h.hebrew.screen : "dashboard
   .hero-chips {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    margin: 0 0 1.75rem;
+    gap: 0.25rem 1.25rem;
+    margin: 0 0 2rem;
     padding: 0;
     list-style: none;
   }
@@ -331,201 +347,136 @@ const hebrewScreen = isScreenKey(h.hebrew.screen) ? h.hebrew.screen : "dashboard
   .hero-chips li {
     display: inline-flex;
     align-items: center;
-    gap: 0.45rem;
-    padding: 0.3rem 0.75rem;
-    border: 1px solid var(--lc-hairline-strong);
-    border-radius: 999px;
-    color: var(--lc-text-muted);
+    gap: 0.5rem;
+    color: var(--lc-ink-muted);
     font-size: var(--lc-text-xs);
     font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  :lang(he) .hero-chips li {
+    letter-spacing: 0;
+    font-size: var(--lc-text-small);
   }
 
   .hero-chips li::before {
     content: "";
-    inline-size: 6px;
-    block-size: 6px;
-    border-radius: 50%;
-    background: var(--lc-signal);
+    inline-size: 7px;
+    block-size: 7px;
+    border: 1px solid var(--lc-ink);
+    rotate: 45deg;
   }
 
   .hero-title {
-    font-size: clamp(2.25rem, 1.45rem + 2.9vw, 3.625rem);
-    font-weight: 640;
-    line-height: 1.04;
+    font-size: clamp(2.5rem, 1.6rem + 3vw, 4rem);
+    font-weight: 540;
+    line-height: 1.02;
+    letter-spacing: -0.035em;
   }
 
   :lang(he) .hero-title {
-    line-height: 1.12;
+    font-size: clamp(2.375rem, 1.5rem + 3.2vw, 4rem);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: 0;
   }
 
   .hero-lead {
-    max-inline-size: 36rem;
-    margin-block-start: 1.5rem;
-    color: var(--lc-text-muted);
+    max-inline-size: 34rem;
+    margin-block-start: 1.75rem;
+    color: var(--lc-ink-muted);
     font-size: var(--lc-text-lead);
+    line-height: 1.55;
   }
 
   .hero-ctas {
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
-    margin-block-start: 2.25rem;
+    margin-block-start: 2.5rem;
   }
 
-  /* Facts */
-  .facts-section {
-    padding-block: 0;
-    background: var(--lc-ink-raised);
+  .hero-margin {
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .hero-margin {
+      display: flex;
+      justify-content: flex-end;
+      margin-block-start: 2rem;
+    }
+  }
+
+  .hero :global(.hero-scale) {
+    margin-block-start: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+  }
+
+  .datasheet-section {
+    padding-block: clamp(2.5rem, 2rem + 2vw, 4rem) 0;
   }
 
   .section-more {
     margin-block-start: 2.5rem;
   }
 
-  /* Offline band */
-  .offline-band {
-    background-color: var(--lc-ink-raised);
-    border-block: 1px solid var(--lc-hairline);
+  /* Offline band (night) */
+  .offline-band,
+  .partners-band {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
   }
 
   .offline-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
-    gap: 0;
-    margin: 3rem 0 0;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    column-gap: 3rem;
+    margin: 3.5rem 0 0;
     padding: 0;
     list-style: none;
-    border-block-start: 1px solid var(--lc-hairline);
+    border-block-start: 1px solid var(--lc-ink);
   }
 
   .offline-point {
-    padding-block: 1.75rem;
-    padding-inline-end: 1.75rem;
-    border-block-end: 1px solid var(--lc-hairline);
+    display: flex;
+    gap: 1rem;
+    padding-block: 1.5rem;
+    border-block-end: 1px solid var(--lc-rule);
   }
 
   .offline-point :global(.offline-icon) {
-    color: var(--lc-signal-bright);
+    flex: none;
+    margin-block-start: 0.15rem;
+    color: var(--lc-ink-muted);
   }
 
   .offline-point-title {
-    margin-block-start: 1rem;
     font-size: var(--lc-text-h3);
-    letter-spacing: -0.01em;
   }
 
   .offline-point-text {
-    margin-block-start: 0.5rem;
-    color: var(--lc-text-muted);
+    margin-block-start: 0.4rem;
+    color: var(--lc-ink-muted);
     font-size: var(--lc-text-small);
   }
 
   .offline-point-text :global(code) {
-    color: var(--lc-text);
-  }
-
-  /* Integrations */
-  .integrations {
-    display: grid;
-    gap: 2rem;
-    margin-block-start: 3rem;
-  }
-
-  @media (min-width: 1024px) {
-    .integrations {
-      grid-template-columns: 4fr 8fr;
-      align-items: start;
-    }
-  }
-
-  .integration-highlight {
-    padding: 2rem;
-    border: 1px solid rgba(52, 211, 153, 0.35);
-    border-radius: var(--lc-radius);
-    background:
-      radial-gradient(90% 80% at 0% 0%, rgba(16, 185, 129, 0.16), transparent 70%),
-      var(--lc-ink-card);
-  }
-
-  .integration-highlight-icon {
-    display: inline-grid;
-    place-items: center;
-    inline-size: 2.75rem;
-    block-size: 2.75rem;
-    border-radius: 10px;
-    background: rgba(16, 185, 129, 0.15);
-    color: var(--lc-signal-bright);
-  }
-
-  .integration-highlight-title {
-    margin-block-start: 1.25rem;
-    font-size: 1.5rem;
-  }
-
-  .integration-highlight-text {
-    margin-block-start: 0.5rem;
-    color: var(--lc-text-muted);
-  }
-
-  .integration-groups {
-    display: grid;
-    gap: 2rem;
-  }
-
-  .group-title {
-    margin-block-end: 0.875rem;
-    color: var(--lc-text-faint);
-    font-size: var(--lc-text-xs);
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-
-  :lang(he) .group-title {
-    letter-spacing: 0;
-    font-size: var(--lc-text-small);
-  }
-
-  .tiles {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
-    gap: 0.625rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .extras-list {
-    display: grid;
-    gap: 0.5rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .extras-list li {
-    display: flex;
-    gap: 0.5rem;
-    color: var(--lc-text-muted);
-    font-size: var(--lc-text-small);
-  }
-
-  .extras-list :global(.extras-check) {
-    flex: none;
-    margin-block-start: 0.15rem;
-    color: var(--lc-signal-bright);
+    color: var(--lc-ink);
   }
 
   /* Imports */
   .imports {
     display: grid;
-    gap: 1rem;
+    gap: 2.5rem;
     margin-block-start: 3rem;
   }
 
   @media (min-width: 800px) {
     .imports {
       grid-template-columns: 1fr 1fr;
+      gap: 3rem;
     }
   }
 
@@ -535,8 +486,8 @@ const hebrewScreen = isScreenKey(h.hebrew.screen) ? h.hebrew.screen : "dashboard
     margin: 0.75rem 0 0;
     padding: 0;
     list-style: none;
-    font-size: var(--lc-text-small);
-    font-weight: 500;
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-text-mono);
   }
 
   .import-bullets li {
@@ -546,13 +497,14 @@ const hebrewScreen = isScreenKey(h.hebrew.screen) ? h.hebrew.screen : "dashboard
   }
 
   .import-bullets :global(svg) {
-    color: var(--lc-signal-bright);
+    flex: none;
+    color: var(--lc-documented-line);
   }
 
   /* Videos */
   .videos {
     display: grid;
-    gap: 1.5rem;
+    gap: 2rem;
     margin-block-start: 3rem;
   }
 
@@ -562,33 +514,29 @@ const hebrewScreen = isScreenKey(h.hebrew.screen) ? h.hebrew.screen : "dashboard
     }
   }
 
-  /* Partners band */
-  .partners-band {
-    padding-block-start: 0;
-  }
-
+  /* Partners band (night) */
   .partners-panel {
     display: grid;
-    gap: 3rem;
-    padding: clamp(2rem, 1.25rem + 3vw, 4rem);
-    border: 1px solid rgba(52, 211, 153, 0.25);
-    border-radius: calc(var(--lc-radius) + 6px);
-    background:
-      radial-gradient(70% 120% at 0% 0%, rgba(16, 185, 129, 0.14), transparent 60%),
-      var(--lc-ink-raised);
-  }
-
-  [dir="rtl"] .partners-panel {
-    background:
-      radial-gradient(70% 120% at 100% 0%, rgba(16, 185, 129, 0.14), transparent 60%),
-      var(--lc-ink-raised);
+    gap: 3.5rem;
   }
 
   @media (min-width: 1024px) {
     .partners-panel {
-      grid-template-columns: 6fr 6fr;
-      align-items: center;
+      grid-template-columns: 6fr 5fr;
+      align-items: end;
+      gap: 5rem;
     }
+  }
+
+  .partners-bearing {
+    inline-size: fit-content;
+    min-inline-size: 4.5rem;
+    margin-block-end: 1.5rem;
+    padding-block-start: 0.75rem;
+    border-block-start: 1px solid var(--lc-ink);
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-text-mono);
+    font-weight: 500;
   }
 
   .partners-title {
@@ -596,12 +544,22 @@ const hebrewScreen = isScreenKey(h.hebrew.screen) ? h.hebrew.screen : "dashboard
   }
 
   .partners-lead {
-    margin-block: 1rem 2rem;
+    margin-block: 1.25rem 2.25rem;
   }
 
   .partners-lists {
     display: grid;
-    gap: 2rem;
+    gap: 2.5rem;
+  }
+
+  .group-title {
+    margin-block-end: 0.875rem;
+    padding-block-end: 0.5rem;
+    border-block-end: 1px solid var(--lc-rule);
+    color: var(--lc-ink-muted);
+    font-size: var(--lc-text-small);
+    font-weight: 500;
+    letter-spacing: 0;
   }
 
   .partners-list {
@@ -619,7 +577,7 @@ const hebrewScreen = isScreenKey(h.hebrew.screen) ? h.hebrew.screen : "dashboard
 
   .partners-list :global(.partners-check) {
     flex: none;
-    margin-block-start: 0.2rem;
-    color: var(--lc-signal-bright);
+    margin-block-start: 0.25rem;
+    color: var(--lc-ink-muted);
   }
 </style>

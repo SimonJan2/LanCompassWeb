@@ -1,67 +1,133 @@
 /*
- * LanCompass design tokens. Tailwind's theme (global.css) reads these, and
- * component styles use them directly. Contrast notes are against the surface
- * each token is meant for.
+ * LanCompass design tokens: "survey paper". Tailwind's theme (global.css)
+ * reads these, and component styles use them directly.
+ *
+ * Every colour token carries one tag:
+ *   @surface  backgrounds, bands, cards, rules, shadows
+ *   @accent   actions, links, focus, semantic states
+ *   @text     reading ink (exempt from the distance rule: dark text is near-black everywhere)
+ * tests/identity.spec.ts parses the tags and requires CIEDE2000 ΔE ≥ 15 between
+ * every @surface / @accent value and each NetBox Labs colour
+ * (docs/design/originality.md has the table). Translucent values are measured
+ * composited over paper. Contrast ratios in the comments are WCAG 2.x, measured
+ * with the same script; text needs ≥ 4.5:1, UI graphics ≥ 3:1.
  */
 :root {
-  /* Ink — the dark page. */
-  --lc-ink: #0b0d10;
-  --lc-ink-raised: #11151a;
-  --lc-ink-card: #171c22;
-  --lc-hairline: rgba(255, 255, 255, 0.08);
-  --lc-hairline-strong: rgba(255, 255, 255, 0.14);
+  /* Paper: the page. Warm off-white, never pure white. */
+  --lc-paper: #f4f1ea; /* @surface ΔE 23.8 */
+  --lc-paper-raised: #fbf9f4; /* @surface ΔE 24.4 — cards, the vellum sheet */
+  --lc-paper-sunk: #ece7dc; /* @surface ΔE 23.2 — datasheet, footer */
+  --lc-rule: #d9d2c3; /* @surface ΔE 23.0 — hairlines (decorative, not a control boundary) */
+  --lc-rule-strong: #bdb4a2; /* @surface ΔE 24.0 — section rules, chip outlines */
+  --lc-contour: #e3dccd; /* @surface ΔE 22.9 — contour lines, kept very faint on purpose */
+  --lc-control: #7a715f; /* @surface ΔE 27.1 — form control borders: 4.28:1 paper, 4.58:1 raised, 3.91:1 sunk */
+  --lc-shadow: rgba(
+    28,
+    33,
+    64,
+    0.14
+  ); /* @surface — indigo-tinted shadow, composited over paper ΔE 24.5 */
 
-  /* Text on ink. */
-  --lc-text: #eef1f4; /* 17.6:1 on ink */
-  --lc-text-muted: #a3adb8; /* 8.4:1 on ink, 7.2:1 on card */
-  --lc-text-faint: #8a95a1; /* 6.0:1 on ink, 5.2:1 on card */
+  /* Night: the accent band (at most two per page). Deep indigo, not neutral black. */
+  --lc-night: #1c2140; /* @surface ΔE 16.2 */
+  --lc-night-raised: #262c55; /* @surface ΔE 18.5 */
+  --lc-night-rule: #454c7e; /* @surface ΔE 23.1 — hairlines on night */
+  --lc-night-contour: #2a305a; /* @surface ΔE 18.8 */
 
-  /* Paper — light sections for rhythm. */
-  --lc-paper: #f7f8f6;
-  --lc-paper-raised: #ffffff;
-  --lc-paper-hairline: rgba(11, 13, 16, 0.1);
-  --lc-paper-text: #0b0d10;
-  --lc-paper-text-muted: #47515c; /* 7.9:1 on paper */
+  /* Ink: reading text. */
+  --lc-ink: #1a1c22; /* @text 15.10:1 paper, 13.81:1 sunk, 16.19:1 raised */
+  --lc-ink-muted: #4a4e5a; /* @text 7.36:1 paper, 6.74:1 sunk, 7.89:1 raised */
+  --lc-ink-faint: #5e6270; /* @text 5.39:1 paper, 4.93:1 sunk, 5.77:1 raised */
+  --lc-night-text: #eeece6; /* @text 13.26:1 night, 11.29:1 night-raised */
+  --lc-night-muted: #b9bcd0; /* @text 8.33:1 night, 7.10:1 night-raised */
 
-  /* Signal — emerald: primary actions, live and resolved states. */
-  --lc-signal: #10b981; /* buttons (ink text on it: 8.6:1), lines */
-  --lc-signal-bright: #34d399; /* highlights on ink: 10.6:1 */
-  --lc-signal-ink: #047857; /* emerald text on paper: 5.2:1 */
-  --lc-signal-wash: rgba(16, 185, 129, 0.12);
+  /* Actions: ink on paper (indigo ink, so the fill passes the distance rule), paper on night. */
+  --lc-action: #1c2140; /* @accent ΔE 16.2 — paper text on it 13.88:1; on paper 13.88:1 as a link */
+  --lc-action-hover: #2b3263; /* @accent ΔE 19.9 — paper text on it 10.70:1 */
+  --lc-action-text: var(--lc-paper); /* @text — the label on a primary action */
+  --lc-focus: #2f5bd3; /* @accent ΔE 29.5 — focus ring: 5.23:1 paper, 4.79:1 sunk */
+  --lc-focus-night: #f4f1ea; /* @accent ΔE 23.8 — focus ring on night: 13.88:1 */
 
-  /* Drift — amber: only for disagreement (findings, ghost edges). */
-  --lc-drift: #f5b544; /* on ink: 10.5:1 */
-  --lc-drift-ink: #8a5300; /* amber text on paper: 5.6:1 */
-  --lc-drift-wash: rgba(245, 181, 68, 0.12);
+  /* Documented: the compass emerald, used only for the resolved / documented state. */
+  --lc-documented: #036b4e; /* @accent ΔE 23.6 — text: 5.79:1 paper, 5.29:1 sunk, 5.29:1 on wash */
+  --lc-documented-line: #0b8a63; /* @accent ΔE 28.7 — strokes and marks: 3.85:1 paper, 4.13:1 raised */
+  --lc-documented-night: #10b981; /* @accent ΔE 15.2 — on night 6.17:1 */
+  --lc-documented-wash: #dcebe0; /* @surface ΔE 17.8 — chip fill */
 
-  /* Info — cyan: observed data, used sparingly. */
-  --lc-info: #38bdf8; /* on ink: 9.2:1 */
+  /* Drift: disagreement between the record and the wire. Survey red, not amber. */
+  --lc-drift: #b4234a; /* @accent ΔE 24.5 — text and strokes: 5.68:1 paper, 5.19:1 sunk, 5.09:1 on wash */
+  --lc-drift-night: #f28ca6; /* @accent ΔE 27.2 — on night 6.77:1 */
+  --lc-drift-wash: #f6e0e4; /* @surface ΔE 33.2 — chip and error-summary fill */
 
-  /* Type. */
-  --lc-font-sans: "Inter Variable", "Heebo Variable", ui-sans-serif, system-ui, sans-serif;
+  /* Observed: what is seen on the wire. Cobalt, used sparingly. */
+  --lc-observed: #2f5bd3; /* @accent ΔE 29.5 — 5.23:1 paper, 4.81:1 on wash */
+  --lc-observed-night: #9db4ff; /* @accent ΔE 36.8 — on night 7.76:1 */
+  --lc-observed-wash: #e2e8f7; /* @surface ΔE 27.6 */
+
+  /* Type. Plex Sans carries Latin, Plex Sans Hebrew carries Hebrew (unicode-range), so a
+     mixed Hebrew–Latin line stays in one design family. Plex Mono is for identifiers. */
+  --lc-font-sans:
+    "IBM Plex Sans Variable", "IBM Plex Sans Hebrew", ui-sans-serif, system-ui, sans-serif;
+  --lc-font-display: var(--lc-font-sans);
   --lc-font-mono:
-    ui-monospace, "SFMono-Regular", "Cascadia Mono", "Segoe UI Mono", Menlo, Consolas, monospace;
+    "IBM Plex Mono", "IBM Plex Sans Hebrew", ui-monospace, "SFMono-Regular", Menlo, Consolas,
+    monospace;
   --lc-text-body: clamp(1.0625rem, 1rem + 0.2vw, 1.125rem); /* 17–18px */
   --lc-text-small: 0.9375rem;
   --lc-text-xs: 0.8125rem;
+  --lc-text-mono: 0.8125rem;
   --lc-text-lead: clamp(1.125rem, 1.02rem + 0.45vw, 1.3125rem);
   --lc-text-h3: clamp(1.1875rem, 1.1rem + 0.35vw, 1.375rem);
-  --lc-text-h2: clamp(1.75rem, 1.35rem + 1.7vw, 2.75rem);
-  --lc-text-h1: clamp(2.25rem, 1.5rem + 3.4vw, 4.25rem);
-  --lc-tracking-display: -0.02em;
+  --lc-text-h2: clamp(1.875rem, 1.4rem + 1.9vw, 3rem);
+  --lc-text-h1: clamp(2.375rem, 1.5rem + 3.6vw, 4.5rem);
+  --lc-tracking-display: -0.025em; /* Latin only; Hebrew display uses 0 */
 
   /* Layout. */
   --lc-content: 1200px;
   --lc-gutter: clamp(1rem, 0.5rem + 2.5vw, 2rem);
-  --lc-section: clamp(4rem, 2.5rem + 6.5vw, 8.5rem); /* 64px mobile → ~136px desktop */
-  --lc-radius: 14px;
-  --lc-radius-sm: 8px;
+  --lc-section: clamp(4.5rem, 2.5rem + 7vw, 9rem);
+  --lc-radius: 4px;
+  --lc-radius-sm: 3px;
 
-  /* Focus. */
-  --lc-focus: #34d399;
+  /* Motion. Springs are defined once, as linear() curves; micro-interactions stay ≤ 200 ms. */
+  --lc-spring: linear(
+    0,
+    0.012 1%,
+    0.05 2.3%,
+    0.2 5.2%,
+    0.43 9%,
+    0.64 13%,
+    0.81 17.6%,
+    0.93 22.6%,
+    1.01 28.5%,
+    1.035 33.6%,
+    1.03 39.4%,
+    1.012 48%,
+    1 60%,
+    0.998 75%,
+    1
+  );
+  --lc-spring-calm: linear(
+    0,
+    0.06 4%,
+    0.24 10%,
+    0.52 20%,
+    0.76 32%,
+    0.9 44%,
+    0.97 58%,
+    0.995 74%,
+    1
+  );
+  --lc-dur-micro: 160ms;
+  --lc-dur-ui: 200ms;
 
-  /* Motion. */
-  --lc-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  color-scheme: light;
+}
 
-  color-scheme: dark;
+/* Hebrew pages: Hebrew from Plex Sans Hebrew, Latin from its own static Latin faces
+   (fonts.css). Same Plex design; a much lighter first paint. */
+:root:lang(he) {
+  --lc-font-sans:
+    "IBM Plex Sans Hebrew", "IBM Plex Sans Hebrew Latin", ui-sans-serif, system-ui, sans-serif;
+  --lc-font-display: var(--lc-font-sans);
 }

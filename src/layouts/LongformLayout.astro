@@ -4,6 +4,7 @@ import { getEntry, render } from "astro:content";
 import BaseLayout from "./BaseLayout.astro";
 import Eyebrow from "../components/Eyebrow.astro";
 import Prose from "../components/Prose.astro";
+import Contours from "../components/motifs/Contours.astro";
 import { getCopy } from "../content/copy";
 import { locales, useUi, type Locale, type PageKey } from "../i18n";
 
@@ -25,7 +26,8 @@ const updated = new Intl.DateTimeFormat(locales[locale].htmlLang, {
 ---
 
 <BaseLayout locale={locale} page={page} title={meta.title} description={meta.description}>
-  <section class="longform-hero grid-paper">
+  <section class="longform-hero">
+    <Contours map="quiet" eager />
     <div class="container-site">
       <Eyebrow>{entry.data.eyebrow}</Eyebrow>
       <h1 class="longform-title" set:html={entry.data.title} />
@@ -54,8 +56,11 @@ const updated = new Intl.DateTimeFormat(locales[locale].htmlLang, {
 
 <style>
   .longform-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
     padding-block: clamp(3rem, 2rem + 4vw, 5.5rem) clamp(2.5rem, 2rem + 2vw, 3.5rem);
-    border-block-end: 1px solid var(--lc-hairline);
+    border-block-end: 1px solid var(--lc-rule);
   }
 
   .longform-title {
@@ -70,8 +75,13 @@ const updated = new Intl.DateTimeFormat(locales[locale].htmlLang, {
 
   .longform-updated {
     margin-block-start: 1.5rem;
-    color: var(--lc-text-faint);
-    font-size: var(--lc-text-small);
+    color: var(--lc-ink-faint);
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-text-xs);
+  }
+
+  :lang(he) .longform-updated {
+    font-family: var(--lc-font-sans);
   }
 
   .longform-review {

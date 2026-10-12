@@ -1,10 +1,8 @@
 /**
- * The one script every page loads (~1 KB): header hairline on scroll, the
- * mobile menu sheet, closing disclosure menus, and the once-only section reveal.
- * Everything works without it; it only enhances.
+ * The one script every page loads (under 1 KB): header hairline on scroll, the
+ * mobile menu sheet and closing disclosure menus. Everything works without it;
+ * it only enhances. Section reveals are CSS scroll-driven animations (global.css).
  */
-
-const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 function headerOnScroll(): void {
   const header = document.querySelector<HTMLElement>("[data-site-header]");
@@ -67,33 +65,6 @@ function disclosures(): void {
   });
 }
 
-function reveal(): void {
-  if (reduceMotion.matches || !("IntersectionObserver" in window)) return;
-  const targets = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
-  const below = targets.filter((el) => el.getBoundingClientRect().top > window.innerHeight);
-  if (below.length === 0) return;
-  const observer = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        const el = entry.target as HTMLElement;
-        el.classList.add("reveal-shown");
-        el.classList.remove("reveal-armed");
-        observer.unobserve(el);
-        el.addEventListener("transitionend", () => el.classList.remove("reveal-shown"), {
-          once: true,
-        });
-      }
-    },
-    { rootMargin: "0px 0px -8% 0px" },
-  );
-  for (const el of below) {
-    el.classList.add("reveal-armed");
-    observer.observe(el);
-  }
-}
-
 headerOnScroll();
 mobileMenu();
 disclosures();
-reveal();

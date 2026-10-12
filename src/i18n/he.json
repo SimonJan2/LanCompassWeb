@@ -18,11 +18,11 @@
     "switchTo": "לקריאת הדף ב{language}"
   },
   "footer": {
-    "positioning": "תיעוד רשת שמותקן אצלכם ומראה איפה הוא לא תואם את הרשת.",
+    "positioning": "תיעוד רשת שמותקן אצלכם, ומראה איפה הוא כבר לא תואם את הרשת.",
     "product": "המוצר",
     "company": "החברה",
     "legal": "מידע משפטי",
-    "overview": "סקירה",
+    "overview": "סקירה כללית",
     "howItWorks": "איך זה עובד",
     "integrations": "אינטגרציות",
     "security": "אבטחה",
@@ -32,28 +32,29 @@
     "accessibility": "נגישות",
     "source": "קוד מקור",
     "docs": "תיעוד",
-    "madeIn": "נבנה בישראל",
+    "madeIn": "פותח בישראל",
     "rights": "LanCompass",
     "navLabel": "ניווט תחתון"
   },
   "drift": {
-    "label": "תרשים מונפש: רשת קטנה כפי שהיא מתועדת, בירוק. קישור לא מתועד בין sw-core-02 ל־ap-lobby-3 מופיע כקו כתום מקווקו עם ממצא, ואחרי שמתעדים אותו הוא הופך לירוק.",
+    "label": "תרשים מונפש: הרשת המתועדת, משורטטת על גיליון שקוף, מונחת מעל הרשת כפי שהיא נצפית בפועל. בהתחלה הגיליונות לא מיושרים. בגיליון הנצפה יש קישור שחסר בתיעוד, בין sw-core-02 ל־ap-lobby-3, והוא מסומן באדום כממצא. הגיליונות מתיישרים, הקישור נוסף לתיעוד, והממצא הופך לירוק: מתועד.",
     "documented": "מתועד",
-    "observed": "נצפה ברשת, לא מתועד",
+    "observed": "נצפה ברשת",
+    "drift": "לא מתועד",
     "finding": "קישור לא מתועד",
     "resolved": "מתועד",
     "pause": "עצירת ההנפשה"
   },
   "screenshot": {
-    "placeholder": "מקום שמור לצילום המסך של {screen} ב־LanCompass. הצילום עדיין לא נלכד.",
+    "placeholder": "כאן יופיע צילום המסך של {screen} ב־LanCompass. הצילום עוד לא נלכד.",
     "screens": {
       "dashboard": "לוח הבקרה",
-      "ipam-tree": "עץ הכתובות והתתי־רשתות",
-      "rack": "תצוגת הארון",
-      "topology-observed": "הטופולוגיה, שכבת הנצפה",
+      "ipam-tree": "היררכיית הקידומות",
+      "rack": "שרטוט הארון",
+      "topology-observed": "הטופולוגיה, השכבה הנצפית",
       "review": "תור הסקירה",
-      "deep-discovery": "שירותי הגילוי המעמיק",
-      "nac": "סקירת ה־<bdi>NAC</bdi>",
+      "deep-discovery": "השירותים בגילוי המעמיק",
+      "nac": "סקירת <bdi>NAC</bdi>",
       "compliance": "ממצאי התאימות"
     },
     "alt": "מסך {screen} ב־LanCompass, עם רשת ההדגמה הבדיונית."
@@ -71,37 +72,37 @@
     "email": "דוא״ל בעבודה",
     "country": "מדינה",
     "networkSize": "גודל הרשת",
-    "networkSizeChoose": "בחרו אפשרות",
+    "networkSizeChoose": "בחירה מהרשימה",
     "networkSizes": [
       "עד 100 רכיבים",
-      "100–500 רכיבים",
-      "500–2,000 רכיבים",
+      "⁦100–500⁩ רכיבים",
+      "⁦500–2,000⁩ רכיבים",
       "יותר מ־2,000 רכיבים",
-      "לא בטוחים"
+      "לא ידוע לי"
     ],
     "vendors": "יצרנים עיקריים",
-    "vendorsHint": "אפשר לבחור כמה.",
+    "vendorsHint": "אפשר לסמן כמה.",
     "vendorOptions": ["Check Point", "FortiGate", "Palo Alto", "Cisco", "MikroTik", "אחר"],
     "airGapped": "האם הרשת מנותקת מהאינטרנט?",
     "airGappedOptions": ["כן", "לא", "חלקית"],
     "message": "הודעה",
     "messageHintPartner": "מה הייתם רוצים ש־<bdi>LanCompass</bdi> תעשה בשביל הצוות שלכם?",
-    "consentBefore": "אני מסכים/ה ש־<bdi>LanCompass</bdi> תשמור את הפרטים כדי לחזור אליי, כמתואר ב",
+    "consentBefore": "קראתי ואישרתי את",
     "consentLink": "הודעת הפרטיות",
-    "consentAfter": ".",
+    "consentAfter": ", ואפשר לשמור את הפרטים האלה כדי לחזור אליי.",
     "honeypot": "נא להשאיר את השדה הזה ריק",
     "submitPartner": "שליחת הבקשה",
     "submitContact": "שליחת ההודעה",
-    "errorSummary": "יש לתקן את השדות המסומנים.",
+    "errorSummary": "יש שדות שצריך לתקן. הם מסומנים למטה.",
     "errors": {
-      "valueMissing": "זהו שדה חובה.",
-      "typeMismatch": "יש להזין כתובת דוא״ל, למשל name@example.com.",
-      "choose": "יש לבחור אפשרות.",
-      "consent": "יש לאשר לפני השליחה."
+      "valueMissing": "זה שדה חובה.",
+      "typeMismatch": "כתובת דוא״ל נראית כך: ⁦name@example.com⁩.",
+      "choose": "צריך לבחור אחת מהאפשרויות.",
+      "consent": "כדי לשלוח, צריך לסמן את האישור."
     },
-    "mailtoIntro": "כתבו לנו בדוא״ל. הכפתור פותח את תוכנת הדואר שלכם עם תבנית קצרה למילוי.",
+    "mailtoIntro": "אפשר לכתוב לנו בדוא״ל. הכפתור פותח את תוכנת הדואר עם תבנית קצרה למילוי.",
     "mailtoButton": "שליחת דוא״ל אל {email}",
-    "mailtoSubjectPartner": "בקשה להצטרף כשותפי פיתוח של LanCompass",
+    "mailtoSubjectPartner": "בקשת הצטרפות לשותפי הפיתוח של LanCompass",
     "mailtoSubjectContact": "פנייה ל־LanCompass",
     "noContact": "TODO(operator): set PUBLIC_CONTACT_EMAIL — there is no contact address yet."
   },
@@ -114,11 +115,11 @@
   "learnMore": "לקריאה נוספת",
   "backHome": "חזרה לדף הבית",
   "longform": {
-    "updated": "עודכן לאחרונה"
+    "updated": "עדכון אחרון"
   },
   "verification": {
     "title": "אימות גרסה",
-    "lead": "קובצי הגרסאות חתומים. בדקו חתימה מול אחת מטביעות האצבע של המפתחות האלה לפני ההתקנה.",
+    "lead": "קובצי הגרסאות חתומים. לפני ההתקנה, בדקו את החתימה מול אחת מטביעות האצבע של המפתחות כאן.",
     "kid": "מזהה מפתח",
     "purpose": "שימוש",
     "sha256": "טביעת אצבע <bdi>SHA-256</bdi>"

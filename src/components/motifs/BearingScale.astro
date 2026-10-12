@@ -1,0 +1,87 @@
+---
+/**
+ * A degree scale unrolled from the compass ring: a tick every 5°, a longer
+ * tick every 15° and a label every 45° (000° … 360°). Decorative, always
+ * left-to-right like the instrument it comes from. `mark` highlights one bearing.
+ */
+interface Props {
+  mark?: number;
+  class?: string;
+}
+
+const { mark, class: className } = Astro.props;
+const W = 1440;
+const step = W / 360;
+const ticks = Array.from({ length: 73 }, (_, i) => i * 5);
+const pad = (n: number) => `${String(n).padStart(3, "0")}°`;
+// One path per tick class keeps the markup small; the scale is on every page twice.
+const ticksOf = (pick: (deg: number) => boolean, length: number) =>
+  ticks
+    .filter(pick)
+    .map((deg) => `M${+(deg * step).toFixed(1)} 0V${length}`)
+    .join("");
+const minor = ticksOf((deg) => deg % 15 !== 0, 5);
+const mid = ticksOf((deg) => deg % 15 === 0 && deg % 45 !== 0, 8);
+const major = ticksOf((deg) => deg % 45 === 0, 12);
+---
+
+<svg
+  class:list={["bearing-scale", className]}
+  viewBox={`0 0 ${W} 28`}
+  preserveAspectRatio="none"
+  aria-hidden="true"
+  focusable="false"
+>
+  <path class="scale-base" d={`M0 0.5H${W}`}></path>
+  <path class="tick" d={minor}></path>
+  <path class="tick tick-mid" d={mid}></path>
+  <path class="tick tick-mid" d={major}></path>
+  {mark !== undefined && <path class="tick-mark" d={`M${mark * step} 0V16`} />}
+  {ticks
+    .filter((deg) => deg % 45 === 0 && deg > 0 && deg < 360)
+    .map((deg) => (
+      <text x={deg * step} y="25" text-anchor="middle">
+        {pad(deg)}
+      </text>
+    ))}
+</svg>
+
+<style>
+  .bearing-scale {
+    display: block;
+    direction: ltr;
+    inline-size: 100%;
+    max-inline-size: none;
+    block-size: 28px;
+    overflow: visible;
+  }
+
+  .scale-base,
+  .tick {
+    stroke: var(--lc-rule-strong);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .tick-mid {
+    stroke: var(--lc-ink-faint);
+  }
+
+  .tick-mark {
+    stroke: var(--lc-drift);
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .bearing-scale text {
+    fill: var(--lc-ink-faint);
+    font-family: var(--lc-font-mono);
+    font-size: 10px;
+  }
+
+  @media (max-width: 700px) {
+    .bearing-scale text {
+      display: none;
+    }
+  }
+</style>

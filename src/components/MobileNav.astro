@@ -83,10 +83,10 @@ const ui = useUi(locale);
     gap: 0.5rem;
     min-block-size: 2.75rem;
     padding: 0.5rem 0.75rem;
-    border: 1px solid var(--lc-hairline-strong);
-    border-radius: 10px;
+    border: 1px solid var(--lc-ink);
+    border-radius: var(--lc-radius-sm);
     background: transparent;
-    color: var(--lc-text);
+    color: var(--lc-ink);
     font: inherit;
     font-size: var(--lc-text-small);
     font-weight: 500;
@@ -102,8 +102,8 @@ const ui = useUi(locale);
     margin: 0;
     padding: 1rem var(--lc-gutter) 2rem;
     border: 0;
-    background: var(--lc-ink);
-    color: var(--lc-text);
+    background: var(--lc-paper);
+    color: var(--lc-ink);
   }
 
   .menu-sheet[open] {
@@ -112,7 +112,7 @@ const ui = useUi(locale);
   }
 
   .menu-sheet::backdrop {
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(28, 33, 64, 0.4);
   }
 
   .sheet-top {
@@ -124,7 +124,7 @@ const ui = useUi(locale);
   }
 
   .sheet-title {
-    color: var(--lc-text-muted);
+    color: var(--lc-ink-muted);
     font-size: var(--lc-text-small);
   }
 
@@ -133,10 +133,10 @@ const ui = useUi(locale);
     place-items: center;
     inline-size: 2.75rem;
     block-size: 2.75rem;
-    border: 1px solid var(--lc-hairline-strong);
-    border-radius: 10px;
+    border: 1px solid var(--lc-ink);
+    border-radius: var(--lc-radius-sm);
     background: transparent;
-    color: var(--lc-text);
+    color: var(--lc-ink);
     cursor: pointer;
   }
 
@@ -144,20 +144,23 @@ const ui = useUi(locale);
     margin: 0;
     padding: 0;
     list-style: none;
+    border-block-start: 1px solid var(--lc-ink);
   }
 
   .sheet-links a {
     display: block;
     padding: 1rem 0;
-    border-block-end: 1px solid var(--lc-hairline);
-    color: var(--lc-text);
-    font-size: 1.375rem;
-    font-weight: 600;
+    border-block-end: 1px solid var(--lc-rule);
+    color: var(--lc-ink);
+    font-size: 1.5rem;
+    font-weight: 550;
     text-decoration: none;
   }
 
   .sheet-links a[aria-current="page"] {
-    color: var(--lc-signal-bright);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 6px;
   }
 
   .sheet-foot {
@@ -178,19 +181,19 @@ const ui = useUi(locale);
   }
 
   .sheet-lang-label {
-    color: var(--lc-text-faint);
+    color: var(--lc-ink-faint);
     font-size: var(--lc-text-small);
   }
 
   @media (prefers-reduced-motion: no-preference) {
     .menu-sheet[open] {
-      animation: sheet-in 220ms var(--lc-ease);
+      animation: sheet-in var(--lc-dur-ui) var(--lc-spring-calm);
     }
 
     @keyframes sheet-in {
       from {
         opacity: 0;
-        transform: translateY(8px);
+        translate: 0 8px;
       }
     }
   }

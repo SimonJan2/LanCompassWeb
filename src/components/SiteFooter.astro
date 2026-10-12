@@ -1,5 +1,6 @@
 ---
 import LanguageSwitcher from "./LanguageSwitcher.astro";
+import BearingScale from "./motifs/BearingScale.astro";
 import Logo from "./Logo.astro";
 import { site } from "../config/site";
 import { pagePath, useUi, type Locale, type PageKey } from "../i18n";
@@ -43,7 +44,8 @@ const columns = [
 const year = new Date().getFullYear();
 ---
 
-<footer class="site-footer" id="site-footer">
+<footer class="site-footer defer-render" id="site-footer">
+  <BearingScale class="footer-scale" />
   <div class="container-site">
     <div class="footer-grid">
       <div class="footer-brand">
@@ -81,9 +83,12 @@ const year = new Date().getFullYear();
 
 <style>
   .site-footer {
-    padding-block: 4.5rem 2.5rem;
-    border-block-start: 1px solid var(--lc-hairline);
-    background: var(--lc-ink);
+    padding-block: 0 2.5rem;
+    background: var(--lc-paper-sunk);
+  }
+
+  .site-footer :global(.footer-scale) {
+    margin-block-end: 4rem;
   }
 
   .footer-grid {
@@ -100,7 +105,7 @@ const year = new Date().getFullYear();
   .footer-positioning {
     max-inline-size: 22rem;
     margin-block-start: 1rem;
-    color: var(--lc-text-muted);
+    color: var(--lc-ink-muted);
     font-size: var(--lc-text-small);
   }
 
@@ -112,16 +117,20 @@ const year = new Date().getFullYear();
 
   .footer-col-title {
     margin-block-end: 0.875rem;
-    color: var(--lc-text-faint);
-    font-size: var(--lc-text-xs);
-    font-weight: 600;
+    padding-block-end: 0.5rem;
+    border-block-end: 1px solid var(--lc-rule-strong);
+    color: var(--lc-ink-faint);
+    font-family: var(--lc-font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
     letter-spacing: 0.06em;
     text-transform: uppercase;
   }
 
   :lang(he) .footer-col-title {
     letter-spacing: 0;
-    font-size: var(--lc-text-small);
+    font-family: var(--lc-font-sans);
+    font-size: var(--lc-text-xs);
   }
 
   .footer-col ul {
@@ -133,13 +142,13 @@ const year = new Date().getFullYear();
   }
 
   .footer-col a {
-    color: var(--lc-text-muted);
+    color: var(--lc-ink-muted);
     font-size: var(--lc-text-small);
     text-decoration: none;
   }
 
   .footer-col a:hover {
-    color: var(--lc-text);
+    color: var(--lc-ink);
     text-decoration: underline;
     text-underline-offset: 4px;
   }
@@ -152,13 +161,13 @@ const year = new Date().getFullYear();
     gap: 1rem 2rem;
     margin-block-start: 3.5rem;
     padding-block-start: 1.5rem;
-    border-block-start: 1px solid var(--lc-hairline);
+    border-block-start: 1px solid var(--lc-rule-strong);
   }
 
   .footer-legal {
     display: flex;
     gap: 0.5rem;
-    color: var(--lc-text-faint);
+    color: var(--lc-ink-faint);
     font-size: var(--lc-text-small);
   }
 </style>

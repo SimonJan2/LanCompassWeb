@@ -4,6 +4,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import ContactEmail from "../../components/ContactEmail.astro";
 import Form from "../../components/form/Form.astro";
 import SectionHeading from "../../components/SectionHeading.astro";
+import Contours from "../../components/motifs/Contours.astro";
 import { getCopy } from "../../content/copy";
 import { localeStaticPaths, type Locale } from "../../i18n";
 
@@ -24,7 +25,8 @@ const c = copy.contact;
   title={copy.meta.contact.title}
   description={copy.meta.contact.description}
 >
-  <section class="contact-hero grid-paper">
+  <section class="contact-hero">
+    <Contours map="quiet" eager />
     <div class="container-site contact-grid">
       <div>
         <SectionHeading eyebrow={c.eyebrow} title={c.title} lead={c.lead} level={1} />
@@ -48,6 +50,9 @@ const c = copy.contact;
 
 <style>
   .contact-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
     padding-block: clamp(3rem, 2rem + 4vw, 6rem);
   }
 
@@ -65,28 +70,45 @@ const c = copy.contact;
 
   .contact-facts {
     margin: 2.5rem 0 0;
+    padding-block: 1rem;
+    border-block: 1px solid var(--lc-ink);
   }
 
   .contact-facts dt {
-    color: var(--lc-text-faint);
-    font-size: var(--lc-text-small);
+    color: var(--lc-ink-faint);
+    font-family: var(--lc-font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  :lang(he) .contact-facts dt {
+    font-family: var(--lc-font-sans);
+    font-size: var(--lc-text-xs);
+    letter-spacing: 0;
   }
 
   .contact-facts dd {
     margin: 0.25rem 0 0;
     font-size: 1.25rem;
-    font-weight: 600;
+    font-weight: 550;
   }
 
   .contact-facts :global(a) {
-    color: var(--lc-signal-bright);
+    color: var(--lc-ink);
     text-decoration: underline;
     text-underline-offset: 4px;
   }
 
   .contact-pricing {
     margin-block-start: 2rem;
-    color: var(--lc-text);
+    color: var(--lc-ink);
+  }
+
+  .contact-form {
+    padding: clamp(1.25rem, 1rem + 1.5vw, 2.5rem);
+    border: 1px solid var(--lc-ink);
+    background: var(--lc-paper-raised);
   }
 
   .contact-form-title {

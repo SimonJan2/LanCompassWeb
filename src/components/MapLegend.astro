@@ -1,0 +1,193 @@
+---
+import RegistrationMarks from "./motifs/RegistrationMarks.astro";
+
+/**
+ * The map legend, in place of an integration tile grid: names typeset as the
+ * legend of a survey map, each group with its own symbol. One entry is
+ * highlighted (Check Point runtime data) with a short note. Product names stay
+ * in Latin script and are bidi-isolated; no vendor logos.
+ */
+interface Group {
+  title: string;
+  symbol: "square" | "triangle" | "circle";
+  items: string[];
+  /** Items are plain product names (bidi-isolated) unless set to "html". */
+  kind?: "names" | "html";
+}
+
+interface Props {
+  title: string;
+  groups: Group[];
+  highlight: { name: string; title: string; text: string };
+}
+
+const { title, groups, highlight } = Astro.props;
+---
+
+<div class="legend">
+  <RegistrationMarks />
+  <p class="legend-title" set:html={title} />
+  <div class="legend-body">
+    <div class="legend-highlight">
+      <span class="sym sym-square is-filled" aria-hidden="true"></span>
+      <div>
+        <p class="legend-highlight-title" set:html={highlight.title} />
+        <p class="legend-highlight-text" set:html={highlight.text} />
+      </div>
+    </div>
+    {groups.map((group) => (
+      <div class="legend-group">
+        <h3 class="legend-group-title">
+          <span class:list={["sym", `sym-${group.symbol}`]} aria-hidden="true" />
+          <span set:html={group.title} />
+        </h3>
+        <ul class:list={["legend-items", group.kind === "html" && "is-prose"]} role="list">
+          {group.items.map((item) => (
+            <li class:list={[item === highlight.name && "is-highlight"]}>
+              {group.kind === "html" ? <span set:html={item} /> : <bdi translate="no">{item}</bdi>}
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .legend {
+    position: relative;
+    margin-block-start: clamp(2.5rem, 2rem + 2vw, 4rem);
+    border: 1px solid var(--lc-ink);
+    background: var(--lc-paper-raised);
+  }
+
+  .legend-title {
+    padding: 0.625rem 1.25rem;
+    border-block-end: 1px solid var(--lc-ink);
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-text-mono);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  :lang(he) .legend-title {
+    font-family: var(--lc-font-sans);
+    font-size: var(--lc-text-small);
+    letter-spacing: 0;
+  }
+
+  .legend-body {
+    display: grid;
+    gap: 2rem 3rem;
+    padding: clamp(1.25rem, 1rem + 1.5vw, 2.25rem);
+  }
+
+  @media (min-width: 900px) {
+    .legend-body {
+      grid-template-columns: 5fr 4fr 3fr;
+    }
+
+    .legend-highlight {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .legend-highlight {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding-block-end: 1.75rem;
+    border-block-end: 1px solid var(--lc-rule);
+  }
+
+  .legend-highlight .sym {
+    margin-block-start: 0.6rem;
+  }
+
+  .legend-highlight-title {
+    font-size: clamp(1.375rem, 1.1rem + 1vw, 1.875rem);
+    font-weight: 550;
+    line-height: 1.25;
+  }
+
+  :lang(he) .legend-highlight-title {
+    font-weight: 600;
+  }
+
+  .legend-highlight-text {
+    margin-block-start: 0.375rem;
+    color: var(--lc-ink-muted);
+    font-family: var(--lc-font-mono);
+    font-size: 0.9rem;
+  }
+
+  :lang(he) .legend-highlight-text {
+    font-family: var(--lc-font-sans);
+  }
+
+  .legend-group-title {
+    display: flex;
+    gap: 0.625rem;
+    align-items: center;
+    margin-block-end: 1rem;
+    padding-block-end: 0.5rem;
+    border-block-end: 1px solid var(--lc-rule-strong);
+    color: var(--lc-ink-muted);
+    font-size: var(--lc-text-small);
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+
+  .legend-items {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    columns: 2 9rem;
+    column-gap: 1.5rem;
+  }
+
+  .legend-items.is-prose {
+    columns: 1;
+  }
+
+  .legend-items li {
+    break-inside: avoid;
+    padding-block: 0.3rem;
+    font-size: var(--lc-text-small);
+  }
+
+  .legend-items .is-highlight {
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--lc-ink);
+    text-underline-offset: 4px;
+  }
+
+  /* Map symbols, drawn in CSS. */
+  .sym {
+    flex: none;
+    display: inline-block;
+    inline-size: 0.6rem;
+    block-size: 0.6rem;
+    border: 1.5px solid var(--lc-ink);
+  }
+
+  .sym.is-filled {
+    inline-size: 0.875rem;
+    block-size: 0.875rem;
+    background: var(--lc-ink);
+  }
+
+  .sym-circle {
+    border-radius: 50%;
+  }
+
+  .sym-triangle {
+    border: 0;
+    inline-size: 0.75rem;
+    block-size: 0.65rem;
+    background: var(--lc-ink);
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  }
+</style>

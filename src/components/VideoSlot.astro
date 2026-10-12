@@ -2,7 +2,10 @@
 /**
  * A video slot. While public/media/<key>.mp4 (or .webm) is missing it shows a
  * poster panel with "Video coming soon". With the file present: <video> with
- * controls, no autoplay, preload="none", poster and en + he caption tracks.
+ * controls, no autoplay, preload="none" and en + he caption tracks. The poster is a lazy
+ * <img> under the video rather than the poster attribute, which browsers fetch at once:
+ * nothing of the video loads until the visitor scrolls near it. No caption track is marked
+ * `default`, because a default track is fetched with the page; both stay in the player's menu.
  */
 import Icon from "./Icon.astro";
 import { locales, useUi, type Locale } from "../i18n";
@@ -18,6 +21,10 @@ const { locale, videoKey, title } = Astro.props;
 const ui = useUi(locale);
 const files = videoFiles(videoKey);
 const ready = files.mp4 !== null || files.webm !== null;
+/** A 1×1 transparent GIF: without any poster Chrome paints the video black over the lazy
+ *  poster image; a data: URI costs no request (the CSP allows data: images). */
+const transparentPoster =
+  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 const captionLabels: Record<Locale, string> = Object.fromEntries(
   Object.entries(locales).map(([code, meta]) => [code, meta.label]),
 ) as Record<Locale, string>;
@@ -25,27 +32,39 @@ const captionLabels: Record<Locale, string> = Object.fromEntries(
 
 <figure class="video" data-video={videoKey} data-video-ready={ready ? "true" : "false"}>
   {ready ? (
-    <video
-      controls
-      preload="none"
-      playsinline
-      poster={files.poster ?? undefined}
-      width="1280"
-      height="720"
-      class="video-el"
-    >
-      {files.webm && <source src={files.webm} type="video/webm" />}
-      {files.mp4 && <source src={files.mp4} type="video/mp4" />}
-      {files.captions.map((c) => (
-        <track
-          kind="captions"
-          src={c.src}
-          srclang={locales[c.locale].htmlLang}
-          label={captionLabels[c.locale]}
-          default={c.locale === locale}
+    <div class="video-frame">
+      {files.poster && (
+        <img
+          class="video-poster-img"
+          src={files.poster}
+          alt=""
+          width="1280"
+          height="720"
+          loading="lazy"
+          decoding="async"
         />
-      ))}
-    </video>
+      )}
+      <video
+        controls
+        preload="none"
+        playsinline
+        width="1280"
+        height="720"
+        class="video-el"
+        poster={files.poster ? transparentPoster : undefined}
+      >
+        {files.webm && <source src={files.webm} type="video/webm" />}
+        {files.mp4 && <source src={files.mp4} type="video/mp4" />}
+        {files.captions.map((c) => (
+          <track
+            kind="captions"
+            src={c.src}
+            srclang={locales[c.locale].htmlLang}
+            label={captionLabels[c.locale]}
+          />
+        ))}
+      </video>
+    </div>
   ) : (
     <div class="video-poster">
       <span class="video-play" aria-hidden="true">
@@ -62,13 +81,36 @@ const captionLabels: Record<Locale, string> = Object.fromEntries(
     margin: 0;
   }
 
+  .video-frame {
+    position: relative;
+  }
+
+  .video-poster-img {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    border-radius: var(--lc-radius);
+    object-fit: cover;
+  }
+
+  .video-el {
+    position: relative;
+    display: block;
+  }
+
+  /* See-through until playback, so the lazy poster underneath shows. */
+  .video-frame .video-el {
+    background: transparent;
+  }
+
   .video-el,
   .video-poster {
     inline-size: 100%;
     aspect-ratio: 16 / 9;
-    border: 1px solid var(--lc-hairline);
-    border-radius: 12px;
-    background: var(--lc-ink-card);
+    border: 1px solid var(--lc-rule-strong);
+    border-radius: var(--lc-radius);
+    background: var(--lc-paper-raised);
   }
 
   .video-poster {
@@ -78,31 +120,31 @@ const captionLabels: Record<Locale, string> = Object.fromEntries(
     justify-items: center;
     gap: 0.75rem;
     overflow: hidden;
-    background:
-      linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px) 0 0 / 32px 32px,
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px) 0 0 / 32px 32px,
-      radial-gradient(80% 90% at 50% 100%, rgba(16, 185, 129, 0.1), transparent 70%),
-      var(--lc-ink-card);
   }
 
   .video-play {
     display: grid;
     place-items: center;
-    inline-size: 3.5rem;
-    block-size: 3.5rem;
-    border: 1px solid var(--lc-hairline-strong);
+    inline-size: 3.25rem;
+    block-size: 3.25rem;
+    border: 1px solid var(--lc-ink-faint);
     border-radius: 50%;
-    color: var(--lc-text-faint);
+    color: var(--lc-ink-muted);
   }
 
   .video-soon {
-    color: var(--lc-text-muted);
-    font-size: var(--lc-text-small);
+    color: var(--lc-ink-muted);
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-text-xs);
+  }
+
+  :lang(he) .video-soon {
+    font-family: var(--lc-font-sans);
   }
 
   .video-title {
     margin-block-start: 0.875rem;
     font-size: var(--lc-text-body);
-    font-weight: 600;
+    font-weight: 550;
   }
 </style>

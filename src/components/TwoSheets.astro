@@ -1,0 +1,602 @@
+---
+/**
+ * Two sheets: the documented network is drawn on a translucent vellum sheet
+ * laid over the observed network. The sheets start misregistered; the observed
+ * sheet carries a link the vellum lacks (sw-core-02 ↔ ap-lobby-3), which shows
+ * as a drift mark with a finding chip; the sheets settle into register, the
+ * link is drawn onto the vellum and the chip resolves to "Documented". 12 s loop.
+ *
+ * The static styles ARE the resolved frame (sheets in register, link documented),
+ * so reduced motion and browsers without animation show it. All animation sits
+ * behind prefers-reduced-motion: no-preference. A CSS-only pause switch covers
+ * WCAG 2.2.2 without JavaScript; src/scripts/two-sheets.ts only pauses the loop
+ * offscreen or in a hidden tab. The picture is never mirrored (dir="ltr"); the
+ * chips keep the page language.
+ */
+import { locales, useUi, type Locale } from "../i18n";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const ui = useUi(locale);
+const meta = locales[locale];
+
+const nodes = [
+  { id: "fw-edge-01", x: 210, y: 78, w: 112 },
+  { id: "sw-core-01", x: 110, y: 160, w: 112 },
+  { id: "sw-core-02", x: 350, y: 160, w: 112 },
+  { id: "sw-floor-2", x: 90, y: 250, w: 108 },
+  { id: "srv-vm-07", x: 240, y: 250, w: 104 },
+  { id: "ap-lobby-3", x: 440, y: 258, w: 108 },
+];
+const pos = Object.fromEntries(nodes.map((n) => [n.id, n]));
+const documented: [string, string][] = [
+  ["fw-edge-01", "sw-core-01"],
+  ["fw-edge-01", "sw-core-02"],
+  ["sw-core-01", "sw-core-02"],
+  ["sw-core-01", "sw-floor-2"],
+  ["sw-core-01", "srv-vm-07"],
+  ["sw-core-02", "srv-vm-07"],
+];
+const edge = (a: string, b: string) => {
+  const p = pos[a]!;
+  const q = pos[b]!;
+  return `M${p.x} ${p.y}L${q.x} ${q.y}`;
+};
+const link = edge("sw-core-02", "ap-lobby-3");
+// Registration marks sit just inside each sheet's corners.
+const marks = [
+  [40, 40],
+  [520, 40],
+  [40, 360],
+  [520, 360],
+] as const;
+const reg = (x: number, y: number) => `M${x - 9} ${y}H${x + 9}M${x} ${y - 9}V${y + 9}`;
+---
+
+<figure class="two-sheets" data-two-sheets>
+  <div class="drift-stage" dir="ltr" role="img" aria-label={ui.drift.label}>
+    <svg viewBox="0 0 560 400" class="sheets-svg" aria-hidden="true" focusable="false">
+      <!-- The observed sheet: what is on the wire, in cobalt. -->
+      <g class="sheet-observed">
+        <rect class="sheet-paper" x="20" y="20" width="520" height="360" rx="2"></rect>
+        <g class="observed-edges">
+          {documented.map(([a, b]) => (
+            <path d={edge(a, b)} />
+          ))}
+          <path d={link} />
+        </g>
+        {nodes.map((n) => (
+          <circle class="observed-node" cx={n.x} cy={n.y} r="4" />
+        ))}
+        <g class="reg-observed">
+          {marks.map(([x, y]) => (
+            <>
+              <circle cx={x} cy={y} r="5" />
+              <path d={reg(x, y)} />
+            </>
+          ))}
+        </g>
+      </g>
+
+      <!-- The vellum: the documented network, translucent, laid over the observed sheet. -->
+      <g class="sheet-vellum">
+        <rect class="vellum-shadow" x="22" y="23" width="516" height="356" rx="2"></rect>
+        <rect class="vellum-paper" x="20" y="20" width="520" height="360" rx="2"></rect>
+        <g class="documented-edges">
+          {documented.map(([a, b]) => (
+            <path d={edge(a, b)} />
+          ))}
+        </g>
+        <path class="edge-resolved" d={link} pathLength="100"></path>
+        {nodes.map((n) => (
+          <g class="node" transform={`translate(${n.x} ${n.y})`}>
+            <rect class="node-box" x={-n.w / 2} y="-15" width={n.w} height="30" rx="2" />
+            <circle class="node-dot" cx={-n.w / 2 + 13} cy="0" r="3" />
+            <text x={-n.w / 2 + 23} y="4.2">
+              {n.id}
+            </text>
+          </g>
+        ))}
+        <g class="reg-vellum">
+          {marks.map(([x, y]) => (
+            <>
+              <circle cx={x} cy={y} r="5" />
+              <path d={reg(x, y)} />
+            </>
+          ))}
+        </g>
+      </g>
+
+      <!-- The drift mark: where the sheets disagree. -->
+      <path class="edge-ghost" d={link}></path>
+      <rect class="node-halo" x="380" y="236" width="120" height="44" rx="3"></rect>
+      <path class="leader" d="M440 280V302"></path>
+      <circle class="probe" r="4" cx="0" cy="0"></circle>
+    </svg>
+    <div class="chips">
+      <p class="chip chip-finding" dir={meta.dir} lang={meta.htmlLang}>
+        <span class="chip-mark" aria-hidden="true"></span>
+        <span set:html={ui.drift.finding} />
+        <span class="chip-sep" aria-hidden="true">
+          ·
+        </span>
+        <bdi class="chip-id">sw-core-02 ↔ ap-lobby-3</bdi>
+      </p>
+      <p class="chip chip-resolved" dir={meta.dir} lang={meta.htmlLang}>
+        <span class="chip-mark" aria-hidden="true"></span>
+        <span set:html={ui.drift.resolved} />
+        <span class="chip-sep" aria-hidden="true">
+          ·
+        </span>
+        <bdi class="chip-id">sw-core-02 ↔ ap-lobby-3</bdi>
+      </p>
+    </div>
+  </div>
+  <figcaption class="sheets-legend">
+    <span class="legend-item">
+      <span class="legend-line legend-documented" aria-hidden="true"></span>
+      <span set:html={ui.drift.documented} />
+    </span>
+    <span class="legend-item">
+      <span class="legend-line legend-observed" aria-hidden="true"></span>
+      <span set:html={ui.drift.observed} />
+    </span>
+    <span class="legend-item">
+      <span class="legend-line legend-drift" aria-hidden="true"></span>
+      <span set:html={ui.drift.drift} />
+    </span>
+    <label class="drift-pause">
+      <input type="checkbox" data-drift-pause />
+      <span set:html={ui.drift.pause} />
+    </label>
+  </figcaption>
+</figure>
+
+<script>
+  import "../scripts/two-sheets.ts";
+</script>
+
+<style>
+  .two-sheets {
+    margin: 0;
+  }
+
+  .drift-stage {
+    position: relative;
+  }
+
+  .sheets-svg {
+    inline-size: 100%;
+    block-size: auto;
+    aspect-ratio: 560 / 400;
+    overflow: visible;
+  }
+
+  /* Observed sheet. */
+  .sheet-paper {
+    fill: var(--lc-paper-sunk);
+    stroke: var(--lc-rule);
+  }
+
+  .observed-edges path {
+    fill: none;
+    stroke: var(--lc-observed);
+    stroke-opacity: 0.55;
+    stroke-width: 1.2;
+    stroke-dasharray: 2 3;
+  }
+
+  .observed-node {
+    fill: var(--lc-observed);
+  }
+
+  .reg-observed :is(circle, path) {
+    fill: none;
+    stroke: var(--lc-observed);
+    stroke-width: 0.9;
+  }
+
+  /* Vellum. Static state: in register. */
+  .sheet-vellum {
+    transform-box: view-box;
+    transform-origin: 280px 200px;
+  }
+
+  .vellum-shadow {
+    fill: var(--lc-shadow);
+    opacity: 0.5;
+  }
+
+  .vellum-paper {
+    fill: var(--lc-paper-raised);
+    fill-opacity: 0.8;
+    stroke: var(--lc-rule-strong);
+  }
+
+  .documented-edges path {
+    fill: none;
+    stroke: var(--lc-ink);
+    stroke-opacity: 0.7;
+    stroke-width: 1.4;
+  }
+
+  .node-box {
+    fill: var(--lc-paper-raised);
+    stroke: var(--lc-ink-faint);
+    stroke-width: 1;
+  }
+
+  .node-dot {
+    fill: var(--lc-documented-line);
+  }
+
+  .node text {
+    fill: var(--lc-ink);
+    font-family: var(--lc-font-mono);
+    font-size: 12px;
+  }
+
+  .reg-vellum :is(circle, path) {
+    fill: none;
+    stroke: var(--lc-ink);
+    stroke-width: 0.9;
+  }
+
+  .edge-resolved {
+    fill: none;
+    stroke: var(--lc-documented-line);
+    stroke-width: 2.2;
+    opacity: 1;
+  }
+
+  /* The drift mark. Static state: gone. */
+  .edge-ghost {
+    fill: none;
+    stroke: var(--lc-drift);
+    stroke-width: 2.2;
+    stroke-dasharray: 6 5;
+    opacity: 0;
+  }
+
+  .node-halo {
+    fill: none;
+    stroke: var(--lc-drift);
+    stroke-width: 1.4;
+    stroke-dasharray: 3 3;
+    opacity: 0;
+  }
+
+  .probe {
+    fill: var(--lc-observed);
+    opacity: 0;
+  }
+
+  /* The chips sit beside the link, in the stage's own left-to-right picture
+     space; each chip keeps the page's direction. */
+  .leader {
+    fill: none;
+    stroke: var(--lc-ink-faint);
+    stroke-width: 1;
+    stroke-dasharray: 2 2;
+  }
+
+  .chips {
+    position: absolute;
+    inset-block-start: 75.5%;
+    inset-inline-end: 4%;
+    display: grid;
+    justify-items: end;
+  }
+
+  .chip {
+    grid-area: 1 / 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid;
+    border-radius: 2px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    line-height: 1.2;
+    white-space: nowrap;
+    box-shadow: 0 8px 22px -12px var(--lc-shadow);
+  }
+
+  .chip-id {
+    color: var(--lc-ink);
+    font-family: var(--lc-font-mono);
+    font-size: 0.72rem;
+    font-weight: 400;
+  }
+
+  .chip-sep {
+    color: var(--lc-ink-faint);
+  }
+
+  .chip-mark {
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+  }
+
+  .chip-finding {
+    border-color: var(--lc-drift);
+    background: var(--lc-drift-wash);
+    color: var(--lc-drift);
+    opacity: 0;
+  }
+
+  .chip-finding .chip-mark {
+    background: var(--lc-drift);
+    rotate: 45deg;
+  }
+
+  .chip-resolved {
+    border-color: var(--lc-documented-line);
+    background: var(--lc-documented-wash);
+    color: var(--lc-documented);
+    opacity: 1;
+  }
+
+  .chip-resolved .chip-mark {
+    background: var(--lc-documented-line);
+    border-radius: 50%;
+  }
+
+  @media (max-width: 520px) {
+    .leader {
+      display: none;
+    }
+
+    .chips {
+      inset-block-start: auto;
+      inset-block-end: 0.5rem;
+      inset-inline-end: 0.5rem;
+      max-inline-size: calc(100% - 1rem);
+    }
+
+    .chip {
+      max-inline-size: 100%;
+    }
+
+    .chip-id {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .sheets-legend {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1.25rem;
+    margin-block-start: 1rem;
+    color: var(--lc-ink-muted);
+    font-size: var(--lc-text-xs);
+  }
+
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .legend-line {
+    inline-size: 1.5rem;
+    block-size: 0;
+    border-block-start: 1.5px solid var(--lc-ink);
+  }
+
+  .legend-observed {
+    border-block-start: 2px dotted var(--lc-observed);
+  }
+
+  .legend-drift {
+    border-block-start: 2px dashed var(--lc-drift);
+  }
+
+  .drift-pause {
+    display: none;
+    align-items: center;
+    gap: 0.4rem;
+    margin-inline-start: auto;
+    cursor: pointer;
+  }
+
+  .drift-pause input {
+    inline-size: 1rem;
+    block-size: 1rem;
+    margin: 0;
+    accent-color: var(--lc-action);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .drift-pause {
+      display: inline-flex;
+    }
+
+    .sheet-vellum {
+      animation: sheets-register 12s linear infinite both;
+    }
+
+    .reg-observed {
+      animation: registration 12s linear infinite both;
+    }
+
+    .probe {
+      animation: probe 12s linear infinite both;
+    }
+
+    .edge-ghost {
+      animation:
+        ghost 12s linear infinite both,
+        march 1.4s linear infinite;
+    }
+
+    .node-halo {
+      animation: ghost 12s linear infinite both;
+    }
+
+    .edge-resolved {
+      animation: resolved 12s linear infinite both;
+    }
+
+    .chip-finding {
+      animation: chip-finding 12s linear infinite both;
+    }
+
+    .chip-resolved {
+      animation: chip-resolved 12s linear infinite both;
+    }
+
+    .two-sheets:has([data-drift-pause]:checked)
+      :is(.sheet-vellum, .reg-observed, .probe, .edge-ghost, .node-halo, .edge-resolved, .chip),
+    .two-sheets[data-offscreen]
+      :is(.sheet-vellum, .reg-observed, .probe, .edge-ghost, .node-halo, .edge-resolved, .chip) {
+      animation-play-state: paused;
+    }
+  }
+
+  /* 0–30 %: misregistered. 30–46 %: the vellum settles into register (spring).
+     90–100 %: it lifts off again for the next loop. */
+  @keyframes sheets-register {
+    0%,
+    30% {
+      transform: translate(15px, -11px) rotate(-1.6deg);
+      animation-timing-function: var(--lc-spring);
+    }
+    46%,
+    90% {
+      transform: none;
+      animation-timing-function: ease-in-out;
+    }
+    100% {
+      transform: translate(15px, -11px) rotate(-1.6deg);
+    }
+  }
+
+  /* The observed sheet's marks fade back as the two sets of marks coincide. */
+  @keyframes registration {
+    0%,
+    30% {
+      opacity: 1;
+    }
+    46%,
+    90% {
+      opacity: 0.35;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  /* The observed probe travels the undocumented link (sw-core-02 → ap-lobby-3). */
+  @keyframes probe {
+    0%,
+    9% {
+      opacity: 0;
+      transform: translate(350px, 160px);
+    }
+    11% {
+      opacity: 0.9;
+      transform: translate(350px, 160px);
+    }
+    21% {
+      opacity: 0.9;
+      transform: translate(440px, 258px);
+    }
+    24%,
+    100% {
+      opacity: 0;
+      transform: translate(440px, 258px);
+    }
+  }
+
+  @keyframes ghost {
+    0%,
+    20% {
+      opacity: 0;
+    }
+    26%,
+    56% {
+      opacity: 1;
+    }
+    62%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes march {
+    to {
+      stroke-dashoffset: -11;
+    }
+  }
+
+  /* Drawn onto the vellum once the sheets are in register. */
+  @keyframes resolved {
+    0%,
+    56% {
+      opacity: 0;
+      stroke-dasharray: 100;
+      stroke-dashoffset: 100;
+    }
+    57% {
+      opacity: 1;
+      stroke-dasharray: 100;
+      stroke-dashoffset: 100;
+    }
+    64%,
+    88% {
+      opacity: 1;
+      stroke-dasharray: 100;
+      stroke-dashoffset: 0;
+    }
+    94%,
+    100% {
+      opacity: 0;
+      stroke-dasharray: 100;
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes chip-finding {
+    0%,
+    26% {
+      opacity: 0;
+      translate: 0 4px;
+    }
+    30%,
+    58% {
+      opacity: 1;
+      translate: 0 0;
+    }
+    62%,
+    100% {
+      opacity: 0;
+      translate: 0 0;
+    }
+  }
+
+  @keyframes chip-resolved {
+    0%,
+    62% {
+      opacity: 0;
+      translate: 0 4px;
+    }
+    66%,
+    88% {
+      opacity: 1;
+      translate: 0 0;
+    }
+    93%,
+    100% {
+      opacity: 0;
+      translate: 0 0;
+    }
+  }
+</style>

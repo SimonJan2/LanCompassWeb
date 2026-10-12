@@ -13,12 +13,14 @@ const { class: className } = Astro.props;
 <style>
   .prose {
     max-inline-size: 44rem;
-    color: var(--lc-text-muted);
+    color: var(--lc-ink-muted);
   }
 
   .prose :global(h2) {
-    margin-block: 3rem 0.875rem;
-    color: var(--lc-text);
+    margin-block: 3.5rem 0.875rem;
+    padding-block-start: 0.75rem;
+    border-block-start: 1px solid var(--lc-rule-strong);
+    color: var(--lc-ink);
     font-size: clamp(1.375rem, 1.2rem + 0.7vw, 1.75rem);
     letter-spacing: -0.015em;
   }
@@ -29,7 +31,7 @@ const { class: className } = Astro.props;
 
   .prose :global(h3) {
     margin-block: 2rem 0.5rem;
-    color: var(--lc-text);
+    color: var(--lc-ink);
     font-size: var(--lc-text-h3);
   }
 
@@ -50,25 +52,29 @@ const { class: className } = Astro.props;
   }
 
   .prose :global(li::marker) {
-    color: var(--lc-signal-bright);
+    color: var(--lc-ink-faint);
   }
 
   .prose :global(strong) {
-    color: var(--lc-text);
-    font-weight: 600;
+    color: var(--lc-ink);
   }
 
   .prose :global(a) {
-    color: var(--lc-signal-bright);
+    color: var(--lc-ink);
     text-decoration: underline;
+    text-decoration-color: var(--lc-ink-faint);
     text-underline-offset: 3px;
+  }
+
+  .prose :global(a:hover) {
+    text-decoration-color: currentColor;
   }
 
   .prose :global(code) {
     padding: 0.1em 0.35em;
-    border: 1px solid var(--lc-hairline);
-    border-radius: 5px;
-    background: var(--lc-ink-card);
-    color: var(--lc-text);
+    border: 1px solid var(--lc-rule);
+    border-radius: 2px;
+    background: var(--lc-paper-raised);
+    color: var(--lc-ink);
   }
 </style>

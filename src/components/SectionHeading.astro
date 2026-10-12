@@ -1,22 +1,42 @@
 ---
 import Eyebrow from "./Eyebrow.astro";
 
-/** Eyebrow + h2 + lead. Strings may contain inline HTML authored in the copy files. */
+/**
+ * Bearing + eyebrow + heading + lead. Sections are numbered as bearings
+ * (000°, 045°, 090° …), set in mono and always left-to-right. Strings may
+ * contain inline HTML authored in the copy files.
+ */
 interface Props {
   eyebrow?: string;
   title: string;
   lead?: string;
   id?: string;
+  /** Degrees, shown as a three-digit bearing. */
+  bearing?: number;
   align?: "start" | "center";
   level?: 1 | 2;
   class?: string;
 }
 
-const { eyebrow, title, lead, id, align = "start", level = 2, class: className } = Astro.props;
+const {
+  eyebrow,
+  title,
+  lead,
+  id,
+  bearing,
+  align = "start",
+  level = 2,
+  class: className,
+} = Astro.props;
 const Tag = level === 1 ? "h1" : "h2";
 ---
 
 <div class:list={["section-heading", `align-${align}`, className]}>
+  {bearing !== undefined && (
+    <p class="bearing" aria-hidden="true" dir="ltr">
+      {String(bearing).padStart(3, "0")}°
+    </p>
+  )}
   {eyebrow && (
     <Eyebrow>
       <Fragment set:html={eyebrow} />
@@ -28,12 +48,26 @@ const Tag = level === 1 ? "h1" : "h2";
 
 <style>
   .section-heading {
-    max-inline-size: 46rem;
+    position: relative;
+    max-inline-size: 48rem;
   }
 
   .align-center {
     margin-inline: auto;
     text-align: center;
+  }
+
+  .bearing {
+    margin-block-end: 1.5rem;
+    padding-block-start: 0.75rem;
+    border-block-start: 1px solid var(--lc-ink);
+    inline-size: fit-content;
+    min-inline-size: 4.5rem;
+    color: var(--lc-ink);
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-text-mono);
+    font-weight: 500;
+    unicode-bidi: isolate;
   }
 
   .heading-1 {
@@ -45,6 +79,7 @@ const Tag = level === 1 ? "h1" : "h2";
   }
 
   .section-lead {
+    max-inline-size: 40rem;
     margin-block-start: 1.25rem;
   }
 </style>

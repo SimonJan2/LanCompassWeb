@@ -51,20 +51,26 @@ export const en = {
   home: {
     hero: {
       chips: ["Self-hosted", "Runs fully offline", "Read-only by default"],
-      title: "Your documentation and your network, finally in agreement.",
-      lead: "LanCompass keeps IPAM, racks and cabling in one self-hosted system, discovers what is really on the network, and shows every place where the two drift apart.",
+      title: "Your documentation and your network, in agreement.",
+      lead: "LanCompass keeps IPAM, racks and cabling in one self-hosted system, discovers what is really on the wire, and shows every place where the two drift apart.",
       primary: "Become a design partner",
       secondary: "See how it works",
+      marginalia: ["10.20.0.0/16", "10.20.12.0/24 · lobby", "sw-core-02 → ap-lobby-3"],
     },
-    facts: [
-      { value: "24 languages", label: "Real right-to-left, with full Hebrew and Arabic." },
-      {
-        value: "12 integrations",
-        label: "Check Point first, then firewalls, hypervisors and controllers.",
-      },
-      { value: "No telemetry. No cloud.", label: "Runs fully offline. Nothing phones home." },
-      { value: "One <code>docker compose up</code>", label: "Self-hosted on your own Linux host." },
-    ],
+    datasheet: {
+      title: "Datasheet",
+      note: "Every line is a fact about the product today.",
+      rows: [
+        { label: "Install", value: "One <code>docker compose up</code>, on your own Linux host" },
+        { label: "Network access", value: "None required. No cloud, no telemetry" },
+        { label: "Default mode", value: "Read-only. Two opt-in writes: DNS PTR, NAC port actions" },
+        { label: "Languages", value: "24, with full Hebrew and Arabic right-to-left" },
+        { label: "Integrations", value: "12, Check Point first" },
+        { label: "Device types", value: "1,594, bundled" },
+        { label: "Sign-in", value: "Local with TOTP MFA, OIDC SSO, LDAP / AD" },
+        { label: "Imports", value: "Excel (Hebrew too), NetBox CSV 3.6–4.2+" },
+      ],
+    },
     loop: {
       eyebrow: "How it works",
       title: "Document. Observe. Reconcile.",
@@ -72,18 +78,16 @@ export const en = {
       steps: [
         {
           name: "Document",
-          screen: "ipam-tree",
-          text: "Write down what the network should be, from the prefix down to the patch panel.",
+          text: "Write down what the network should be, from the prefix to the patch panel.",
           bullets: [
             "Sites, VRFs, prefixes, IPs, VLANs and DHCP ranges",
             "Racks, devices, cables and patch panels, with 1,594 bundled device types",
-            "Import Excel workbooks, including Hebrew ones, or NetBox CSV exports",
+            "Import Excel workbooks, Hebrew ones too, or NetBox CSV exports",
           ],
         },
         {
           name: "Observe",
-          screen: "topology-observed",
-          text: "Let LanCompass look at what is really connected, at the depth you choose.",
+          text: "Let LanCompass look at what is really connected, as deep as you choose.",
           bullets: [
             "A quick scan by default; deep and passive (listen-only) discovery when you opt in",
             "SNMP v1, v2c and v3 enrichment, traps, and LLDP and CDP neighbours",
@@ -92,65 +96,84 @@ export const en = {
         },
         {
           name: "Reconcile",
-          screen: "review",
           text: "Review each place where the record and the network disagree, and settle it.",
           bullets: [
-            "Documented and observed layers on the same topology",
+            "Documented and observed layers on one topology",
             "A review queue for drift",
             "Config backups checked against compliance packs",
           ],
         },
       ],
+      figure: {
+        screen: "review",
+        caption:
+          "The review queue: each disagreement between the record and the wire, one at a time.",
+      },
     },
-    bento: {
+    atlas: {
       eyebrow: "Everything in one box",
-      title: "One install covers the network, from address plan to alert.",
-      lead: "No add-on servers, no second database, no cloud account. Each part reads from the same record.",
+      title: "One install, from address plan to alert.",
+      lead: "No add-on servers, no second database, no cloud account. Each part reads the same record.",
       link: "See every capability",
-      tiles: [
+      previewLabel: "Screen preview",
+      rows: [
         {
           key: "ipam",
           title: "IPAM & DCIM",
-          text: "Sites, VRFs, prefixes, IPs, VLANs and DHCP ranges. Racks, devices, cables and patch panels, with 1,594 bundled device types.",
+          text: "Prefixes, VLANs, racks and patch panels, with 1,594 bundled device types.",
           screen: "rack",
+          section: "ipam",
         },
         {
           key: "discovery",
           title: "Discovery",
-          text: "A quick scan by default. Deep and passive (listen-only) discovery when you opt in, with device identification.",
+          text: "A quick scan by default. Deep and passive discovery when you opt in.",
+          screen: "deep-discovery",
+          section: "discovery",
         },
         {
           key: "snmp",
           title: "SNMP & topology",
-          text: "SNMP v1, v2c and v3 enrichment and traps. LLDP and CDP neighbours draw the observed layer.",
+          text: "SNMP v1, v2c and v3, traps, and LLDP and CDP neighbours.",
+          screen: "topology-observed",
+          section: "snmp",
+        },
+        {
+          key: "config",
+          title: "Config backup & compliance",
+          text: "SSH backups with host-key pinning, checked against four compliance packs.",
+          screen: "compliance",
+          section: "config",
         },
         {
           key: "nac",
           title: "NAC",
-          text: "Detection first. Enforcement is optional, guarded, and off by default.",
+          text: "Detection first. Enforcement is optional, guarded and off by default.",
+          screen: "nac",
+          section: "nac",
         },
         {
           key: "monitoring",
           title: "Monitoring & alerts",
           text: "Ping, TCP and HTTP checks. Alerts to webhook, email, Discord, Telegram and syslog.",
-        },
-        {
-          key: "config",
-          title: "Config backup & compliance",
-          text: "Config backup over SSH with host-key pinning. Compliance packs for Cisco IOS, MikroTik RouterOS, Check Point Gaia and FortiOS.",
-          screen: "compliance",
+          screen: "dashboard",
+          section: "monitoring",
         },
         {
           // TODO(operator): confirm a one-line description of the Design studio; only the topology layers are in the claims list.
           key: "studios",
           title: "Topology & Design studios",
           text: "Documented and observed layers side by side, so drift is something you can see.",
+          screen: "topology-observed",
+          section: "studios",
         },
         {
           // TODO(operator): confirm report and dashboard specifics before naming any; this line stays generic on purpose.
           key: "reports",
           title: "Reports & dashboards",
-          text: "Reports and dashboards over the same record, inside the same install.",
+          text: "Over the same record, inside the same install.",
+          screen: "dashboard",
+          section: "reports",
         },
       ],
     },
@@ -195,12 +218,14 @@ export const en = {
       eyebrow: "Integrations",
       title: "Reads the systems you already run.",
       lead: "Twelve integrations bring in data from the systems you already run, and four config drivers back up and check device configs.",
+      legendTitle: "Legend",
       highlight: {
+        name: "Check Point",
         title: "Check Point runtime data",
         text: "ARP, DHCP and VPN, per gateway.",
       },
-      groupIntegrations: "Integrations",
-      groupDrivers: "Config drivers and compliance packs",
+      groupIntegrations: "Integrations · 12",
+      groupDrivers: "Config drivers and compliance packs · 4",
       items: [
         "Check Point",
         "FortiGate",
@@ -244,7 +269,7 @@ export const en = {
     },
     videos: {
       eyebrow: "Watch",
-      title: "Three short videos, each one task.",
+      title: "Three short videos, one task each.",
       items: [
         { key: "hebrew-excel-import", title: "Import a Hebrew Excel workbook" },
         { key: "check-point-gateway-pull", title: "Pull runtime data from a Check Point gateway" },

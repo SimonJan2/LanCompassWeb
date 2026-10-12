@@ -1,0 +1,62 @@
+---
+/**
+ * Printer's registration marks (a circle with a cross) at the four corners of
+ * the parent, which needs `position: relative`. Decorative.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+const corners = ["ss", "se", "es", "ee"] as const;
+---
+
+{corners.map((corner) => (
+  <svg
+    class:list={["reg-mark", `reg-${corner}`, className]}
+    viewBox="0 0 20 20"
+    width="20"
+    height="20"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <circle cx="10" cy="10" r="5"></circle>
+    <path d="M10 0V20M0 10H20"></path>
+  </svg>
+))}
+
+<style>
+  .reg-mark {
+    position: absolute;
+    inline-size: 20px;
+    block-size: 20px;
+    pointer-events: none;
+  }
+
+  .reg-mark circle,
+  .reg-mark path {
+    fill: none;
+    stroke: var(--lc-ink-faint);
+    stroke-width: 0.9;
+  }
+
+  /* Logical corners: block-start/inline-start, and so on. */
+  .reg-ss {
+    inset-block-start: -10px;
+    inset-inline-start: -10px;
+  }
+
+  .reg-se {
+    inset-block-start: -10px;
+    inset-inline-end: -10px;
+  }
+
+  .reg-es {
+    inset-block-end: -10px;
+    inset-inline-start: -10px;
+  }
+
+  .reg-ee {
+    inset-block-end: -10px;
+    inset-inline-end: -10px;
+  }
+</style>

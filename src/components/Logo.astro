@@ -1,4 +1,9 @@
 ---
+/**
+ * The compass mark on its own app-icon tile (the mark is unchanged from the
+ * product, and its white north needle needs the dark tile on paper), beside
+ * the wordmark "LanCompass" set in Plex Sans. Never mirrored.
+ */
 import CompassMark from "./CompassMark.astro";
 
 interface Props {
@@ -11,7 +16,7 @@ const { href, label, size = 28 } = Astro.props;
 ---
 
 <a href={href} class="logo" aria-label={label}>
-  <CompassMark size={size} />
+  <CompassMark size={size} tile />
   <span class="logo-word" translate="no" dir="ltr">
     LanCompass
   </span>
@@ -22,16 +27,16 @@ const { href, label, size = 28 } = Astro.props;
     display: inline-flex;
     align-items: center;
     gap: 0.625rem;
-    color: var(--lc-text);
+    color: var(--lc-ink);
     text-decoration: none;
-    border-radius: 6px;
+    border-radius: 2px;
   }
 
   .logo-word {
-    font-family: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--lc-font-sans);
     font-size: 1.125rem;
-    font-weight: 650;
-    letter-spacing: -0.02em;
+    font-weight: 600;
+    letter-spacing: -0.015em;
     unicode-bidi: isolate;
   }
 </style>

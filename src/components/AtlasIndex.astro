@@ -1,0 +1,207 @@
+---
+/**
+ * The atlas index, in place of a bento grid: a typographic list of
+ * capabilities, one row each with a one-line claim. Each row links to its
+ * section on /product. On wide screens a preview of the matching screen sits
+ * beside the list and follows hover AND keyboard focus (CSS :has(), no
+ * JavaScript), so every preview is reachable without a pointer. Up to ten rows.
+ */
+import Icon from "./Icon.astro";
+import ScreenshotFrame from "./ScreenshotFrame.astro";
+import type { Locale } from "../i18n";
+import { isScreenKey } from "../lib/screens";
+
+interface Props {
+  locale: Locale;
+  rows: { key: string; title: string; text: string; screen: string; href: string }[];
+  /** Label for the previews panel (e.g. "Preview"). */
+  previewLabel: string;
+}
+
+const { locale, rows, previewLabel } = Astro.props;
+---
+
+<div class="atlas" data-atlas>
+  <ol class="atlas-list" role="list">
+    {rows.map((row, i) => (
+      <li class="atlas-item">
+        <a class="atlas-row" href={row.href} data-atlas-row={row.key}>
+          <span class="atlas-num" aria-hidden="true" dir="ltr">
+            {String(i + 1).padStart(2, "0")}
+          </span>
+          <span class="atlas-title" set:html={row.title} />
+          <span class="atlas-claim" set:html={row.text} />
+          <Icon name="arrow" size={18} class="atlas-arrow" />
+        </a>
+      </li>
+    ))}
+  </ol>
+  <div class="atlas-previews" role="group" aria-label={previewLabel}>
+    {rows.map((row) => (
+      <div class="atlas-preview" data-atlas-preview={row.key}>
+        {isScreenKey(row.screen) && (
+          <ScreenshotFrame screen={row.screen} locale={locale} single={960} />
+        )}
+        <p class="atlas-preview-caption" set:html={row.title} />
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .atlas {
+    display: grid;
+    gap: 3rem;
+    margin-block-start: clamp(2.5rem, 2rem + 2vw, 4rem);
+  }
+
+  @media (min-width: 960px) {
+    .atlas {
+      grid-template-columns: 7fr 5fr;
+      align-items: start;
+    }
+  }
+
+  .atlas-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-block-start: 1px solid var(--lc-ink);
+  }
+
+  .atlas-row {
+    display: grid;
+    grid-template-columns: 2.25rem 1fr auto;
+    grid-template-areas:
+      "num title arrow"
+      "num claim arrow";
+    gap: 0.25rem 1rem;
+    align-items: baseline;
+    padding-block: 1.125rem;
+    padding-inline: 0.25rem;
+    border-block-end: 1px solid var(--lc-rule);
+    color: var(--lc-ink);
+    text-decoration: none;
+  }
+
+  @media (min-width: 720px) {
+    .atlas-row {
+      grid-template-columns: 2.25rem minmax(11rem, 2fr) 3fr auto;
+      grid-template-areas: "num title claim arrow";
+    }
+  }
+
+  .atlas-num {
+    grid-area: num;
+    color: var(--lc-ink-faint);
+    font-family: var(--lc-font-mono);
+    font-size: 0.75rem;
+  }
+
+  .atlas-title {
+    grid-area: title;
+    font-size: var(--lc-text-h3);
+    font-weight: 550;
+    line-height: 1.3;
+  }
+
+  :lang(he) .atlas-title {
+    font-weight: 600;
+  }
+
+  .atlas-claim {
+    grid-area: claim;
+    color: var(--lc-ink-muted);
+    font-size: var(--lc-text-small);
+    line-height: 1.5;
+  }
+
+  .atlas-row :global(.atlas-arrow) {
+    grid-area: arrow;
+    align-self: center;
+    color: var(--lc-ink-faint);
+  }
+
+  .atlas-row:is(:hover, :focus) {
+    background: var(--lc-paper-raised);
+  }
+
+  .atlas-row:is(:hover, :focus) :global(.atlas-arrow) {
+    color: var(--lc-ink);
+  }
+
+  .atlas-row:focus-visible {
+    outline-offset: -2px;
+  }
+
+  /* Previews: wide screens only; one visible at a time, the first by default. */
+  .atlas-previews {
+    display: none;
+  }
+
+  @media (min-width: 960px) {
+    .atlas-previews {
+      position: sticky;
+      inset-block-start: 6rem;
+      display: grid;
+    }
+  }
+
+  .atlas-preview {
+    grid-area: 1 / 1;
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  .atlas-preview-caption {
+    margin-block-start: 0.75rem;
+    color: var(--lc-ink-muted);
+    font-size: var(--lc-text-xs);
+  }
+
+  .atlas:not(:has(.atlas-row:is(:hover, :focus))) .atlas-preview:first-child,
+  .atlas:has(.atlas-item:nth-child(1) .atlas-row:is(:hover, :focus)) .atlas-preview:nth-child(1),
+  .atlas:has(.atlas-item:nth-child(2) .atlas-row:is(:hover, :focus)) .atlas-preview:nth-child(2),
+  .atlas:has(.atlas-item:nth-child(3) .atlas-row:is(:hover, :focus)) .atlas-preview:nth-child(3),
+  .atlas:has(.atlas-item:nth-child(4) .atlas-row:is(:hover, :focus)) .atlas-preview:nth-child(4),
+  .atlas:has(.atlas-item:nth-child(5) .atlas-row:is(:hover, :focus)) .atlas-preview:nth-child(5),
+  .atlas:has(.atlas-item:nth-child(6) .atlas-row:is(:hover, :focus)) .atlas-preview:nth-child(6),
+  .atlas:has(.atlas-item:nth-child(7) .atlas-row:is(:hover, :focus)) .atlas-preview:nth-child(7),
+  .atlas:has(.atlas-item:nth-child(8) .atlas-row:is(:hover, :focus)) .atlas-preview:nth-child(8),
+  .atlas:has(.atlas-item:nth-child(9) .atlas-row:is(:hover, :focus)) .atlas-preview:nth-child(9),
+  .atlas:has(.atlas-item:nth-child(10) .atlas-row:is(:hover, :focus)) .atlas-preview:nth-child(10) {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .atlas-row {
+      transition: background-color var(--lc-dur-micro) ease;
+    }
+
+    .atlas-preview {
+      transition:
+        opacity var(--lc-dur-ui) ease,
+        visibility 0s linear var(--lc-dur-ui);
+    }
+
+    .atlas:not(:has(.atlas-row:is(:hover, :focus))) .atlas-preview:first-child,
+    .atlas:has(.atlas-row:is(:hover, :focus)) .atlas-preview {
+      transition:
+        opacity var(--lc-dur-ui) ease,
+        visibility 0s;
+    }
+
+    .atlas-row :global(.atlas-arrow) {
+      transition: translate var(--lc-dur-ui) var(--lc-spring);
+    }
+
+    .atlas-row:is(:hover, :focus) :global(.atlas-arrow) {
+      translate: 3px 0;
+    }
+
+    [dir="rtl"] .atlas-row:is(:hover, :focus) :global(.atlas-arrow) {
+      translate: -3px 0;
+    }
+  }
+</style>

@@ -71,8 +71,8 @@ const current = locales[locale];
     gap: 0.375rem;
     min-block-size: 2.5rem;
     padding: 0.375rem 0.625rem;
-    border-radius: 8px;
-    color: var(--lc-text-muted);
+    border-radius: var(--lc-radius-sm);
+    color: var(--lc-ink-muted);
     font-size: var(--lc-text-small);
     cursor: pointer;
     list-style: none;
@@ -83,7 +83,7 @@ const current = locales[locale];
   }
 
   .lang-menu summary:hover {
-    color: var(--lc-text);
+    color: var(--lc-ink);
   }
 
   .lang-menu[open] :global(.lang-chevron) {
@@ -99,10 +99,10 @@ const current = locales[locale];
     margin: 0;
     padding: 0.375rem;
     list-style: none;
-    border: 1px solid var(--lc-hairline-strong);
-    border-radius: 10px;
-    background: var(--lc-ink-card);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+    border: 1px solid var(--lc-rule-strong);
+    border-radius: var(--lc-radius);
+    background: var(--lc-paper-raised);
+    box-shadow: 0 16px 40px -18px var(--lc-shadow);
   }
 
   .lang-list a {
@@ -111,18 +111,18 @@ const current = locales[locale];
     justify-content: space-between;
     gap: 1rem;
     padding: 0.5rem 0.625rem;
-    border-radius: 6px;
-    color: var(--lc-text);
+    border-radius: var(--lc-radius-sm);
+    color: var(--lc-ink);
     font-size: var(--lc-text-small);
     text-decoration: none;
   }
 
   .lang-list a:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--lc-paper-sunk);
   }
 
   .lang-list a[aria-current] {
-    color: var(--lc-signal-bright);
+    font-weight: 600;
   }
 
   .lang-inline {
@@ -135,17 +135,19 @@ const current = locales[locale];
   }
 
   .lang-inline a {
-    color: var(--lc-text-muted);
+    color: var(--lc-ink-muted);
     font-size: var(--lc-text-small);
     text-decoration: none;
   }
 
   .lang-inline a:hover {
-    color: var(--lc-text);
+    color: var(--lc-ink);
     text-decoration: underline;
+    text-underline-offset: 4px;
   }
 
   .lang-inline a[aria-current] {
-    color: var(--lc-text);
+    color: var(--lc-ink);
+    font-weight: 600;
   }
 </style>

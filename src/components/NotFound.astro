@@ -3,6 +3,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import Button from "./Button.astro";
 import CompassMark from "./CompassMark.astro";
 import Eyebrow from "./Eyebrow.astro";
+import Contours from "./motifs/Contours.astro";
 import { getCopy } from "../content/copy";
 import { pagePath, type Locale } from "../i18n";
 
@@ -22,10 +23,11 @@ const n = copy.notFound;
   description={copy.meta.notFound.description}
   notFound
 >
-  <section class="nf grid-paper">
+  <section class="nf">
+    <Contours map="quiet" eager />
     <div class="container-site nf-inner">
       <div class="nf-mark">
-        <CompassMark size={160} heading={137} class="nf-compass" />
+        <CompassMark size={160} heading={137} class="nf-compass" tile />
       </div>
       <div>
         <Eyebrow>{n.eyebrow}</Eyebrow>
@@ -43,6 +45,9 @@ const n = copy.notFound;
 
 <style>
   .nf {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
     padding-block: clamp(4rem, 3rem + 6vw, 9rem);
   }
 
@@ -75,7 +80,7 @@ const n = copy.notFound;
   @media (prefers-reduced-motion: no-preference) {
     .nf-mark :global(.nf-compass g) {
       transform-origin: 16px 16px;
-      animation: wander 6s var(--lc-ease) infinite alternate;
+      animation: wander 6s var(--lc-spring-calm) infinite alternate;
     }
 
     @keyframes wander {

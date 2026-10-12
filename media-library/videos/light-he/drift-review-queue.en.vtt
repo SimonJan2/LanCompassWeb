@@ -1,0 +1,21 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:05.000
+The review queue: every place where the documentation and the network disagree.
+
+2
+00:00:05.000 --> 00:00:11.629
+Findings are grouped by kind: IP requests, config compliance, SSH host keys, NAC.
+
+3
+00:00:11.629 --> 00:00:17.996
+Each row says why it was flagged, and links to the device or the link it concerns.
+
+4
+00:00:17.996 --> 00:00:24.997
+A ghost link: seen on the wire, missing from the documented topology.
+
+5
+00:00:24.997 --> 00:00:29.998
+Back in the queue, you decide what is true: document it, or dismiss it.

@@ -150,3 +150,40 @@ test.describe("keyboard", () => {
     expect((await requestPromise).method()).toBe("POST");
   });
 });
+
+test.describe("atlas index", () => {
+  for (const locale of ["en", "he"] as const) {
+    test(`(${locale}) every preview opens on keyboard focus, reachable by Tab alone`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.goto(pathFor(locale, "home"));
+      const rows = page.locator("[data-atlas-row]");
+      const keys = await rows.evaluateAll((els) =>
+        els.map((el) => el.getAttribute("data-atlas-row") ?? ""),
+      );
+      expect(keys.length).toBeGreaterThanOrEqual(8);
+      // Tab into the list from the element just before it, then walk it with Tab only.
+      await page.locator("#atlas-title").evaluate((el) => {
+        el.setAttribute("tabindex", "-1");
+        (el as HTMLElement).focus();
+      });
+      for (const key of keys) {
+        await page.keyboard.press("Tab");
+        await expect(page.locator(`[data-atlas-row="${key}"]`)).toBeFocused();
+        await expect(page.locator(`[data-atlas-preview="${key}"]`)).toBeVisible();
+        for (const other of keys.filter((k) => k !== key)) {
+          await expect(page.locator(`[data-atlas-preview="${other}"]`)).toBeHidden();
+        }
+      }
+    });
+  }
+
+  test("previews also follow hover", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/");
+    await page.locator('[data-atlas-row="nac"]').hover();
+    await expect(page.locator('[data-atlas-preview="nac"]')).toBeVisible();
+    await expect(page.locator('[data-atlas-preview="ipam"]')).toBeHidden();
+  });
+});

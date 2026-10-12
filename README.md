@@ -57,13 +57,21 @@ Videos: drop files into `public/media/` as described in `public/media/README.md`
 ## Screenshots
 
 `scripts/capture-screenshots.mjs` signs in to a locally running LanCompass, sets the theme
-(`dark`) and language (`en`, `he`) in the capture browser's `localStorage` only, and saves
-2× PNGs to `src/assets/screens/{en,he}/<screen>.png`. It never changes data or settings.
+and language (`en`, `he`) in the capture browser's `localStorage` only, and saves 2× PNGs to
+`src/assets/screens/{en,he}/<screen>.png`. It never changes data or settings.
+`LANCOMPASS_CAPTURE_THEME` picks the product theme: `light` (default, sits on the site's
+paper), `nightwire` (the product's default dark theme) or `dark`. `LANCOMPASS_CAPTURE_DIR`
+writes to another folder instead, for example `media-library/screens/nightwire`.
+
+`scripts/record-review-video.mjs` records the drift review-queue video the same read-only way
+(navigation and scrolling only) and writes the WebM, a poster and en + he captions. Both
+scripts were used to fill `media-library/` (light and Nightwire, en and he); see
+`media-library/README.md`.
 
 ```bash
 docker run --rm --network host --user "$(id -u):$(id -g)" -e HOME=/tmp \
   -e LANCOMPASS_DEMO_URL=http://localhost:3010 \
-  -e LANCOMPASS_DEMO_USER -e LANCOMPASS_DEMO_PASS \
+  -e LANCOMPASS_DEMO_USER -e LANCOMPASS_DEMO_PASS -e LANCOMPASS_CAPTURE_THEME=light \
   -v "$PWD":/app -w /app mcr.microsoft.com/playwright:v1.64.0-noble npm run capture
 ```
 
@@ -89,49 +97,68 @@ src/
   pages/           routes: [...lang]/*.astro (en has no prefix), [lang]/404.astro, og/, icons
   layouts/         BaseLayout (head, SEO, header, footer), LongformLayout (MDX pages)
   components/      SiteHeader, MobileNav, LanguageSwitcher, SiteFooter, Button, Eyebrow,
-                   SectionHeading, FeatureCard, BentoGrid, ScreenshotFrame, DriftMap, FactStrip,
-                   StepTimeline, ComparisonRow, IntegrationTile, VideoSlot, CTABand, Prose, form/
+                   SectionHeading, FeatureCard, AtlasIndex, Datasheet, MapLegend, TwoSheets,
+                   ScreenshotFrame, StepTimeline, ComparisonRow, VideoSlot, CTABand, Prose,
+                   form/, motifs/ (Contours, BearingScale, RegistrationMarks, Marginalia)
   content/         copy/{en,he}.ts (structured pages), pages/{en,he}/*.mdx, fingerprints.json
   i18n/            locales.ts (the locale list), en.json, he.json (UI strings)
   config/site.ts   PUBLIC_* configuration
   styles/          tokens.css (design tokens), global.css (Tailwind + base), fonts.css
-  scripts/         the small client scripts (site, drift map, forms, scroll-spy)
+  scripts/         the small client scripts (site, two sheets, forms, scroll-spy)
   lib/             build-time helpers: screenshots, OG images, WOFF2 decoding, media
   assets/          brand/ (compass mark), screens/{en,he}/ (captures)
-scripts/           capture-screenshots.mjs, build-test.mjs, lhci.mjs
+scripts/           capture-screenshots.mjs, record-review-video.mjs, build-test.mjs, lhci.mjs
+media-library/     captured screens and videos (light + Nightwire, en + he), not built
 tests/             Playwright specs
 docs/headers.md    security headers and nginx equivalents
+docs/design/       originality.md: the identity, measured against NetBox Labs (ΔE, fonts)
+docs/copy/         he-voice.md (how Hebrew is written), he-review.md (every Hebrew string, glossed)
 ```
 
-Client JavaScript is about 2 KB gzipped per page: header state, the mobile sheet, disclosure
-menus, the once-only section reveal, the drift-map offscreen pause, form messages, and the
-product page scroll-spy. Everything works without it.
+## Identity and motion
+
+"Survey paper": a light, warm paper base with graphite ink, deep-indigo night bands (at most
+two per page), cartographic motifs (contour lines, a bearing scale, registration marks, mono
+marginalia) and an editorial page rhythm. The compass emerald appears only in the mark and in
+the "documented" state. Every colour token in `src/styles/tokens.css` is tagged
+(`@surface`, `@accent`, `@text`) with its contrast ratios; `tests/identity.spec.ts` checks the
+distance rule. See `docs/design/originality.md`.
+
+Motion is native and CSS-only: cross-document View Transitions between pages (the wordmark and
+the page title are shared elements), section reveals with scroll-driven animations, and the
+12 s Two sheets loop. All of it sits behind `prefers-reduced-motion: no-preference`. Springs
+are `linear()` curves defined once as tokens (`--lc-spring`, `--lc-spring-calm`).
+
+Client JavaScript is under 2 KB gzipped per page: header state, the mobile sheet, disclosure
+menus, the Two sheets offscreen pause, form messages, and the product page scroll-spy.
+Section reveals and page transitions need no JavaScript. Everything works without it.
 
 ## Dependencies
 
 Exact versions are pinned in `package.json` and `package-lock.json`.
 
-| Package                       | Version | Why                                                                                           |
-| ----------------------------- | ------- | --------------------------------------------------------------------------------------------- |
-| `astro`                       | 7.3.8   | The static site generator.                                                                    |
-| `@astrojs/mdx`                | 8.0.3   | Long-form pages in MDX.                                                                       |
-| `@astrojs/sitemap`            | 3.7.4   | `sitemap-index.xml` with hreflang.                                                            |
-| `tailwindcss`                 | 4.3.3   | Utility CSS on top of the design tokens.                                                      |
-| `@tailwindcss/vite`           | 4.3.3   | Tailwind's Vite plugin.                                                                       |
-| `sharp`                       | 0.35.5  | Image pipeline (AVIF/WebP), icons and OG images.                                              |
-| `@fontsource-variable/inter`  | 5.3.0   | Self-hosted Inter (Latin subset only).                                                        |
-| `@fontsource-variable/heebo`  | 5.3.0   | Self-hosted Heebo (Hebrew subset only).                                                       |
-| `@astrojs/check` (dev)        | 0.9.10  | `astro check`.                                                                                |
-| `typescript` (dev)            | 6.0.3   | Required peer of `@astrojs/check` (supports TypeScript 5 and 6, not 7).                       |
-| `@playwright/test` (dev)      | 1.64.0  | End-to-end tests, screenshot capture, Chromium for Lighthouse.                                |
-| `@axe-core/playwright` (dev)  | 4.13.0  | Accessibility checks.                                                                         |
-| `@lhci/cli` (dev)             | 0.15.1  | Lighthouse budgets.                                                                           |
-| `linkinator` (dev)            | 8.1.0   | Internal link check.                                                                          |
-| `prettier` (dev)              | 3.9.10  | Formatting.                                                                                   |
-| `prettier-plugin-astro` (dev) | 1.1.1   | Lets Prettier format `.astro` files; without it the format check cannot cover the components. |
+| Package                              | Version | Why                                                                                                                              |
+| ------------------------------------ | ------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `astro`                              | 7.3.8   | The static site generator.                                                                                                       |
+| `@astrojs/mdx`                       | 8.0.3   | Long-form pages in MDX.                                                                                                          |
+| `@astrojs/sitemap`                   | 3.7.4   | `sitemap-index.xml` with hreflang.                                                                                               |
+| `tailwindcss`                        | 4.3.3   | Utility CSS on top of the design tokens.                                                                                         |
+| `@tailwindcss/vite`                  | 4.3.3   | Tailwind's Vite plugin.                                                                                                          |
+| `sharp`                              | 0.35.5  | Image pipeline (AVIF/WebP), icons and OG images.                                                                                 |
+| `@fontsource-variable/ibm-plex-sans` | 5.3.0   | Self-hosted IBM Plex Sans, variable (Latin subset only): display and text.                                                       |
+| `@fontsource/ibm-plex-sans-hebrew`   | 5.3.0   | Self-hosted IBM Plex Sans Hebrew 400/600 (Hebrew subset), plus its static Latin 400/600 faces, which Hebrew pages use for Latin. |
+| `@fontsource/ibm-plex-mono`          | 5.3.0   | Self-hosted IBM Plex Mono 400 (Latin subset): identifiers, the datasheet, marginalia.                                            |
+| `@astrojs/check` (dev)               | 0.9.10  | `astro check`.                                                                                                                   |
+| `typescript` (dev)                   | 6.0.3   | Required peer of `@astrojs/check` (supports TypeScript 5 and 6, not 7).                                                          |
+| `@playwright/test` (dev)             | 1.64.0  | End-to-end tests, screenshot capture, Chromium for Lighthouse.                                                                   |
+| `@axe-core/playwright` (dev)         | 4.13.0  | Accessibility checks.                                                                                                            |
+| `@lhci/cli` (dev)                    | 0.15.1  | Lighthouse budgets.                                                                                                              |
+| `linkinator` (dev)                   | 8.1.0   | Internal link check.                                                                                                             |
+| `prettier` (dev)                     | 3.9.10  | Formatting.                                                                                                                      |
+| `prettier-plugin-astro` (dev)        | 1.1.1   | Lets Prettier format `.astro` files; without it the format check cannot cover the components.                                    |
 
 No UI kit, animation library, icon font or analytics SDK. Icons are drawn inline in
-`src/components/Icon.astro`. OG images set text in the same Inter and Heebo fonts through a
+`src/components/Icon.astro`. OG images set text in the same IBM Plex fonts through a
 small WOFF2 decoder (`src/lib/woff2.ts`, Node's built-in Brotli) instead of another font package.
 
 ## Docker

@@ -13,20 +13,22 @@ const { class: className } = Astro.props;
   .eyebrow {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    margin-block-end: 1rem;
-    color: var(--lc-signal-bright);
+    gap: 0.6rem;
+    margin-block-end: 1.25rem;
+    color: var(--lc-ink-muted);
     font-size: var(--lc-text-xs);
-    font-weight: 600;
-    letter-spacing: 0.08em;
+    font-weight: 500;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
   }
 
+  /* A bearing tick, taken from the compass ring. */
   .eyebrow::before {
     content: "";
-    inline-size: 1.25rem;
-    block-size: 1px;
-    background: currentColor;
+    inline-size: 0.75rem;
+    block-size: 0.75rem;
+    border-block-start: 1px solid currentColor;
+    border-inline-start: 1px solid currentColor;
   }
 
   :lang(he) .eyebrow {

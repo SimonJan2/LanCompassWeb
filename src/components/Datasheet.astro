@@ -1,0 +1,141 @@
+---
+/**
+ * The datasheet, in place of a logo wall: the product's specs set in mono,
+ * like a spec sheet. Every value traces to the claims list. Strings may hold
+ * inline HTML (<bdi>, <code>) authored in the copy files.
+ */
+interface Props {
+  title: string;
+  /** A short line under the title, in the margin of the sheet. */
+  note?: string;
+  rows: { label: string; value: string }[];
+  /** id of the heading, for aria-labelledby on the section. */
+  id?: string;
+  class?: string;
+}
+
+const { title, note, rows, id, class: className } = Astro.props;
+---
+
+<div class:list={["datasheet", className]}>
+  <div class="ds-head">
+    <h2 class="ds-title" id={id} set:html={title} />
+    {note && <p class="ds-note" set:html={note} />}
+  </div>
+  <dl class="ds-rows">
+    {rows.map((row, i) => (
+      <div class="ds-row">
+        <dt>
+          <span class="ds-num" aria-hidden="true" dir="ltr">
+            {String(i + 1).padStart(2, "0")}
+          </span>
+          <span set:html={row.label} />
+        </dt>
+        <dd set:html={row.value} />
+      </div>
+    ))}
+  </dl>
+</div>
+
+<style>
+  .datasheet {
+    border-block: 1px solid var(--lc-ink);
+  }
+
+  .ds-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 2rem;
+    padding-block: 1rem;
+    border-block-end: 1px solid var(--lc-ink);
+  }
+
+  .ds-title {
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-text-mono);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+
+  :lang(he) .ds-title {
+    font-family: var(--lc-font-sans);
+    font-size: var(--lc-text-small);
+    letter-spacing: 0;
+  }
+
+  .ds-note {
+    color: var(--lc-ink-faint);
+    font-size: var(--lc-text-xs);
+  }
+
+  .ds-rows {
+    display: grid;
+    margin: 0;
+  }
+
+  @media (min-width: 900px) {
+    .ds-rows {
+      grid-template-columns: 1fr 1fr;
+      column-gap: 3rem;
+    }
+  }
+
+  .ds-row {
+    display: grid;
+    grid-template-columns: minmax(9rem, 2fr) 3fr;
+    gap: 1rem;
+    align-items: baseline;
+    padding-block: 0.875rem;
+    border-block-end: 1px solid var(--lc-rule);
+  }
+
+  @media (max-width: 520px) {
+    .ds-row {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+    }
+  }
+
+  .ds-row dt {
+    display: flex;
+    gap: 0.75rem;
+    color: var(--lc-ink-muted);
+    font-size: var(--lc-text-small);
+  }
+
+  .ds-num {
+    color: var(--lc-ink-faint);
+    font-family: var(--lc-font-mono);
+    font-size: 0.75rem;
+    line-height: 1.9;
+    unicode-bidi: isolate;
+  }
+
+  .ds-row dd {
+    margin: 0;
+    color: var(--lc-ink);
+    font-family: var(--lc-font-mono);
+    font-size: 0.9rem;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  /* Plex Mono has no Hebrew; Hebrew values set in Plex Sans Hebrew, identifiers stay mono. */
+  :lang(he) .ds-row dd {
+    font-family: var(--lc-font-sans);
+    font-size: var(--lc-text-small);
+  }
+
+  :lang(he) .ds-row dd :global(:is(code, bdi)) {
+    font-family: var(--lc-font-mono);
+    font-size: 0.85rem;
+  }
+
+  .ds-row dd :global(code) {
+    font-size: 1em;
+  }
+</style>

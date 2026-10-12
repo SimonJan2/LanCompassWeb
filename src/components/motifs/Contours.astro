@@ -1,0 +1,104 @@
+---
+/**
+ * Contour lines behind a section: a generated survey-map background, very low
+ * contrast. Decorative and never mirrored. The parent needs `position: relative`
+ * and `isolation: isolate`.
+ *
+ * Two renderings, on purpose:
+ *  - `eager` (a page's first, above-the-fold section): an inline <svg>. Inline SVG is
+ *    never a Largest Contentful Paint candidate, so the headline stays the LCP element.
+ *  - otherwise: a CSS background from a cached same-origin file (src/pages/contours/),
+ *    so the coordinates are not repeated in every page's HTML.
+ */
+import { contourMaps, type ContourMap, type ContourTone } from "../../lib/contour-maps";
+import { contourPaths } from "../../lib/contours";
+
+interface Props {
+  /** Which map to draw; each is a fixed, deterministic set of hills. */
+  map?: ContourMap;
+  /** "night" on a night band. */
+  tone?: ContourTone;
+  /** The first, above-the-fold section: drawn inline (see above). */
+  eager?: boolean;
+  class?: string;
+}
+
+const { map = "hero", tone = "paper", eager = false, class: className } = Astro.props;
+const paths = eager ? contourPaths(contourMaps[map], 10) : [];
+---
+
+{eager ? (
+  <svg
+    class:list={["contours", "contours-inline", className]}
+    viewBox="0 0 1440 720"
+    preserveAspectRatio="xMidYMid slice"
+    aria-hidden="true"
+    focusable="false"
+  >
+    {paths.map((d, i) => (
+      <path d={d} class:list={[i % 4 === 0 && "index"]} />
+    ))}
+  </svg>
+) : (
+  <span class:list={["contours", `contours-${map}-${tone}`, className]} aria-hidden="true"></span>
+)}
+
+<style>
+  .contours {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .contours-inline {
+    inline-size: 100%;
+    block-size: 100%;
+    max-inline-size: none;
+  }
+
+  .contours-inline path {
+    fill: none;
+    stroke: var(--lc-contour);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .contours-inline .index {
+    stroke-width: 1.6;
+  }
+
+  /* Drawn on a pseudo-element: a decorative background, never the page's largest content. */
+  .contours::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  .contours-hero-paper::before {
+    background-image: url("/contours/hero-paper.svg");
+  }
+
+  .contours-band-paper::before {
+    background-image: url("/contours/band-paper.svg");
+  }
+
+  .contours-quiet-paper::before {
+    background-image: url("/contours/quiet-paper.svg");
+  }
+
+  .contours-hero-night::before {
+    background-image: url("/contours/hero-night.svg");
+  }
+
+  .contours-band-night::before {
+    background-image: url("/contours/band-night.svg");
+  }
+
+  .contours-quiet-night::before {
+    background-image: url("/contours/quiet-night.svg");
+  }
+</style>
