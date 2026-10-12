@@ -15,7 +15,14 @@ the other folder).
 `<set>` is `light` or `nightwire`; `<ui>` is the product's interface language (`en` or `he`).
 The English page shows the `en` variant and the Hebrew page the `he` variant; `hebrew-native`
 is always `he`. Record them with `scripts/record-video.mjs <key>` (README → Screenshots) into
-`media-library/videos/<set>-<ui>/`, then copy them here under these names (posters as WebP).
+`media-library/videos/<set>-<ui>/`, then copy them here under these names (posters as WebP), or pass `--publish`.
 
-Videos never autoplay and load nothing until the visitor scrolls near them or presses play.
-No caption track is marked `default`; both are in the player's menu.
+Videos never autoplay, have no sound, and load nothing until the visitor scrolls near them or
+presses play. No caption track is marked `default` (a default track is fetched with the page);
+both are in the player's menu. When captions turn on, `src/scripts/site.ts` makes the page
+language's track the showing one; after that the visitor's own choice in the menu stands.
+
+Every recording here comes from `scripts/record-video.mjs` (W1.3 storyboards): a title card,
+five steps and an end card, 1280 × 720, at most 45 s and 10 MB. Each `.vtt` starts with a
+`NOTE storyboard <key>` line, and `tests/media.spec.ts` checks the cue count against the
+storyboard. `record-video.mjs <key> --publish` copies a recording here under these names.

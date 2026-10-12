@@ -1,21 +1,31 @@
 WEBVTT
 
+NOTE storyboard drift-review-queue: 5 steps and 2 cards
+
 1
-00:00:00.000 --> 00:00:05.002
-The review queue: every place where the documentation and the network disagree.
+00:00:00.000 --> 00:00:02.548
+From a finding to a decision
 
 2
-00:00:05.002 --> 00:00:11.621
-Findings are grouped by kind: IP requests, config compliance, SSH host keys, NAC.
+00:00:02.548 --> 00:00:09.682
+The review queue: every gap between the documentation and the network, with the open count on top.
 
 3
-00:00:11.621 --> 00:00:17.922
-Each row says why it was flagged, and links to the device or the link it concerns.
+00:00:09.682 --> 00:00:16.683
+Findings are grouped by kind, and each group shows how many are open.
 
 4
-00:00:17.922 --> 00:00:24.922
-A ghost link: seen on the wire, missing from the documented topology.
+00:00:16.683 --> 00:00:23.744
+Each finding says why it was flagged. This one: a link the switches report over LLDP or CDP, with no cable on record.
 
 5
-00:00:24.922 --> 00:00:29.922
-Back in the queue, you decide what is true: document it, or dismiss it.
+00:00:23.744 --> 00:00:32.020
+On the topology it is a ghost link: seen on the wire, missing from the record.
+
+6
+00:00:32.020 --> 00:00:38.905
+Back in the queue, the reviewer decides: document the link, or dismiss the finding.
+
+7
+00:00:38.905 --> 00:00:41.456
+Every gap between the documentation and the network, in one queue. A person decides.

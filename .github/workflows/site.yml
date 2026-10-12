@@ -58,6 +58,12 @@ jobs:
         env:
           LHCI_THEME: dark
 
+      - name: Lighthouse CI budgets (auto)
+        # Builds dist-lhci-auto (both palettes; Lighthouse emulates the light scheme).
+        run: npm run lhci
+        env:
+          LHCI_THEME: auto
+
       - name: Keep reports
         if: always()
         uses: actions/upload-artifact@v4

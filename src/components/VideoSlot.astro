@@ -9,6 +9,7 @@
  * <img> under the video rather than the poster attribute, which browsers fetch at once:
  * nothing of the video loads until the visitor scrolls near it. No caption track is marked
  * `default`, because a default track is fetched with the page; both stay in the player's menu.
+ * When captions turn on, src/scripts/site.ts makes the page language's track the one showing.
  */
 import Icon from "./Icon.astro";
 import { locales, useUi, type Locale } from "../i18n";

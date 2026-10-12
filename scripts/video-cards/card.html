@@ -1,0 +1,149 @@
+<!doctype html>
+<!--
+  A title or end card for scripts/record-video.mjs. It is rendered in the capture browser
+  only, as a data: URL: the recorder fills the {{slots}}, inlines the Plex faces from
+  node_modules as data: URIs and the compass tile from src/assets/brand. Nothing here is
+  built into or served by the site.
+-->
+<html lang="{{lang}}" dir="{{dir}}">
+  <head>
+    <meta charset="utf-8" />
+    <title>{{text}}</title>
+    <style>
+      {{fonts}}
+      :root {
+        --page: {{page}};
+        --raised: {{raised}};
+        --contour: {{contour}};
+        --rule: {{rule}};
+        --ink: {{ink}};
+        --muted: {{inkMuted}};
+        --documented: {{documented}};
+        --observed: {{observed}};
+        --drift: {{drift}};
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1280px;
+        height: 720px;
+        overflow: clip;
+        background: var(--page);
+        color: var(--ink);
+        font-family: "Plex Sans", "Plex Sans Hebrew", sans-serif;
+        font-variation-settings: "wght" 520;
+        -webkit-font-smoothing: antialiased;
+      }
+      :lang(he) body {
+        font-family: "Plex Sans Hebrew", "Plex Sans", sans-serif;
+        font-weight: 600;
+      }
+      .contours {
+        position: absolute;
+        inset: 0;
+      }
+      [dir="rtl"] .contours {
+        scale: -1 1;
+      }
+      .sheet {
+        position: absolute;
+        inset: 72px 96px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 22px;
+        letter-spacing: 0.005em;
+      }
+      .brand svg {
+        width: 44px;
+        height: 44px;
+      }
+      .kicker {
+        margin: 0 0 22px;
+        color: var(--muted);
+        font-family: "Plex Mono", monospace;
+        font-size: 17px;
+        font-weight: 400;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      :lang(he) .kicker {
+        font-family: "Plex Sans Hebrew", sans-serif;
+        letter-spacing: 0;
+        text-transform: none;
+      }
+      .text {
+        max-width: 900px;
+        margin: 0;
+        font-size: {{size}}px;
+        line-height: 1.12;
+        letter-spacing: -0.012em;
+        text-wrap-style: balance;
+      }
+      :lang(he) .text {
+        letter-spacing: 0;
+        line-height: 1.2;
+      }
+      .legend {
+        display: flex;
+        gap: 28px;
+        color: var(--muted);
+        font-family: "Plex Mono", monospace;
+        font-size: 15px;
+        font-weight: 400;
+      }
+      :lang(he) .legend {
+        font-family: "Plex Sans Hebrew", sans-serif;
+      }
+      .legend span::before {
+        content: "";
+        display: inline-block;
+        width: 22px;
+        height: 0;
+        margin-inline-end: 10px;
+        vertical-align: middle;
+        border-top: 2px solid var(--documented);
+      }
+      .legend span.obs::before {
+        border-top: 2px dashed var(--observed);
+      }
+    </style>
+  </head>
+  <body>
+    <svg class="contours" viewBox="0 0 1280 720" aria-hidden="true">
+      <g fill="none" stroke="var(--contour)" stroke-width="1.4">
+        <path d="M820 -40 C 1010 40 1180 120 1320 300" />
+        <path d="M760 -40 C 960 80 1150 190 1320 390" />
+        <path d="M700 -40 C 900 120 1110 260 1320 480" />
+        <path d="M640 -40 C 850 170 1070 340 1320 580" />
+        <path d="M600 760 C 820 610 1050 560 1320 650" />
+        <path d="M480 760 C 720 560 1000 480 1320 540" />
+      </g>
+      <path
+        d="M1010 210 C 1080 260 1130 330 1150 420"
+        fill="none"
+        stroke="var(--observed)"
+        stroke-width="2"
+        stroke-dasharray="7 7"
+        opacity="0.75"
+      />
+      <circle cx="1010" cy="210" r="5" fill="var(--documented)" />
+      <circle cx="1150" cy="420" r="5" fill="var(--observed)" />
+    </svg>
+    <main class="sheet">
+      <div class="brand">{{mark}}<span dir="ltr">LanCompass</span></div>
+      <div>
+        <p class="kicker">{{kicker}}</p>
+        <h1 class="text">{{text}}</h1>
+      </div>
+      <div class="legend">
+        <span>{{documentedLabel}}</span><span class="obs">{{observedLabel}}</span>
+      </div>
+    </main>
+  </body>
+</html>

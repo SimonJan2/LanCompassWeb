@@ -39,15 +39,17 @@ docker run --rm --network host --user "$(id -u):$(id -g)" -e HOME=/tmp \
 
 ## Videos — `videos/<theme>-<ui>/<key>.*`
 
-Product walkthroughs (1280 × 720 WebM) recorded by `scripts/record-video.mjs <key>`, each with a
-poster (`.jpg`) and captions in English and Hebrew (`.en.vtt`, `.he.vtt`) timed to the same
-steps. The site's copies live in `public/media/<theme>/<key>.<ui>.*` (posters as WebP).
+Product walkthroughs (1280 × 720 WebM, at most 45 s) recorded by `scripts/record-video.mjs <key>`,
+each with a poster (`.jpg` and `.webp`, from the step marked `poster`) and captions in English
+and Hebrew (`.en.vtt`, `.he.vtt`) timed to the same steps. Each is a storyboard: a title card,
+five steps and an end card, in the site's identity, with a pointer dot the recorder draws in the
+capture page. The site's copies live in `public/media/<theme>/<key>.<ui>.*`.
 
-| Key                      | Shows                                                                             | Recorded                                                 |
-| ------------------------ | --------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| `drift-review-queue`     | The review queue, one ghost link on the topology, back to the queue (≈ 30 s)      | all four: light-en, light-he, nightwire-en, nightwire-he |
-| `documented-vs-observed` | Three ghost links through the review queue's `focus=edge:obs-…` deep links        | not yet (needs the demo login; W1.2)                     |
-| `hebrew-native`          | Dashboard, prefix hierarchy, the DC-A01 rack, the review queue, all in Hebrew RTL | not yet (needs the demo login; W1.2)                     |
+| Key                      | Story                                                                                                                      | Poster frame                   | Recorded (W1.3)                                          |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | -------------------------------------------------------- |
+| `drift-review-queue`     | "From a finding to a decision": the queue and its count, groups, why one finding was flagged, its ghost link, the decision | the ghost link on the topology | all four: light-en, light-he, nightwire-en, nightwire-he |
+| `documented-vs-observed` | "Seen on the wire, missing from the record": one site's topology, the queue's ghost links, three of them on the map        | the first ghost link           | all four                                                 |
+| `hebrew-native`          | "Built in Hebrew, not translated": dashboard, prefix hierarchy, the DC-A01 rack, the review queue, all in Hebrew RTL       | the RTL dashboard              | light-he, nightwire-he (always he UI)                    |
 
 Folders: `videos/light-en/`, `videos/light-he/`, `videos/nightwire-en/`, `videos/nightwire-he/`.
 

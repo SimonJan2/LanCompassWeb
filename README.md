@@ -92,18 +92,37 @@ dark site shows); `dark` is also accepted. `LANCOMPASS_CAPTURE_DIR` writes to an
 instead, for example `media-library/screens/nightwire`.
 
 `scripts/record-video.mjs <key>` records one product video the same read-only way
-(navigation and scrolling only; never a layer toggle, approve, dismiss, save, import, sync or
-enable) and writes the WebM, a poster and en + he captions timed to the same steps. Keys:
-`drift-review-queue`, `documented-vs-observed`, `hebrew-native` (always he UI).
-`LANCOMPASS_VIDEO_UI` (`en` | `he`) and `LANCOMPASS_VIDEO_DIR` choose the variant and folder.
+(navigation, hover and scrolling; a click only follows a link; never a layer toggle, approve,
+dismiss, save, import, sync or enable). Each video is a storyboard in that file: a title card,
+five `{ seconds, en, he, run }` steps and an end card. It writes the WebM (1280 × 720, at most
+45 s), a poster (`.jpg` and `.webp`, taken at the step marked `poster`) and en + he captions
+timed to the same steps. Keys: `drift-review-queue`, `documented-vs-observed`, `hebrew-native`
+(always he UI). `LANCOMPASS_VIDEO_UI` (`en` | `he`), `LANCOMPASS_CAPTURE_THEME` (`light` |
+`nightwire`) and `LANCOMPASS_VIDEO_DIR` choose the variant and folder (default
+`media-library/videos/<set>-<ui>/`). Flags:
+
+- `--check` signs in and walks every step without recording, and fails if a link or element a
+  step needs is missing. Run it before spending a recording.
+- `--publish` also copies the recording to `public/media/<set>/<key>.<ui>.*`.
+- `--cards <dir>` renders the title and end card to PNG; it needs neither the product nor a
+  login.
+
 Both scripts fill `media-library/` (light and Nightwire, en and he); see
-`media-library/README.md`, then copy the site's set into `public/media/`.
+`media-library/README.md`, then copy the site's set into `public/media/` (or use `--publish`).
 
 ```bash
 docker run --rm --network host --user "$(id -u):$(id -g)" -e HOME=/tmp \
   -e LANCOMPASS_DEMO_URL=http://localhost:3010 \
   -e LANCOMPASS_DEMO_USER -e LANCOMPASS_DEMO_PASS -e LANCOMPASS_CAPTURE_THEME=light \
   -v "$PWD":/app -w /app mcr.microsoft.com/playwright:v1.64.0-noble npm run capture
+```
+
+```bash
+docker run --rm --network host --ipc=host --user "$(id -u):$(id -g)" -e HOME=/tmp \
+  -e LANCOMPASS_DEMO_USER -e LANCOMPASS_DEMO_PASS \
+  -e LANCOMPASS_CAPTURE_THEME=nightwire -e LANCOMPASS_VIDEO_UI=he \
+  -v "$PWD":/app -w /app mcr.microsoft.com/playwright:v1.64.0-noble \
+  node scripts/record-video.mjs documented-vs-observed --check
 ```
 
 Rebuild afterwards: `ScreenshotFrame` picks the files up automatically and serves them as

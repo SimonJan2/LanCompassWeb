@@ -1,0 +1,31 @@
+WEBVTT
+
+NOTE storyboard documented-vs-observed: 5 steps and 2 cards
+
+1
+00:00:00.000 --> 00:00:02.548
+Seen on the wire, missing from the record
+
+2
+00:00:02.548 --> 00:00:08.902
+One site's topology: the documented links in solid lines, and dashed, links only seen on the wire.
+
+3
+00:00:08.902 --> 00:00:15.219
+The review queue lists the links seen on the wire that the record lacks.
+
+4
+00:00:15.219 --> 00:00:22.459
+Open the first: the map marks that ghost link, beside the documented ones.
+
+5
+00:00:22.459 --> 00:00:30.417
+A second and a third, in other parts of the network: neighbours the switches report over LLDP or CDP.
+
+6
+00:00:30.417 --> 00:00:36.649
+Next, the reviewer documents each link, or dismisses it.
+
+7
+00:00:36.649 --> 00:00:39.204
+Documented and observed, on one topology.

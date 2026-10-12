@@ -668,45 +668,63 @@ Front matter (eyebrow, title, lead) first, then each heading, paragraph and list
 | 15  | כל דף, בשתי השפות, עובר בדיקות נגישות אוטומטיות ברוחב של טלפון וברוחב של מחשב, וגם בדיקה במקלדת.                                                               | Every page, in both languages, goes through automated accessibility checks at phone width and at desktop width, and a keyboard check too.                                                                                      | rewritten: voice |
 | 16  | ## מגבלות ידועות                                                                                                                                               | ## Known limitations                                                                                                                                                                                                           | kept             |
 | 17  | - צילומי המסך מראים את הממשק של LanCompass. הטקסט החלופי מתאר כל מסך, ולא כל ערך שמופיע בו.                                                                    | - The screenshots show the LanCompass interface. The alternative text describes each screen, not every value shown in it.                                                                                                      | rewritten: voice |
-| 18  | - סרטוני המוצר עוד לא פורסמו. כשיפורסמו, יהיו בהם כתוביות בעברית ובאנגלית.                                                                                     | - The product videos haven't been published yet. When they are, they'll have captions in Hebrew and English.                                                                                                                   | kept             |
+| 18  | - לסרטוני המוצר יש כתוביות בעברית ובאנגלית.                                                                                                                    | - The product videos have captions in Hebrew and English.                                                                                                                                                                      | rewritten (W1.3) |
 | 19  | ## פנייה בנושא נגישות                                                                                                                                          | ## Accessibility enquiries                                                                                                                                                                                                     | kept             |
 | 20  | משהו באתר לא נוח לשימוש? ספרו לנו ונתקן. כתבו אל <ContactEmail subject="Accessibility" /> ותארו את הדף ואת הבעיה.                                              | Something on the site isn't easy to use? Tell us and we'll fix it. Write to <address> and describe the page and the problem.                                                                                                   | rewritten: voice |
 
-## `public/media/<set>/drift-review-queue.<ui>.he.vtt` (video captions)
+## `scripts/record-video.mjs` → video captions and cards (W1.3)
 
-The English captions (`.en.vtt`) are the source of the back-gloss.
+W1.3 re-recorded all three videos as storyboards: a title card, five steps and an end card. The
+recorder writes each line into the recording's `.he.vtt` (and the `.en.vtt` from the English
+column), and the two card lines onto the cards themselves, in the recording's interface
+language. Latin runs (`LLDP`, `CDP`, `DC-A01`) are bidi-isolated in the files (U+2066 … U+2069)
+and in `<bdi>` on the cards. The W1.2 lines below them are replaced. The English captions are the
+source of the back-gloss.
 
-| #   | Hebrew                                                            | Back-gloss                                                                         | Note |
-| --- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ---- |
-| 1   | תור הסקירה: כל מקום שבו התיעוד והרשת לא תואמים.                   | The review queue: every place where the documentation and the network disagree.    | new  |
-| 2   | הממצאים מקובצים לפי סוג: בקשות IP, תאימות תצורה, מפתחות SSH, NAC. | Findings are grouped by kind: IP requests, config compliance, SSH host keys, NAC.  | new  |
-| 3   | כל שורה מסבירה למה סומנה, ומקשרת לרכיב או לקישור שהיא נוגעת בו.   | Each row says why it was flagged, and links to the device or the link it concerns. | new  |
-| 4   | קישור רפאים: נצפה ברשת, וחסר בטופולוגיה המתועדת.                  | A ghost link: seen on the wire, missing from the documented topology.              | new  |
-| 5   | חוזרים לתור ומחליטים מה נכון: לתעד, או לדחות.                     | Back in the queue, you decide what is true: document it, or dismiss it.            | new  |
+### `drift-review-queue`: "From a finding to a decision"
 
-## `scripts/record-video.mjs` → `documented-vs-observed` captions (W1.2)
+| #          | Hebrew                                                                                       | Back-gloss                                                                                                                                | Note       |
+| ---------- | -------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| title card | מממצא להחלטה                                                                                 | From a finding to a decision                                                                                                              | new (W1.3) |
+| 1          | תור הסקירה: כל פער בין התיעוד לרשת, ומספר הממצאים הפתוחים בראש הדף.                          | The review queue: every gap between the documentation and the network, and the number of open findings at the top of the page.            | new (W1.3) |
+| 2          | הממצאים מקובצים לפי סוג, וליד כל קבוצה מספר הממצאים הפתוחים בה.                              | The findings are grouped by kind, and next to each group the number of open findings in it.                                               | new (W1.3) |
+| 3          | כל ממצא מסביר למה סומן. כאן: קישור שהמתגים מדווחים עליו ב־LLDP או ב־CDP, ואין לו כבל בתיעוד. | Each finding explains why it was flagged. Here: a link the switches report on over LLDP or CDP, and it has no cable in the documentation. | new (W1.3) |
+| 4          | בטופולוגיה זה קישור רפאים: נצפה ברשת, וחסר בתיעוד.                                           | On the topology this is a ghost link: seen on the network, and missing from the documentation.                                            | new (W1.3) |
+| 5          | חוזרים לתור ומחליטים: לתעד את הקישור, או לדחות את הממצא.                                     | You go back to the queue and decide: document the link, or dismiss the finding.                                                           | new (W1.3) |
+| end card   | כל פער בין התיעוד לרשת, בתור אחד. ההחלטה נשארת אצלכם.                                        | Every gap between the documentation and the network, in one queue. The decision stays with you.                                           | new (W1.3) |
 
-Written in Hebrew from the same steps as the English; the recorder writes them into the `.he.vtt`
-file. Not recorded yet (the demo login was not available in the W1.2 run).
+### `documented-vs-observed`: "Seen on the wire, missing from the record"
 
-| #   | Hebrew                                                                    | Back-gloss                                                                                         | Note       |
-| --- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ---------- |
-| 1   | תור הסקירה מציג קישורים שנצפו ברשת ואין להם תיעוד.                        | The review queue shows links that were seen on the network and have no documentation.              | new (W1.2) |
-| 2   | הטופולוגיה עם שכבת ״נצפה״: הקישורים המתועדים, ולידם קישור רפאים.          | The topology with the "observed" layer: the documented links, and next to them a ghost link.       | new (W1.2) |
-| 3   | עוד קישור רפאים: שכן שהמתגים מדווחים עליו ב־LLDP או ב־CDP, ואין לו תיעוד. | Another ghost link: a neighbour the switches report over LLDP or CDP, and it has no documentation. | new (W1.2) |
-| 4   | קישור רפאים שלישי, בחלק אחר של הרשת.                                      | A third ghost link, in another part of the network.                                                | new (W1.2) |
-| 5   | חוזרים לתור ומחליטים מה לתעד.                                             | You go back to the queue and decide what to document.                                              | new (W1.2) |
+| #          | Hebrew                                                                                  | Back-gloss                                                                                                                     | Note       |
+| ---------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ---------- |
+| title card | נצפה ברשת, חסר בתיעוד                                                                   | Seen on the network, missing from the documentation                                                                            | new (W1.3) |
+| 1          | הטופולוגיה של אתר אחד: הקישורים המתועדים בקו רציף, ובקו מקווקו קישורים שנצפו ברשת בלבד. | The topology of one site: the documented links in a solid line, and in a dashed line links that were only seen on the network. | new (W1.3) |
+| 2          | תור הסקירה מציג את הקישורים שנצפו ברשת וחסרים בתיעוד.                                   | The review queue shows the links that were seen on the network and are missing from the documentation.                         | new (W1.3) |
+| 3          | פותחים את הראשון: המפה מסמנת את קישור הרפאים, לצד הקישורים המתועדים.                    | You open the first: the map marks the ghost link, next to the documented links.                                                | new (W1.3) |
+| 4          | קישור שני ושלישי, בחלקים אחרים של הרשת: שכנים שהמתגים מדווחים עליהם ב־LLDP או ב־CDP.    | A second and a third link, in other parts of the network: neighbours the switches report on over LLDP or CDP.                  | new (W1.3) |
+| 5          | הצעד הבא: מתעדים כל קישור, או דוחים אותו.                                               | The next step: you document each link, or dismiss it.                                                                          | new (W1.3) |
+| end card   | המתועד והנצפה, בטופולוגיה אחת.                                                          | The documented and the observed, in one topology.                                                                              | new (W1.3) |
 
-## `scripts/record-video.mjs` → `hebrew-native` captions (W1.2)
+### `hebrew-native`: "Built in Hebrew, not translated"
 
-Not recorded yet, as above.
+| #          | Hebrew                                                                              | Back-gloss                                                                                                | Note               |
+| ---------- | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ------------------ |
+| title card | נבנה בעברית, לא תורגם אליה                                                          | Built in Hebrew, not translated into it                                                                   | new (W1.3)         |
+| 1          | לוח הבקרה בעברית, בפריסה מימין לשמאל.                                               | The dashboard in Hebrew, in a right-to-left layout.                                                       | new (W1.3)         |
+| 2          | היררכיית הקידומות: שמות אתרים בעברית לצד כתובות באותיות לטיניות, כל אחד בכיוון שלו. | The prefix hierarchy: site names in Hebrew next to addresses in Latin letters, each in its own direction. | new (W1.3)         |
+| 3          | שרטוט הארון DC-A01, עם תוויות בעברית.                                               | The DC-A01 rack drawing, with labels in Hebrew.                                                           | new (W1.3)         |
+| 4          | וגם תור הסקירה, בעברית.                                                             | And the review queue too, in Hebrew.                                                                      | new (W1.3)         |
+| 5          | הממשק זמין ב־24 שפות, עם עברית וערבית מלאות מימין לשמאל.                            | The interface is available in 24 languages, with full Hebrew and Arabic right to left.                    | kept (W1.2 line 4) |
+| end card   | ממשק ב־24 שפות, עם עברית וערבית מלאות מימין לשמאל.                                  | An interface in 24 languages, with full Hebrew and Arabic right to left.                                  | new (W1.3)         |
 
-| #   | Hebrew                                                                | Back-gloss                                                                                                   | Note       |
-| --- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ---------- |
-| 1   | כל הממשק בעברית, בפריסה מימין לשמאל.                                  | The whole interface in Hebrew, in a right-to-left layout.                                                    | new (W1.2) |
-| 2   | היררכיית הקידומות, עם שמות אתרים בעברית לצד הכתובות.                  | The prefix hierarchy, with Hebrew site names next to the addresses.                                          | new (W1.2) |
-| 3   | שרטוט ארון, עם תוויות בעברית.                                         | A rack drawing, with labels in Hebrew.                                                                       | new (W1.2) |
-| 4   | ותור הסקירה. הממשק זמין ב־24 שפות, עם עברית וערבית מלאות מימין לשמאל. | And the review queue. The interface is available in 24 languages, with full Hebrew and Arabic right to left. | new (W1.2) |
+### Card labels
+
+| Where                       | Hebrew      | Back-gloss            | Note                                             |
+| --------------------------- | ----------- | --------------------- | ------------------------------------------------ |
+| title card, above the title | מרשת ההדגמה | From the demo network | new (W1.3)                                       |
+| end card, above the line    | בקצרה       | In short              | new (W1.3)                                       |
+| legend, solid line          | מתועד       | Documented            | new (W1.3), product term `topo.layer.documented` |
+| legend, dashed line         | נצפה        | Observed              | new (W1.3), product term `topo.layer.observed`   |
 
 ## Latin-only strings (unchanged by design)
 

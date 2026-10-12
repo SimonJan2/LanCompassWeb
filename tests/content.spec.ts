@@ -69,3 +69,21 @@ test.describe("forbidden content", () => {
     });
   }
 });
+
+test.describe("accessibility statement", () => {
+  for (const [path, says, never] of [
+    [
+      "/accessibility/",
+      "The product videos have captions in English and Hebrew.",
+      /not published yet/i,
+    ],
+    ["/he/accessibility/", "לסרטוני המוצר יש כתוביות בעברית ובאנגלית.", /עוד לא פורסמו/],
+  ] as const) {
+    test(`${path} states that the videos have captions`, async ({ page }) => {
+      await page.goto(path);
+      const text = await page.evaluate(() => document.body.innerText);
+      expect(text).toContain(says);
+      expect(text).not.toMatch(never);
+    });
+  }
+});
