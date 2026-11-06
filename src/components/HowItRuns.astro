@@ -1,0 +1,317 @@
+---
+/**
+ * W4: "What talks to what". One inline SVG in the site's palette tokens (light, dark and auto
+ * follow the page), labelled in the page's language and laid out in its direction (mirrored in
+ * Hebrew), numbered 1–7; right under it, the same numbers as a list that carries every fact the
+ * drawing shows (its text alternative). Facts and their claim rows: src/content/copy, howItRuns.
+ * Used on /security (#how-it-runs) and /product#platform. No script.
+ */
+import { getCopy } from "../content/copy";
+import { locales, type Locale } from "../i18n";
+
+interface Props {
+  locale: Locale;
+  /** Render the section's own heading (h3), for a page that has none above the drawing. */
+  heading?: boolean;
+  class?: string;
+}
+
+const { locale, heading = false, class: className } = Astro.props;
+const c = getCopy(locale).howItRuns;
+const L = c.labels;
+const rtl = locales[locale].dir === "rtl";
+const W = 480;
+/** Mirror a horizontal position (and a box's left edge) for a right-to-left page. */
+const mx = (x: number, w = 0) => (rtl ? W - x - w : x);
+const plain = (s: string) => s.replace(/<[^>]+>/g, "");
+
+type Box = {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  cls: string;
+  lines: [string, number, string?][];
+};
+/** Boxes in left-to-right coordinates: [text, y, "s" for a small muted line]. */
+const boxes: Box[] = [
+  { x: 20, y: 104, w: 440, h: 236, cls: "host", lines: [[L.host, 128]] },
+  { x: 20, y: 12, w: 200, h: 46, cls: "", lines: [[L.people, 40]] },
+  {
+    x: 300,
+    y: 12,
+    w: 160,
+    h: 46,
+    cls: "off",
+    lines: [
+      [L.internet, 32],
+      [L.nothing, 49, "s"],
+    ],
+  },
+  { x: 40, y: 142, w: 190, h: 56, cls: "", lines: [[L.web, 175]] },
+  {
+    x: 250,
+    y: 142,
+    w: 190,
+    h: 56,
+    cls: "",
+    lines: [
+      [L.api, 164],
+      [L.workers, 185, "s"],
+    ],
+  },
+  { x: 40, y: 212, w: 190, h: 42, cls: "", lines: [[L.db, 238]] },
+  { x: 250, y: 212, w: 190, h: 42, cls: "", lines: [[L.redis, 238]] },
+  { x: 40, y: 270, w: 400, h: 50, cls: "", lines: [[L.backups, 300]] },
+  {
+    x: 20,
+    y: 400,
+    w: 200,
+    h: 58,
+    cls: "",
+    lines: [
+      [L.network, 423],
+      [L.networkSub, 444, "s"],
+    ],
+  },
+  {
+    x: 280,
+    y: 400,
+    w: 180,
+    h: 58,
+    cls: "",
+    lines: [
+      [L.systems, 423],
+      [L.systemsSub, 444, "s"],
+    ],
+  },
+];
+/** Lines: [x, y1, y2, kind]; vertical, so mirroring moves only x. */
+const lines: [number, number, number, string][] = [
+  [120, 58, 100, "https"],
+  [60, 340, 396, "read"],
+  [190, 340, 396, "write"],
+  [420, 340, 396, "read"],
+];
+/** Free labels: [text, x, y, "s"]. */
+const tags: [string, number, number, string?][] = [
+  [L.https, 160, 84],
+  [L.reads, 98, 372, "s"],
+  [L.reads, 452, 372, "s"],
+  [L.writes, 300, 366, "s"],
+  [L.writesSub, 300, 381, "s"],
+];
+/** The numbers, on the thing each list item names: [n, x, y]. */
+const badges: [number, number, number][] = [
+  [1, 20, 104],
+  [2, 40, 142],
+  [3, 20, 12],
+  [4, 20, 400],
+  [4, 280, 400],
+  [5, 190, 352],
+  [6, 300, 12],
+  [7, 40, 270],
+];
+---
+
+<div class:list={["hir", className]} id={heading ? "how-it-runs" : undefined}>
+  {heading && <h3 class="hir-title" set:html={c.eyebrow} />}
+  <div class="hir-body">
+    <svg
+      class="hir-svg"
+      viewBox={`0 0 ${W} 470`}
+      role="img"
+      aria-labelledby={`hir-t-${locale}`}
+      aria-describedby={`hir-d-${locale}`}
+    >
+      <title id={`hir-t-${locale}`}>{plain(c.title)}</title>
+      <desc id={`hir-d-${locale}`}>{plain(c.desc)}</desc>
+      <defs>
+        {["https", "read", "write"].map((k) => (
+          <marker
+            id={`hir-${k}`}
+            viewBox="0 0 10 10"
+            refX="9"
+            refY="5"
+            markerWidth="7"
+            markerHeight="7"
+            orient="auto"
+          >
+            <path class={`m-${k}`} d="M0 0L10 5L0 10z" />
+          </marker>
+        ))}
+      </defs>
+      {boxes.map((b) => (
+        <>
+          <rect class={b.cls || undefined} x={mx(b.x, b.w)} y={b.y} width={b.w} height={b.h} />
+          {b.lines.map(([t, y, s]) => (
+            <text class={s ? "s" : undefined} x={mx(b.x + b.w / 2)} y={y}>
+              {t}
+            </text>
+          ))}
+        </>
+      ))}
+      <path class="none" d={`M${mx(380)} 60V100M${mx(372)} 76l16 8M${mx(388)} 76l-16 8`} />
+      {lines.map(([x, y1, y2, k]) => (
+        <path class={k} d={`M${mx(x)} ${y1}V${y2}`} marker-end={`url(#hir-${k})`} />
+      ))}
+      {tags.map(([t, x, y, s]) => (
+        <text class={s ? "s" : undefined} x={mx(x)} y={y}>
+          {t}
+        </text>
+      ))}
+      {badges.map(([n, x, y]) => (
+        <g class="n">
+          <circle cx={mx(x)} cy={y} r="10" />
+          <text x={mx(x)} y={y + 4}>
+            {n}
+          </text>
+        </g>
+      ))}
+    </svg>
+    <ol class="hir-list" role="list">
+      {c.items.map((item) => (
+        <li>
+          <span set:html={item} />
+        </li>
+      ))}
+    </ol>
+  </div>
+</div>
+
+<style is:global>
+  .hir {
+    scroll-margin-block-start: 8rem;
+  }
+
+  .hir .hir-title {
+    margin-block-end: 1rem;
+    font-size: var(--lc-text-h3);
+  }
+
+  .hir .hir-body {
+    display: grid;
+    gap: 1.5rem 2rem;
+    align-items: start;
+  }
+
+  .hir .hir-svg {
+    inline-size: 100%;
+    max-inline-size: 560px;
+    block-size: auto;
+  }
+
+  /* A label by default; .s a smaller, muted line. */
+  .hir .hir-svg text {
+    fill: var(--lc-ink);
+    font-family: var(--lc-font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    text-anchor: middle;
+  }
+
+  .hir .hir-svg .s {
+    fill: var(--lc-ink-muted);
+    font-size: 11px;
+    font-weight: 400;
+  }
+
+  /* A box by default; .host the host, .off the internet (nothing reaches it). Lines and marks
+     read accent tokens (--lc-action, not the --lc-ink text token): every colour in the drawing
+     keeps its distance from NetBox Labs (tests/identity.spec.ts). */
+  .hir rect {
+    fill: var(--lc-paper-raised);
+    stroke: var(--lc-rule-strong);
+    rx: 4px;
+  }
+
+  .hir rect.host {
+    fill: var(--lc-paper-sunk);
+    stroke: var(--lc-action);
+    stroke-width: 1.5;
+  }
+
+  .hir rect.off {
+    stroke-dasharray: 3 3;
+  }
+
+  .hir path.https,
+  .hir path.read,
+  .hir path.write,
+  .hir path.none {
+    fill: none;
+    stroke-width: 2;
+  }
+
+  .hir path.https {
+    stroke: var(--lc-action);
+  }
+
+  .hir path.read {
+    stroke: var(--lc-observed);
+  }
+
+  .hir path.write {
+    stroke: var(--lc-drift);
+    stroke-dasharray: 6 4;
+  }
+
+  .hir path.none {
+    stroke: var(--lc-ink-faint);
+  }
+
+  .hir .m-https {
+    fill: var(--lc-action);
+  }
+
+  .hir .m-read {
+    fill: var(--lc-observed);
+  }
+
+  .hir .m-write {
+    fill: var(--lc-drift);
+  }
+
+  .hir .n circle {
+    fill: var(--lc-action);
+  }
+
+  .hir .hir-svg .n text {
+    fill: var(--lc-action-text);
+    font-family: var(--lc-font-mono);
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  /* The text alternative: the drawing's numbers, as a list. */
+  .hir .hir-list {
+    display: grid;
+    gap: 0.625rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: hir;
+    font-size: var(--lc-text-small);
+  }
+
+  .hir .hir-list li {
+    display: flex;
+    gap: 0.625rem;
+    counter-increment: hir;
+  }
+
+  .hir .hir-list li::before {
+    display: grid;
+    flex: none;
+    place-items: center;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    border-radius: 50%;
+    background: var(--lc-action);
+    color: var(--lc-action-text);
+    content: counter(hir);
+    font-family: var(--lc-font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+</style>

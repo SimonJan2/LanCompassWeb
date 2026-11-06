@@ -8,9 +8,10 @@ import { localeCodes, type Locale } from "../i18n/locales";
  *   <key>.<ui>.webm (or .mp4)   the recording, <ui> = the product's interface language
  *   <key>.<ui>.webp (or .jpg)   its poster
  *   <key>.<ui>.<lang>.vtt       captions in en and he, timed to that recording
- * <set> is the product theme it was recorded in: light, or nightwire (dark builds).
+ * <set> is the product theme it was recorded in (W5): survey (Survey, light builds), or
+ * night-chart (Night chart, dark builds) — the product's official pair, the site's own.
  */
-export type MediaSet = "light" | "nightwire";
+export type MediaSet = "survey" | "night-chart";
 
 export interface VideoFiles {
   set: MediaSet;
@@ -46,6 +47,9 @@ function variant(key: string, set: MediaSet, ui: Locale): VideoFiles {
 
 export const hasVideo = (files: VideoFiles) => files.mp4 !== null || files.webm !== null;
 
+/** The interface language a video is shown in on a page of `locale`. */
+export const videoUi = (key: string, locale: Locale): Locale => fixedUi[key] ?? locale;
+
 /**
  * The recording for a media set and page locale. Resolution order: theme, then locale,
  * then fallback — the set's variant in the page's language (or the video's fixed
@@ -53,16 +57,16 @@ export const hasVideo = (files: VideoFiles) => files.mp4 !== null || files.webm 
  * first variant that exists, or the preferred (empty) one while none does.
  */
 export function videoFiles(key: string, set: MediaSet, locale: Locale): VideoFiles {
-  const preferred = fixedUi[key] ?? locale;
+  const preferred = videoUi(key, locale);
   const order = [preferred, ...localeCodes.filter((code) => code !== preferred)];
-  const other: MediaSet = set === "light" ? "nightwire" : "light";
+  const other: MediaSet = set === "survey" ? "night-chart" : "survey";
   const variants = [set, other].flatMap((s) => order.map((ui) => variant(key, s, ui)));
   return variants.find(hasVideo) ?? variants[0]!;
 }
 
-/** The media sets a site theme shows: light → light, dark → Nightwire, auto → both. */
+/** The media sets a site theme shows: light → Survey, dark → Night chart, auto → both. */
 export function mediaSets(theme: SiteTheme): MediaSet[] {
-  if (theme === "dark") return ["nightwire"];
-  if (theme === "auto") return ["light", "nightwire"];
-  return ["light"];
+  if (theme === "dark") return ["night-chart"];
+  if (theme === "auto") return ["survey", "night-chart"];
+  return ["survey"];
 }

@@ -1,0 +1,31 @@
+WEBVTT
+
+NOTE storyboard drift-review-queue: 5 steps and 2 cards
+
+1
+00:00:00.000 --> 00:00:02.549
+From a finding to a decision
+
+2
+00:00:02.549 --> 00:00:09.821
+The dashboard: what the scans found that nobody documented.
+
+3
+00:00:09.821 --> 00:00:17.831
+Discovery: one queue for everything that waits for a decision, in groups.
+
+4
+00:00:17.831 --> 00:00:24.836
+A group's preview: what every row would become, before anything changes.
+
+5
+00:00:24.836 --> 00:00:31.843
+Apply: the whole group is decided as one batch.
+
+6
+00:00:31.843 --> 00:00:38.844
+Undo: one step, and the queue is as it was.
+
+7
+00:00:38.844 --> 00:00:41.428
+Every decision is one previewed batch, undone in one step.

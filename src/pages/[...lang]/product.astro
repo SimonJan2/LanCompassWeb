@@ -1,9 +1,10 @@
 ---
 import type { GetStaticPaths } from "astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import AnnotatedScreen from "../../components/AnnotatedScreen.astro";
 import CTABand from "../../components/CTABand.astro";
+import HowItRuns from "../../components/HowItRuns.astro";
 import Icon from "../../components/Icon.astro";
-import ScreenshotFrame from "../../components/ScreenshotFrame.astro";
 import SectionHeading from "../../components/SectionHeading.astro";
 import Contours from "../../components/motifs/Contours.astro";
 import { getCopy } from "../../content/copy";
@@ -23,6 +24,17 @@ const ui = useUi(locale);
 /** Old anchors that still land on the section that took them over (W2): #studios on the
  *  Design Studio, #snmp on the map (LLDP and CDP from SNMP polls). #reports is a section id. */
 const aliases: Record<string, string[]> = { studio: ["studios"], map: ["snmp"] };
+/** W4: every section's screen is a numbered figure (Fig. 1 … n on this page), with its notes. */
+let figureCount = 0;
+const figures = p.sections.map((s) =>
+  isScreenKey(s.screen) && copy.figures[s.screen as keyof typeof copy.figures]
+    ? {
+        screen: s.screen,
+        n: ++figureCount,
+        ...copy.figures[s.screen as keyof typeof copy.figures],
+      }
+    : null,
+);
 ---
 
 <BaseLayout
@@ -91,11 +103,15 @@ const aliases: Record<string, string[]> = { studio: ["studios"], map: ["snmp"] }
           <p class="capability-note">
             <strong>{ui.goodToKnow}:</strong> <span set:html={s.note} />
           </p>
-          {isScreenKey(s.screen) && (
+          {s.id === "platform" && <HowItRuns locale={locale} heading class="capability-runs" />}
+          {figures[index] && (
             <div class="capability-visual reveal">
-              <ScreenshotFrame
-                screen={s.screen}
+              <AnnotatedScreen
+                screen={figures[index].screen}
                 locale={locale}
+                n={figures[index].n}
+                caption={figures[index].caption}
+                notes={figures[index].notes}
                 sizes="(min-width: 1264px) 840px, (min-width: 960px) 66vw, 100vw"
               />
             </div>
@@ -259,6 +275,10 @@ const aliases: Record<string, string[]> = { studio: ["studios"], map: ["snmp"] }
   }
 
   .capability-visual {
+    margin-block-start: 2.5rem;
+  }
+
+  .capability-body :global(.capability-runs) {
     margin-block-start: 2.5rem;
   }
 

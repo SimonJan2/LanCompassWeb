@@ -211,7 +211,7 @@ const atlasRows = h.atlas.rows.map((row) => ({
         ))}
       </ul>
       <div class="section-more">
-        <Button href={pagePath(locale, "security")} variant="tertiary">
+        <Button href={`${pagePath(locale, "security")}#how-it-runs`} variant="tertiary">
           {h.offline.link}
         </Button>
       </div>
@@ -314,7 +314,7 @@ const atlasRows = h.atlas.rows.map((row) => ({
       />
       <div class="videos">
         {h.videos.items.map((v) => (
-          <VideoSlot locale={locale} videoKey={v.key} title={v.title} />
+          <VideoSlot locale={locale} videoKey={v.key} />
         ))}
       </div>
     </div>

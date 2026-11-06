@@ -37,6 +37,9 @@ export const GET: APIRoute = async ({ props }) => {
   } else if (page === "contact") {
     eyebrow = copy.contact.eyebrow;
     title = copy.contact.lead;
+  } else if (page === "videos") {
+    eyebrow = copy.videoText.eyebrow;
+    title = copy.videoText.title;
   } else {
     const entry = await getEntry("pages", `${locale}/${page}`);
     eyebrow = entry?.data.eyebrow ?? copy.meta[page].title;

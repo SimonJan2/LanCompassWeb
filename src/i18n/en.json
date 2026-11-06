@@ -65,9 +65,15 @@
     },
     "alt": "The LanCompass {screen} screen, showing the fictional demo network."
   },
+  "figure": {
+    "label": "Fig. {n}",
+    "note": "Note {m}",
+    "full": "Open the full screen"
+  },
   "video": {
     "comingSoon": "Video coming soon",
-    "captions": "Captions in English and Hebrew"
+    "captions": "Captions in English and Hebrew",
+    "shows": "What the video shows"
   },
   "form": {
     "required": "Required",

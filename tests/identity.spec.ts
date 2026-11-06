@@ -409,3 +409,60 @@ test.describe("identity: the Night chart (dark theme)", () => {
     });
   }
 });
+
+test.describe("identity: the figures' marks and the drawing (W4)", () => {
+  // W4 adds no colour token: the marks, the legend's numbers and highlight, and the drawing's
+  // fills and strokes read existing semantic tokens. Their rendered colours are held to the same
+  // distance from NetBox Labs as the tokens, in every theme project.
+  for (const path of ["/product/", "/he/product/", "/security/", "/he/security/"]) {
+    test(`${path}: every mark, number and stroke is ΔE2000 ≥ 15 from NetBox`, async ({ page }) => {
+      await page.goto(path);
+      await page.addStyleTag({
+        content: ".defer-render { content-visibility: visible !important; }",
+      });
+      const colours = await page.evaluate(() => {
+        const ctx = document.createElement("canvas").getContext("2d")!;
+        const norm = (c: string) => {
+          const m = c.match(/^color\(srgb ([\d.]+) ([\d.]+) ([\d.]+)(?: \/ ([\d.]+))?\)$/);
+          if (m) {
+            const [r, g, b] = [m[1], m[2], m[3]].map((v) => Math.round(Number(v) * 255));
+            return `rgba(${r}, ${g}, ${b}, ${m[4] ?? 1})`;
+          }
+          ctx.fillStyle = "#010203";
+          ctx.fillStyle = c;
+          const out = String(ctx.fillStyle);
+          return out === "#010203" ? c : out;
+        };
+        const out: { where: string; colour: string }[] = [];
+        const add = (where: string, c: string | null | undefined) => {
+          if (c && c !== "none" && c !== "transparent" && !/^rgba\(.*,\s*0\)$/.test(c))
+            out.push({ where, colour: norm(c) });
+        };
+        for (const a of document.querySelectorAll(".fig-a a"))
+          add("mark", getComputedStyle(a).backgroundColor);
+        for (const s of document.querySelectorAll(".fig-a"))
+          add("mark frame", getComputedStyle(s, "::before").borderTopColor);
+        for (const li of document.querySelectorAll(".fig-notes li, .hir-list li"))
+          add("legend number", getComputedStyle(li, "::before").backgroundColor);
+        for (const el of document.querySelectorAll(".hir rect, .hir path, .hir circle")) {
+          const style = getComputedStyle(el);
+          add(`drawing ${el.getAttribute("class") ?? el.tagName} fill`, style.fill);
+          add(`drawing ${el.getAttribute("class") ?? el.tagName} stroke`, style.stroke);
+        }
+        return out;
+      });
+      expect(colours.length).toBeGreaterThan(10);
+      const over = rendersDark() ? NIGHT : PAPER;
+      const failures = new Set<string>();
+      for (const { where, colour } of colours) {
+        const rgb = parseColour(colour, over);
+        if (!rgb) continue;
+        for (const ref of NETBOX) {
+          const d = deltaE2000(toLab(rgb), toLab(hexToRgb(ref)));
+          if (d < MIN_DELTA_E) failures.add(`${where} ${colour} vs ${ref}: ΔE ${d.toFixed(1)}`);
+        }
+      }
+      expect([...failures]).toEqual([]);
+    });
+  }
+});

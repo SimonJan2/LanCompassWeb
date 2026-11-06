@@ -14,8 +14,8 @@ check() { # description, expected, actual
 status() { curl -s -o /dev/null -w '%{http_code}' "$@"; }
 header() { curl -s -D - -o /dev/null "$2" ${3:+-H "$3"} | tr -d '\r' | grep -i "^$1:" | head -1 | cut -d' ' -f2-; }
 
-for path in / /product/ /security/ /design-partners/ /contact/ /accessibility/ /privacy/ \
-            /he/ /he/product/ /he/security/ /he/design-partners/ /he/contact/ /he/accessibility/ /he/privacy/; do
+for path in / /product/ /videos/ /security/ /design-partners/ /contact/ /accessibility/ /privacy/ \
+            /he/ /he/product/ /he/videos/ /he/security/ /he/design-partners/ /he/contact/ /he/accessibility/ /he/privacy/; do
   check "GET $path" 200 "$(status "$BASE$path")"
 done
 for path in /sitemap-index.xml /robots.txt /site.webmanifest /favicon.svg /og/he/home.png /healthz; do

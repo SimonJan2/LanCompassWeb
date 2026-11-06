@@ -59,7 +59,7 @@ The colour theme is a build-time choice, like every `PUBLIC_*` value: set
 - `light` builds W1.1 exactly: survey paper, paper OG images and icons, light screenshots
   and videos.
 - `dark` builds the **Night chart**: deep indigo ground, paper-ink type, lamp-lit bands, the
-  product's Night chart screenshots and its Nightwire videos (until W5), night OG images, a night manifest and
+  product's Night chart screenshots and videos, night OG images, a night manifest and
   `theme-color`.
 - `auto` ships both palettes. CSS switches with `prefers-color-scheme`, screenshots switch
   with `<picture><source media>` (only the matching image is fetched), each video slot
@@ -77,7 +77,7 @@ Release-key fingerprints for `/security#verification` live in `src/content/finge
 (`[{ "kid": "...", "purpose": "...", "sha256": "AB:CD:..." }]`). The block renders only when
 the list is not empty; it ships empty.
 
-Videos: drop files into `public/media/<light|nightwire>/` as described in
+Videos: drop files into `public/media/<survey|night-chart>/` as described in
 `public/media/README.md`.
 
 ## Screenshots
@@ -99,14 +99,18 @@ every key without writing a file and fails on a missing route or element; `--key
 screenshot to `.tmp/probe/`. Narrow slots (What's new, the atlas previews) show the crop, wide
 ones (the product sections) the full window.
 
-`scripts/record-video.mjs <key>` records one product video the same read-only way
-(navigation, hover and scrolling; a click only follows a link; never a layer toggle, approve,
-dismiss, save, import, sync or enable). Each video is a storyboard in that file: a title card,
-five `{ seconds, en, he, run }` steps and an end card. It writes the WebM (1280 × 720, at most
-45 s), a poster (`.jpg` and `.webp`, taken at the step marked `poster`) and en + he captions
-timed to the same steps. Keys: `drift-review-queue`, `documented-vs-observed`, `hebrew-native`
-(always he UI). `LANCOMPASS_VIDEO_UI` (`en` | `he`), `LANCOMPASS_CAPTURE_THEME` (`light` |
-`nightwire`) and `LANCOMPASS_VIDEO_DIR` choose the variant and folder (default
+`scripts/record-video.mjs <key>` records one product video on the same capture stack
+(navigation, hover, scrolling, the Q key, opening a card or a preview). Its one kind of write
+is DECISIONS.md D-VIDEO-WRITES: the queue story applies one group as one batch and undoes it in
+one step, only with `LANCOMPASS_VIDEO_WRITES=lcweb-cap` against the capture stack's own web port,
+each write logged to `LANCOMPASS_WRITES_LOG`. Each video is a storyboard: a title card, five
+`{ seconds, en, he, claims }` steps and an end card in `src/content/videos.json` (the captions,
+the cards, each slot's title and the `/videos/` page, the videos' text alternative that each
+slot links to), and each step's `run` in the script. It writes the WebM (1280 × 720, at most 45 s), a poster (`.jpg` and `.webp`, taken at
+the step marked `poster`) and en + he captions timed to the same steps. Keys:
+`drift-review-queue`, `documented-vs-observed`, `hebrew-native` (always he UI).
+`LANCOMPASS_VIDEO_UI` (`en` | `he`), `LANCOMPASS_CAPTURE_THEME` (`survey` | `night-chart`) and
+`LANCOMPASS_VIDEO_DIR` choose the variant and folder (default
 `media-library/videos/<set>-<ui>/`). Flags:
 
 - `--check` signs in and walks every step without recording, and fails if a link or element a
@@ -115,8 +119,7 @@ timed to the same steps. Keys: `drift-review-queue`, `documented-vs-observed`, `
 - `--cards <dir>` renders the title and end card to PNG; it needs neither the product nor a
   login.
 
-Both scripts fill `media-library/` (screens: Survey and Night chart; videos: light and
-Nightwire until W5; en and he); see
+Both scripts fill `media-library/` (Survey and Night chart; en and he); see
 `media-library/README.md`, then copy the site's set into `public/media/` (or use `--publish`).
 
 ```bash
@@ -128,8 +131,8 @@ docker run --rm --network host --ipc=host --user "$(id -u):$(id -g)" -e HOME=/tm
 
 ```bash
 docker run --rm --network host --ipc=host --user "$(id -u):$(id -g)" -e HOME=/tmp \
-  -e LANCOMPASS_DEMO_USER -e LANCOMPASS_DEMO_PASS \
-  -e LANCOMPASS_CAPTURE_THEME=nightwire -e LANCOMPASS_VIDEO_UI=he \
+  -e LANCOMPASS_DEMO_URL=http://127.0.0.1:4186 -e LANCOMPASS_DEMO_USER -e LANCOMPASS_DEMO_PASS \
+  -e LANCOMPASS_CAPTURE_THEME=night-chart -e LANCOMPASS_VIDEO_UI=he \
   -v "$PWD":/app -w /app mcr.microsoft.com/playwright:v1.64.0-noble \
   node scripts/record-video.mjs documented-vs-observed --check
 ```

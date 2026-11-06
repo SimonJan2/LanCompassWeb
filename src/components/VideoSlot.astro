@@ -1,32 +1,47 @@
 ---
 /**
  * A video slot. The recording comes from public/media/<set>/<key>.<ui>.webm (src/lib/media.ts):
- * the set follows the site theme (light, or Nightwire in a dark build), the interface
- * language follows the page. An auto build renders one player per colour scheme and hides
- * the other with a media query (auto.css), because browsers ignore <video><source media>.
+ * the set follows the site theme (Survey, or Night chart in a dark build), the interface
+ * language follows the page. An auto build renders one player with the Night chart recording
+ * behind a prefers-color-scheme: dark <source> (and its poster behind a <picture> source):
+ * browsers honour <source media> inside <video> again (Chrome 120+, Firefox, Safari). Its
+ * captions are the Survey recording's: the two takes of a story run within 0.12 s of each other
+ * cue by cue (W5, measured), so one set of tracks serves both.
  * While no recording exists the slot shows a poster panel with "Video coming soon". With the file present: <video> with
  * controls, no autoplay, preload="none" and en + he caption tracks. The poster is a lazy
  * <img> under the video rather than the poster attribute, which browsers fetch at once:
  * nothing of the video loads until the visitor scrolls near it. No caption track is marked
  * `default`, because a default track is fetched with the page; both stay in the player's menu.
  * When captions turn on, src/scripts/site.ts makes the page language's track the one showing.
+ *
+ * The slot's title is its storyboard's (src/content/videos.json), in the page's language. Under
+ * it, "What the video shows" links to the video's text alternative on /videos/ (WCAG 1.2.1; AA
+ * in IS 5568): the storyboard's steps as a numbered list. The list itself does not fit the home
+ * page's first round trip (W5, measured: +441 B gzip on /he/), so it has a page of its own.
  */
 import Icon from "./Icon.astro";
-import { locales, useUi, type Locale } from "../i18n";
+import { locales, pagePath, useUi, type Locale } from "../i18n";
 import { site } from "../config/site";
 import { hasVideo, mediaSets, videoFiles } from "../lib/media";
+import { storyboards } from "../lib/videos";
 
 interface Props {
   locale: Locale;
   videoKey: string;
-  title: string;
 }
 
-const { locale, videoKey, title } = Astro.props;
+const { locale, videoKey } = Astro.props;
+const board = storyboards[videoKey];
+const title = board ? board.title[locale] : videoKey;
 const ui = useUi(locale);
 const sets = mediaSets(site.theme);
 const variants = sets.map((set) => videoFiles(videoKey, set, locale));
 const ready = variants.every(hasVideo);
+/** The player's recording (Survey, or the theme's one set) and, in an auto build, the Night
+ *  chart recording behind a prefers-color-scheme: dark <source> (and poster <source>). */
+const main = variants[0]!;
+const dark = variants.length > 1 ? variants[1]! : null;
+const darkMedia = "(prefers-color-scheme: dark)";
 /** A 1×1 transparent GIF: without any poster Chrome paints the video black over the lazy
  *  poster image; a data: URI costs no request (the CSP allows data: images). */
 const transparentPoster =
@@ -38,46 +53,60 @@ const captionLabels: Record<Locale, string> = Object.fromEntries(
 
 <figure class="video" data-video={videoKey} data-video-ready={ready ? "true" : "false"}>
   {ready ? (
-    variants.map((files) => (
-      <div
-        class="video-frame"
-        data-video-set={files.set}
-        data-video-ui={files.ui}
-        data-dark={sets.length > 1 && files === variants[1] ? "" : undefined}
-      >
-        {files.poster && (
+    <div
+      class="video-frame"
+      data-video-set={variants.map((v) => v.set).join(" ")}
+      data-video-ui={main.ui}
+    >
+      {main.poster && dark?.poster ? (
+        <picture>
+          <source media={darkMedia} srcset={dark.poster} />
           <img
             class="video-poster-img"
-            src={files.poster}
+            src={main.poster}
             alt=""
             width="1280"
             height="720"
             loading="lazy"
             decoding="async"
           />
-        )}
-        <video
-          controls
-          preload="none"
-          playsinline
-          width="1280"
-          height="720"
-          class="video-el"
-          poster={files.poster ? transparentPoster : undefined}
-        >
-          {files.webm && <source src={files.webm} type="video/webm" />}
-          {files.mp4 && <source src={files.mp4} type="video/mp4" />}
-          {files.captions.map((c) => (
-            <track
-              kind="captions"
-              src={c.src}
-              srclang={locales[c.locale].htmlLang}
-              label={captionLabels[c.locale]}
-            />
-          ))}
-        </video>
-      </div>
-    ))
+        </picture>
+      ) : (
+        main.poster && (
+          <img
+            class="video-poster-img"
+            src={main.poster}
+            alt=""
+            width="1280"
+            height="720"
+            loading="lazy"
+            decoding="async"
+          />
+        )
+      )}
+      <video
+        controls
+        preload="none"
+        playsinline
+        width="1280"
+        height="720"
+        class="video-el"
+        poster={main.poster ? transparentPoster : undefined}
+      >
+        {dark?.webm && <source src={dark.webm} type="video/webm" media={darkMedia} />}
+        {dark?.mp4 && <source src={dark.mp4} type="video/mp4" media={darkMedia} />}
+        {main.webm && <source src={main.webm} type="video/webm" />}
+        {main.mp4 && <source src={main.mp4} type="video/mp4" />}
+        {main.captions.map((c) => (
+          <track
+            kind="captions"
+            src={c.src}
+            srclang={locales[c.locale].htmlLang}
+            label={captionLabels[c.locale]}
+          />
+        ))}
+      </video>
+    </div>
   ) : (
     <div class="video-poster">
       <span class="video-play" aria-hidden="true">
@@ -86,19 +115,29 @@ const captionLabels: Record<Locale, string> = Object.fromEntries(
       <span class="video-soon">{ui.video.comingSoon}</span>
     </div>
   )}
-  <figcaption class="video-title" set:html={title} />
+  <figcaption class="video-title">
+    {title}
+    {board && (
+      <a class="video-shows" href={`${pagePath(locale, "videos")}#${videoKey}`}>
+        {ui.video.shows}
+      </a>
+    )}
+  </figcaption>
 </figure>
 
-<style>
+<style is:global>
+  /* Prefixed global styles (W5, as night A did for twelve components): a scoped <style> writes
+     a data-astro-cid attribute on every element of every slot, bytes the home page's first
+     round trip does not have. The rules and their order are the scoped ones. */
   .video {
     margin: 0;
   }
 
-  .video-frame {
+  .video .video-frame {
     position: relative;
   }
 
-  .video-poster-img {
+  .video .video-poster-img {
     position: absolute;
     inset: 0;
     inline-size: 100%;
@@ -107,18 +146,18 @@ const captionLabels: Record<Locale, string> = Object.fromEntries(
     object-fit: cover;
   }
 
-  .video-el {
+  .video .video-el {
     position: relative;
     display: block;
   }
 
   /* See-through until playback, so the lazy poster underneath shows. */
-  .video-frame .video-el {
+  .video .video-frame .video-el {
     background: transparent;
   }
 
-  .video-el,
-  .video-poster {
+  .video .video-el,
+  .video .video-poster {
     inline-size: 100%;
     aspect-ratio: 16 / 9;
     border: 1px solid var(--lc-rule-strong);
@@ -126,7 +165,7 @@ const captionLabels: Record<Locale, string> = Object.fromEntries(
     background: var(--lc-paper-raised);
   }
 
-  .video-poster {
+  .video .video-poster {
     position: relative;
     display: grid;
     place-content: center;
@@ -135,7 +174,7 @@ const captionLabels: Record<Locale, string> = Object.fromEntries(
     overflow: hidden;
   }
 
-  .video-play {
+  .video .video-play {
     display: grid;
     place-items: center;
     inline-size: 3.25rem;
@@ -145,19 +184,29 @@ const captionLabels: Record<Locale, string> = Object.fromEntries(
     color: var(--lc-ink-muted);
   }
 
-  .video-soon {
+  .video .video-soon {
     color: var(--lc-ink-muted);
     font-family: var(--lc-font-mono);
     font-size: var(--lc-text-xs);
   }
 
-  :lang(he) .video-soon {
+  :lang(he) .video .video-soon {
     font-family: var(--lc-font-sans);
   }
 
-  .video-title {
+  .video .video-title {
     margin-block-start: 0.875rem;
     font-size: var(--lc-text-body);
     font-weight: 550;
+  }
+
+  /* What the video shows: the link to its text alternative, under the title. */
+  .video .video-shows {
+    display: block;
+    inline-size: fit-content;
+    margin-block-start: 0.25rem;
+    color: var(--lc-ink-muted);
+    font-size: var(--lc-text-small);
+    font-weight: 400;
   }
 </style>

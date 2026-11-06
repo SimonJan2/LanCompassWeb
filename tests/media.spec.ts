@@ -24,7 +24,7 @@ function visibleFrame(page: Page, key: string) {
 }
 
 test.describe("video slots", () => {
-  test("the lineup is the three read-only videos, in order", async ({ page }) => {
+  test("the lineup is the three videos, in order", async ({ page }) => {
     await page.goto("/");
     const keys = await page
       .locator("figure[data-video]")
@@ -37,7 +37,7 @@ test.describe("video slots", () => {
       page,
     }) => {
       // media.ts falls back to the other set, so any recording makes the slot ready.
-      const ready = recorded("light", key) || recorded("nightwire", key);
+      const ready = recorded("survey", key) || recorded("night-chart", key);
       expect(siteProject().dist).toBeTruthy();
       await page.goto("/");
       const figure = page.locator(`figure[data-video="${key}"]`);
@@ -48,9 +48,20 @@ test.describe("video slots", () => {
       }
       const frame = visibleFrame(page, key);
       await expect(frame).toHaveCount(1);
-      const expectedSet = rendersDark() ? "nightwire" : "light";
+      const expectedSet = rendersDark() ? "night-chart" : "survey";
+      // One player per slot (W5): an auto build lists both sets, the dark one behind a
+      // prefers-color-scheme: dark <source>.
       if (recorded(expectedSet, key))
-        await expect(frame).toHaveAttribute("data-video-set", expectedSet);
+        await expect(frame).toHaveAttribute(
+          "data-video-set",
+          new RegExp(`(^| )${expectedSet}( |$)`),
+        );
+      if (siteProject().theme === "auto") {
+        const media = await frame
+          .locator("video source")
+          .evaluateAll((els) => els.map((el) => el.getAttribute("media") ?? ""));
+        expect(media).toEqual(["(prefers-color-scheme: dark)", ""]);
+      }
       // Both caption tracks, neither marked default.
       const tracks = frame.locator("track[kind=captions]");
       await expect(tracks).toHaveCount(2);
@@ -75,12 +86,37 @@ test.describe("video slots", () => {
         const frames = page.locator(`figure[data-video="${key}"] .video-frame`);
         if ((await frames.count()) === 0) continue;
         for (const frame of await frames.all()) {
-          const set = (await frame.getAttribute("data-video-set"))!;
+          const set = (await frame.getAttribute("data-video-set"))!.split(" ")[0]!;
           const want = key === "hebrew-native" ? "he" : ui;
           // A variant that was not recorded falls back to the other language (media.ts).
           if (existsSync(join(media, set, `${key}.${want}.webm`)))
             await expect(frame, `${path} ${key}`).toHaveAttribute("data-video-ui", want);
         }
+      }
+    }
+  });
+
+  test("each slot links to what the video shows: its steps on /videos/, in the page's language", async ({
+    page,
+  }) => {
+    for (const [path, lang, videos] of [
+      ["/", "en", "/videos/"],
+      ["/he/", "he", "/he/videos/"],
+    ] as const) {
+      await page.goto(path);
+      for (const key of slots) {
+        const board = storyboards[key] as { title: Record<string, string> };
+        const caption = page.locator(`figure[data-video="${key}"] figcaption`);
+        await expect(caption, `${path} ${key}`).toContainText(board.title[lang]!);
+        await expect(caption.locator("a.video-shows")).toHaveAttribute("href", `${videos}#${key}`);
+      }
+      await page.goto(videos);
+      for (const key of slots) {
+        const steps = (storyboards[key] as { steps: Record<string, string>[] }).steps;
+        const items = page.locator(`section#${key} ol[data-video-steps] li`);
+        await expect(items, `${videos} ${key}`).toHaveCount(steps.length);
+        const texts = (await items.allTextContents()).map((t) => t.trim());
+        expect(texts, `${videos} ${key}`).toEqual(steps.map((s) => s[lang]));
       }
     }
   });
@@ -114,6 +150,10 @@ test.describe("video slots", () => {
     await expect
       .poll(() => video.evaluate((v: HTMLVideoElement) => v.currentTime), { timeout: 15_000 })
       .toBeGreaterThan(0.2);
+    // The recording that plays is the page's scheme's own: Night chart where the page renders
+    // dark (a dark build, or auto under a dark scheme), Survey otherwise.
+    const src = await video.evaluate((v: HTMLVideoElement) => v.currentSrc);
+    expect(src).toContain(`/media/${rendersDark() ? "night-chart" : "survey"}/`);
   });
 });
 
@@ -333,7 +373,7 @@ test.describe("screen slots", () => {
 
 test.describe("recordings on disk", () => {
   const files = (ext: string) =>
-    ["light", "nightwire"].flatMap((set) =>
+    ["survey", "night-chart"].flatMap((set) =>
       readdirSync(join(media, set))
         .filter((f) => f.endsWith(ext))
         .map((f) => join(set, f)),
@@ -353,8 +393,30 @@ test.describe("recordings on disk", () => {
     test.skip(siteProject().theme !== "light", "a source check: light project only");
   });
 
+  test("only the survey and night-chart sets; no light or nightwire folder (W5)", () => {
+    const sets = readdirSync(media, { withFileTypes: true })
+      .filter((e) => e.isDirectory())
+      .map((e) => e.name)
+      .sort();
+    expect(sets).toEqual(["night-chart", "survey"]);
+    const library = join(process.cwd(), "media-library", "videos");
+    const folders = readdirSync(library, { withFileTypes: true })
+      .filter((e) => e.isDirectory())
+      .map((e) => e.name)
+      .sort();
+    expect(folders).toEqual(["night-chart-en", "night-chart-he", "survey-en", "survey-he"]);
+  });
+
+  test("every Hebrew cue starts with a Hebrew letter or U+200F, so it reads right to left", () => {
+    const vtts = files(".he.vtt");
+    expect(vtts.length).toBe(10);
+    for (const file of vtts)
+      for (const cue of cues(readFileSync(join(media, file), "utf8")))
+        expect(cue, file).toMatch(/^[‏א-ת]/);
+  });
+
   test("every slot is recorded in both sets, for each interface language it shows", () => {
-    for (const set of ["light", "nightwire"])
+    for (const set of ["survey", "night-chart"])
       for (const key of slots)
         for (const ui of key === "hebrew-native" ? ["he"] : ["en", "he"])
           for (const ext of ["webm", "webp", "en.vtt", "he.vtt"])

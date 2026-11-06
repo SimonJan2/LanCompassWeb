@@ -6,6 +6,7 @@ updated: "2026-11-06"
 legalReview: false
 ---
 import ContactEmail from "../../../components/ContactEmail.astro";
+import HowItRuns from "../../../components/HowItRuns.astro";
 
 {/* Every product paragraph cites its row of docs/claims.md in the comment above it. */}
 
@@ -14,6 +15,12 @@ import ContactEmail from "../../../components/ContactEmail.astro";
 {/* C-NET-1, C-INST-1, C-INST-2 */}
 
 LanCompass is self-hosted. It installs on your own Linux host from one signed offline bundle, and it runs with no internet connection: everything it needs is inside the bundle, and nothing is downloaded during the install or fetched while it runs.
+
+<h2 id="how-it-runs">What talks to what</h2>
+
+{/* C-INST-1, C-INST-2, C-INST-12, C-SEC-5, C-RO-1, C-RO-2, C-INT-2, C-NET-1, C-NET-2, C-LIC-1, C-INST-13, C-INST-7 (the drawing's text: src/content/copy/en.ts, howItRuns) */}
+
+<HowItRuns locale="en" />
 
 ## No telemetry
 

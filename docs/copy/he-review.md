@@ -464,6 +464,68 @@ W2 removed the W1 sections "SNMP and topology" (its facts moved into the map) an
 | `lead`  | אולי הכתובת זזה, ואולי היא אף פעם לא הייתה קיימת. המצפן עדיין מכוון הביתה. | Maybe the address moved, and maybe it never existed. The compass still points home. | rewritten: voice |
 | `home`  | חזרה לדף הבית                                                              | Back to the home page                                                               | kept             |
 
+## `copy.figures` (W4)
+
+The captions and notes of the numbered figures on `/product` (one note per capture anchor). Each note says what is on the screen, nothing more.
+
+| Key                                 | Hebrew                                                                 | Back-gloss                                                                                         | Note     |
+| ----------------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | -------- |
+| `ipam-tree.caption`                 | היררכיית הקידומות: אתרים, VRF וקידומות בעץ אחד.                        | The prefix hierarchy: sites, VRF and prefixes in one tree.                                         | new (W4) |
+| `ipam-tree.notes.tree`              | אתר נפתח ל־VRF שלו, וכל VRF לקידומות שבו.                              | A site opens to its VRF, and each VRF to the prefixes in it.                                       | new (W4) |
+| `rack.caption`                      | ארון בסטודיו הארונות, והעדשות שלו ליד השרטוט.                          | A rack in the rack studio, and its lenses next to the drawing.                                     | new (W4) |
+| `rack.notes.elevation`              | שרטוט הארון מלפנים: כל רכיב ביחידות שהוא תופס.                         | The rack drawing from the front: each component in the units it takes up.                          | new (W4) |
+| `discovery-queue.caption`           | תור ההחלטות של הגילוי: כל מה שמחכה להחלטה.                             | Discovery's decision queue: everything that waits for a decision.                                  | new (W4) |
+| `discovery-queue.notes.queue`       | מה שמחכה להחלטה, והספירות בראש.                                        | What waits for a decision, and the counts at the top.                                              | new (W4) |
+| `discovery-queue.notes.first-group` | קבוצה, ושמה לפי מה שהשורות שלה יהפכו להיות.                            | A group, its name after what its rows will become.                                                 | new (W4) |
+| `map-ages.caption`                  | המפה של מטה דמו: קו אחד לכל כבל, וכל קו אומר בן כמה הוא.               | The map of Demo HQ: one line for each cable, and each line says how old it is.                     | new (W4) |
+| `map-ages.notes.lens`               | עדשת „שינויים מאז”: מה זז או השתתק מאז התאריך שבוחרים.                 | The "changes since" lens: what moved or went quiet since the date one picks.                       | new (W4) |
+| `map-ages.notes.canvas`             | הכרטיס של כבל: מתי הוא אומת ברשת בפעם האחרונה.                         | A cable's card: when it was last verified on the network.                                          | new (W4) |
+| `ask-the-map.caption`               | שואלים את המפה: השאלה, והתשובה מתחת לשורה.                             | Asking the map: the question, and the answer under the bar.                                        | new (W4) |
+| `ask-the-map.notes.answer`          | התשובה: לאיזה מכשיר שייכת הכתובת.                                      | The answer: which device the address belongs to.                                                   | new (W4) |
+| `design-studio.caption`             | תכנון DMZ בסטודיו, ומתג אחד נבחר.                                      | A DMZ design in the studio, and one switch selected.                                               | new (W4) |
+| `design-studio.notes.canvas`        | הקנבס: התכנון, משורטט בתוך שקף.                                        | The canvas: the design, drawn inside a slide.                                                      | new (W4) |
+| `design-studio.notes.selected`      | המתג שנבחר, ובחלונית לידו המראה שלו.                                   | The selected switch, and in the panel next to it, its look.                                        | new (W4) |
+| `compliance.caption`                | ממצאי התאימות על התצורות השמורות, לפי חומרה, חבילה ואתר.               | The compliance findings on the stored configurations, by severity, pack and site.                  | new (W4) |
+| `compliance.notes.section`          | כל ממצא: המכשיר, הכלל, החבילה והמקורות שלו.                            | Each finding: the device, the rule, the pack and its sources.                                      | new (W4) |
+| `nac.caption`                       | NAC במצב ברירת המחדל: זיהוי בלבד.                                      | NAC in the default mode: detection only.                                                           | new (W4) |
+| `nac.notes.mode`                    | שורת המצב: זיהוי בלבד, הרצה יבשה פעילה, ואף פורט לא משתנה.             | The mode line: detection only, dry run active, and no port changes.                                | new (W4) |
+| `dashboard.caption`                 | לוח הבקרה: מה לא מקוון, מה נכשל, ואירועי הניטור.                       | The dashboard: what is offline, what failed, and the monitoring events.                            | new (W4) |
+| `dashboard.notes.grid`              | וידג׳טים מאותו תיעוד: מכשירים לא מקוונים, סריקות שנכשלו, אירועי ניטור. | Widgets from the same documentation: offline devices, scans that failed, monitoring events.        | new (W4) |
+| `gallery.caption`                   | גלריית לוחות הבקרה, עם השורה „תצוגה”.                                  | The dashboards gallery, with the "Showcase" row.                                                   | new (W4) |
+| `gallery.notes.showcase`            | לוח לתצוגה מקדימה, למעקב, או לעותק משלכם.                              | A dashboard for a preview, for following, or for a copy of your own.                               | new (W4) |
+| `licence.caption`                   | הגדרות ← רישיון, בתקופת ההערכה: נבדק בשרת הזה, בלי פנייה לרשת.         | Settings → License, in the evaluation period: checked on this server, with no call to the network. | new (W4) |
+| `licence.notes.state`               | מצב הרישיון: תקופת הערכה, כל עוד לא הועלה קובץ רישיון.                 | The licence state: evaluation period, as long as no licence file was uploaded.                     | new (W4) |
+
+## `copy.howItRuns` (W4)
+
+"What talks to what" on `/security` and `/product#platform`: the drawing's title, description and labels, and the numbered list beside it (its text alternative). The image names (`web`, `API`, `PostgreSQL`, `Redis`) and `HTTPS` stay Latin; they are listed at the end.
+
+| Key                 | Hebrew                                                                                                                               | Back-gloss                                                                                                                                                                  | Note     |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| `eyebrow`           | מה מדבר עם מה                                                                                                                        | What talks with what                                                                                                                                                        | new (W4) |
+| `title`             | שרת אחד, ארבע תמונות, שום דבר לאינטרנט.                                                                                              | One server, four images, nothing to the internet.                                                                                                                           | new (W4) |
+| `desc`              | שבעה חלקים ממוספרים; הרשימה הממוספרת שמתחת לשרטוט אומרת מהו כל אחד מהם.                                                              | Seven numbered parts; the numbered list under the drawing says what each one is (the drawing's description, read after its title).                                          | new (W4) |
+| `items.0`           | שרת לינוקס אחד עם Docker: השרת שלכם, מותקן מחבילה לא־מקוונת אחת וחתומה.                                                              | One Linux server with Docker: your server, installed from one offline, signed bundle.                                                                                       | new (W4) |
+| `items.1`           | ארבע תמונות קונטיינרים: שכבת ה־web, ה־API, ‏PostgreSQL ו־Redis. הסורק ועובד הגילוי שבתמונת ה־API עובדים ברשת המארח, לסריקות בשכבה 2. | Four container images: the web tier, the API, PostgreSQL and Redis. The scanner and the discovery worker in the API image work on the host's network, for layer-2 scans.    | new (W4) |
+| `items.2`           | אנשים נכנסים אליה בדפדפן, ב־HTTPS.                                                                                                   | People enter it in a browser, over HTTPS.                                                                                                                                   | new (W4) |
+| `items.3`           | היא קוראת את הרשת שלכם, בסריקות ובתשאולי SNMP שאתם מגדירים, ואת המערכות שלכם, דרך מחברים לקריאה בלבד.                                | It reads your network, in the scans and SNMP queries you set up, and your systems, through read-only connectors.                                                            | new (W4) |
+| `items.4`           | היא כותבת לרשת רק בשני מקומות, פרסום DNS PTR ופעולות פורט ב־NAC, ושניהם פועלים רק אם מפעילים אותם וכבויים כברירת מחדל: הקו המקווקו.  | It writes to the network in only two places, DNS PTR publishing and port actions in NAC, and both work only if they are turned on, and are off by default: the dashed line. | new (W4) |
+| `items.5`           | שום דבר לא יוצא לאינטרנט: אין טלמטריה, והרישיון נבדק על השרת.                                                                        | Nothing goes out to the internet: there is no telemetry, and the licence is checked on the server.                                                                          | new (W4) |
+| `items.6`           | הגיבויים נשמרים בתיקייה על השרת, עם תרגולי שחזור.                                                                                    | The backups are kept in a folder on the server, with restore drills.                                                                                                        | new (W4) |
+| `labels.host`       | שרת הלינוקס שלכם · Docker                                                                                                            | Your Linux server · Docker                                                                                                                                                  | new (W4) |
+| `labels.people`     | אנשים, בדפדפן                                                                                                                        | People, in a browser                                                                                                                                                        | new (W4) |
+| `labels.internet`   | האינטרנט                                                                                                                             | The internet                                                                                                                                                                | new (W4) |
+| `labels.nothing`    | לא נשלח דבר                                                                                                                          | Nothing is sent                                                                                                                                                             | new (W4) |
+| `labels.workers`    | סורק וגילוי: רשת המארח                                                                                                               | Scanner and discovery: the host's network                                                                                                                                   | new (W4) |
+| `labels.backups`    | backups/ · תרגולי שחזור                                                                                                              | backups/ · restore drills                                                                                                                                                   | new (W4) |
+| `labels.network`    | הרשת שלכם                                                                                                                            | Your network                                                                                                                                                                | new (W4) |
+| `labels.networkSub` | סריקות, תשאולי SNMP                                                                                                                  | Scans, SNMP queries                                                                                                                                                         | new (W4) |
+| `labels.systems`    | המערכות שלכם                                                                                                                         | Your systems                                                                                                                                                                | new (W4) |
+| `labels.systemsSub` | מחברים לקריאה בלבד                                                                                                                   | Read-only connectors                                                                                                                                                        | new (W4) |
+| `labels.reads`      | קריאה                                                                                                                                | Reading                                                                                                                                                                     | new (W4) |
+| `labels.writes`     | DNS PTR, פעולות פורט ב־NAC                                                                                                           | DNS PTR, port actions in NAC                                                                                                                                                | new (W4) |
+| `labels.writesSub`  | רק אם מפעילים; כבויות כברירת מחדל                                                                                                    | Only if turned on; off by default                                                                                                                                           | new (W4) |
+
 ## `ui.skipLink`
 
 | Key           | Hebrew      | Back-gloss      | Note |
@@ -550,6 +612,14 @@ W2 removed `ui.footer.source` (קוד מקור — "Source code") with the `PUBL
 | `alt`                       | מסך {screen} ב־LanCompass, עם רשת ההדגמה הבדיונית.                 | The {screen} screen in LanCompass, with the fictional demo network.                                 | kept             |
 
 W3 removed `screens.deep-discovery` (השירותים בגילוי המעמיק — "The services in deep discovery"): no page shows that screen any more, and the capture set no longer takes it.
+
+## `ui.figure` (W4)
+
+| Key     | Hebrew          | Back-gloss                                                                    | Note     |
+| ------- | --------------- | ----------------------------------------------------------------------------- | -------- |
+| `label` | איור {n}        | Figure {n}                                                                    | new (W4) |
+| `note`  | הערה {m}        | Note {m} (the accessible name of a mark, before its note)                     | new (W4) |
+| `full`  | פתיחת המסך המלא | Opening the full screen (a link from a cropped figure; no page shows one yet) | new (W4) |
 
 ## `ui.video`
 
@@ -659,6 +729,7 @@ Front matter (eyebrow, title, lead) first, then each heading, paragraph and list
 | 3   | LanCompass נבנתה לרוץ בתוך רשתות שלא יכולות, או לא צריכות, לצאת לאינטרנט. כאן מוסבר מה היא קוראת, מה היא כותבת, איך מתקינים אותה, ואיך היא שומרת על מה שנשמר בה.                                                                                                                                                                                                | LanCompass was built to run inside networks that can't, or shouldn't, go out to the internet. This explains what it reads, what it writes, how it is installed, and how it protects what is stored in it.                                                                                                                                                                                                                                            | rewritten (W2): facts |
 | 4   | ## המידע לא יוצא מהרשת                                                                                                                                                                                                                                                                                                                                          | ## The data doesn't leave the network                                                                                                                                                                                                                                                                                                                                                                                                                | kept                  |
 | 5   | LanCompass מותקנת אצלכם, על שרת לינוקס שלכם, מחבילת התקנה חתומה אחת. היא עובדת בלי חיבור לאינטרנט: כל מה שהיא צריכה נמצא בחבילה, ושום דבר לא יורד מבחוץ — לא בהתקנה ולא בזמן העבודה.                                                                                                                                                                            | LanCompass is installed at your site, on your Linux server, from one signed install bundle. It works without an internet connection: everything it needs is in the bundle, and nothing is downloaded from outside — not at install and not while it works.                                                                                                                                                                                           | rewritten (W2): facts |
+| 5a  | ## מה מדבר עם מה (then the drawing and its list: `copy.howItRuns`)                                                                                                                                                                                                                                                                                              | ## What talks with what                                                                                                                                                                                                                                                                                                                                                                                                                              | new (W4)              |
 | 6   | ## בלי טלמטריה                                                                                                                                                                                                                                                                                                                                                  | ## No telemetry                                                                                                                                                                                                                                                                                                                                                                                                                                      | kept                  |
 | 7   | ל־LanCompass אין סוכן, אין חשבון ענן ואין טלמטריה: שום דבר לא יוצא מהשרת שלכם חוץ מפעולות הרשת שהגדרתם. גם הרישיון נבדק על השרת שלכם, בלי לפנות לרשת. התראות יוצאות רק לערוצים שהגדרתם: webhook, דוא״ל, Discord, Telegram או syslog.                                                                                                                            | LanCompass has no agent, no cloud account and no telemetry: nothing leaves your server except the network operations you configured. The licence too is checked on your server, without reaching out to the network. Alerts go out only to the channels you configured: webhook, email, Discord, Telegram or syslog.                                                                                                                                 | rewritten (W2): facts |
 | 8   | ## קריאה בלבד כברירת מחדל                                                                                                                                                                                                                                                                                                                                       | ## Read-only by default                                                                                                                                                                                                                                                                                                                                                                                                                              | kept                  |
@@ -742,16 +813,77 @@ Front matter (eyebrow, title, lead) first, then each heading, paragraph and list
 | 19  | ## פנייה בנושא נגישות                                                                                                                                          | ## Accessibility enquiries                                                                                                                                                                                                     | kept             |
 | 20  | משהו באתר לא נוח לשימוש? ספרו לנו ונתקן. כתבו אל <ContactEmail subject="Accessibility" /> ותארו את הדף ואת הבעיה.                                              | Something on the site isn't easy to use? Tell us and we'll fix it. Write to <address> and describe the page and the problem.                                                                                                   | rewritten: voice |
 
-## `scripts/record-video.mjs` → video captions and cards (W1.3)
+## `src/content/videos.json` → video captions, cards and "What the video shows" (W5)
 
-W1.3 re-recorded all three videos as storyboards: a title card, five steps and an end card. The
-recorder writes each line into the recording's `.he.vtt` (and the `.en.vtt` from the English
-column), and the two card lines onto the cards themselves, in the recording's interface
-language. Latin runs (`LLDP`, `CDP`, `DC-A01`) are bidi-isolated in the files (U+2066 … U+2069)
-and in `<bdi>` on the cards. The W1.2 lines below them are replaced. The English captions are the
-source of the back-gloss.
+W5 re-recorded all three videos on 0.7.0, from the signed bundle, in Survey and Night chart. Each
+storyboard is a title card, five steps and an end card, written once in `src/content/videos.json`:
+the recorder (`scripts/record-video.mjs`) writes each line into the recording's `.he.vtt` (and
+the `.en.vtt` from the English column) and the two card lines onto the cards, and `/he/videos/`
+lists the five steps of each video, its "What the video shows" text. Every Hebrew cue starts
+with U+200F (right-to-left mark); Latin runs (`IP`, `Q`, `DC-A01`, `DMZ`) are bidi-isolated in the
+files (U+2066 … U+2069) and in `<bdi>` on the cards and the page. W1.3's lines (below the W5
+tables, struck) are replaced. The English captions are the source of the back-gloss.
 
-### `drift-review-queue`: "From a finding to a decision"
+### `drift-review-queue` (W5): "From a finding to a decision"
+
+| #          | Hebrew                                                             | Back-gloss                                                                                                                 | Note        |
+| ---------- | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| title card | מממצא להחלטה                                                       | From a finding to a decision                                                                                               | kept (W1.3) |
+| 1          | לוח הבקרה: מה שהסריקות מצאו ואף אחד לא תיעד.                       | The dashboard: what the scans found and nobody documented.                                                                 | new (W5)    |
+| 2          | גילוי: תור אחד לכל מה שמחכה להחלטה, בקבוצות.                       | Discovery: one queue for everything that waits for a decision, in groups.                                                  | new (W5)    |
+| 3          | התצוגה המקדימה של קבוצה: מה כל שורה תהפוך להיות, לפני שמשהו משתנה. | A group's preview: what each row will become, before anything changes.                                                     | new (W5)    |
+| 4          | החלה: כל הקבוצה מוחלטת באצווה אחת.                                 | Applying: the whole group is decided in one batch. ("החלה" is the product's own button word, `decisions.apply`.)           | new (W5)    |
+| 5          | ביטול פעולה: צעד אחד, והתור חוזר להיות כמו שהיה.                   | Undo: one step, and the queue goes back to how it was. ("ביטול פעולה" is the product's `common.undo`.)                     | new (W5)    |
+| end card   | כל החלטה היא אצווה אחת עם תצוגה מקדימה, ומבטלים אותה בצעד אחד.     | Every decision is one batch with a preview, and you undo it in one step. (The site's own line for C-DISC-4 on `/product`.) | new (W5)    |
+
+### `documented-vs-observed` (W5): "Seen on the wire, missing from the record"
+
+| #          | Hebrew                                                       | Back-gloss                                                                                   | Note        |
+| ---------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------- | ----------- |
+| title card | נצפה ברשת, חסר בתיעוד                                        | Seen on the network, missing from the documentation                                          | kept (W1.3) |
+| 1          | המפה של מטה דמו: קו אחד לכל כבל, וכל קו אומר בן כמה הוא.     | The map of Demo HQ: one line for each cable, and each line says how old it is.               | new (W5)    |
+| 2          | בסקירה מופיעים הקישורים שנצפו ברשת וחסרים בתיעוד.            | Review shows the links that were seen on the network and are missing from the documentation. | new (W5)    |
+| 3          | במפה זה קישור רפאים: נצפה ברשת, ולא תועד.                    | On the map it is a ghost link: seen on the network, and not documented.                      | new (W5)    |
+| 4          | עדשת „שינויים מאז”: מה השתנה במפה ב־7 הימים האחרונים.        | The "changes since" lens: what changed on the map in the last 7 days.                        | new (W5)    |
+| 5          | שואלים את המפה: לוחצים Q, שואלים איפה משהו נמצא, והמפה עונה. | You ask the map: press Q, ask where something is, and the map answers.                       | new (W5)    |
+| end card   | מה שהרשת מראה ומה שהתיעוד אומר, על מפה אחת.                  | What the network shows and what the documentation says, on one map.                          | new (W5)    |
+
+### `hebrew-native` (W5): "Built in Hebrew, not translated"
+
+| #          | Hebrew                                                             | Back-gloss                                                                                                                                  | Note        |
+| ---------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| title card | נבנה בעברית, לא תורגם אליה                                         | Built in Hebrew, not translated into it                                                                                                     | kept (W1.3) |
+| 1          | לוח הבקרה בעברית, בפריסה מימין לשמאל.                              | The dashboard in Hebrew, in a right-to-left layout.                                                                                         | kept (W1.3) |
+| 2          | תוכנית ה־IP בעברית, והכתובות בה משמאל לימין, באותיות לטיניות.      | The IP plan in Hebrew, and the addresses in it left to right, in Latin letters.                                                             | new (W5)    |
+| 3          | הארון DC-A01, והשרטוט שלו עם תוויות בעברית.                        | The DC-A01 rack, and its drawing with labels in Hebrew.                                                                                     | new (W5)    |
+| 4          | התכנון „תכנון DMZ חדש”, בעברית, בסטודיו התכנון.                    | The design "New DMZ design", in Hebrew, in the design studio.                                                                               | new (W5)    |
+| 5          | וגם תור ההחלטות של הגילוי, בעברית.                                 | And Discovery's decision queue too, in Hebrew.                                                                                              | new (W5)    |
+| end card   | עברית ואנגלית מלאות, ערבית חלקית, ועוד 21 שפות עם המסכים העיקריים. | Hebrew and English complete, Arabic partial, and 21 more languages with the main screens. (The language tiers, C-LANG-1; no "full Arabic".) | new (W5)    |
+
+### "What the video shows" and `/he/videos/` (W5)
+
+Each home-page slot's title is now its storyboard's title (the rows above, "title card"), and
+under it a link, "מה רואים בסרטון", leads to `/he/videos/`, where each video's five steps and its
+closing line are listed: the videos' text alternative. The home page's three old slot titles
+(`copy.home.videos.items.*.title`: עבודה עם תור הסקירה · קישורים שנצפו ברשת וחסרים בתיעוד ·
+LanCompass בעברית, מימין לשמאל) are gone.
+
+| Key                            | Hebrew                                                                                                                               | Back-gloss                                                                                                                                                                          | Note     |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| `ui.video.shows`               | מה רואים בסרטון                                                                                                                      | What you see in the video (the link under each video to its text version)                                                                                                           | new (W5) |
+| `copy.meta.videos.title`       | הסרטונים, במילים — LanCompass                                                                                                        | The videos, in words — LanCompass                                                                                                                                                   | new (W5) |
+| `copy.meta.videos.description` | מה רואים בכל אחד משלושת הסרטונים של LanCompass, צעד אחר צעד: הגרסה הכתובה של כל הקלטה.                                               | What you see in each of LanCompass's three videos, step by step: the written version of each recording.                                                                             | new (W5) |
+| `copy.videoText.eyebrow`       | הסרטונים, במילים                                                                                                                     | The videos, in words                                                                                                                                                                | new (W5) |
+| `copy.videoText.title`         | מה רואים בכל סרטון, צעד אחר צעד.                                                                                                     | What you see in each video, step by step.                                                                                                                                           | new (W5) |
+| `copy.videoText.lead`          | שלושת הסרטונים בדף הבית שקטים. כאן כתוב מה כל אחד מהם מראה, לפי הסדר, למי שלא יכול או לא רוצה להפעיל אותם. הכתוביות אומרות אותו דבר. | The three videos on the home page are silent. Written here is what each of them shows, in order, for whoever cannot or does not want to play them. The captions say the same thing. | new (W5) |
+| `copy.videoText.inShort`       | בקצרה                                                                                                                                | In short                                                                                                                                                                            | new (W5) |
+| `copy.videoText.back`          | חזרה לסרטונים                                                                                                                        | Back to the videos                                                                                                                                                                  | new (W5) |
+
+### W1.3's lines (replaced by W5)
+
+The tables below are the W1.3 recordings' lines, kept for the reviewer's history; no page or file uses them any more.
+
+### `drift-review-queue` (W1.3): "From a finding to a decision"
 
 | #          | Hebrew                                                                                       | Back-gloss                                                                                                                                | Note       |
 | ---------- | -------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
@@ -763,7 +895,7 @@ source of the back-gloss.
 | 5          | חוזרים לתור ומחליטים: לתעד את הקישור, או לדחות את הממצא.                                     | You go back to the queue and decide: document the link, or dismiss the finding.                                                           | new (W1.3) |
 | end card   | כל פער בין התיעוד לרשת, בתור אחד. ההחלטה נשארת אצלכם.                                        | Every gap between the documentation and the network, in one queue. The decision stays with you.                                           | new (W1.3) |
 
-### `documented-vs-observed`: "Seen on the wire, missing from the record"
+### `documented-vs-observed` (W1.3): "Seen on the wire, missing from the record"
 
 | #          | Hebrew                                                                                  | Back-gloss                                                                                                                     | Note       |
 | ---------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ---------- |
@@ -775,7 +907,7 @@ source of the back-gloss.
 | 5          | הצעד הבא: מתעדים כל קישור, או דוחים אותו.                                               | The next step: you document each link, or dismiss it.                                                                          | new (W1.3) |
 | end card   | המתועד והנצפה, בטופולוגיה אחת.                                                          | The documented and the observed, in one topology.                                                                              | new (W1.3) |
 
-### `hebrew-native`: "Built in Hebrew, not translated"
+### `hebrew-native` (W1.3): "Built in Hebrew, not translated"
 
 | #          | Hebrew                                                                              | Back-gloss                                                                                                | Note               |
 | ---------- | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ------------------ |
@@ -787,7 +919,7 @@ source of the back-gloss.
 | 5          | הממשק זמין ב־24 שפות, עם עברית וערבית מלאות מימין לשמאל.                            | The interface is available in 24 languages, with full Hebrew and Arabic right to left.                    | kept (W1.2 line 4) |
 | end card   | ממשק ב־24 שפות, עם עברית וערבית מלאות מימין לשמאל.                                  | An interface in 24 languages, with full Hebrew and Arabic right to left.                                  | new (W1.3)         |
 
-**No longer true at 0.7.0 (left for W5):** step 5 and the end card say "full Hebrew and Arabic"; at 0.7.0 Arabic is the _Partial_ tier (`docs/claims.md` C-LANG-1). The end card is drawn into the recording itself, so W2 leaves this video, its storyboard and its captions as they are and W5, which re-records all three videos on 0.7.0, rewrites both lines.
+**Resolved by W5:** W1.3's step 5 and end card said "full Hebrew and Arabic"; at 0.7.0 Arabic is the _Partial_ tier (`docs/claims.md` C-LANG-1). The W5 recordings' end card says the three tiers, and no line says "full Arabic".
 
 ### Card labels
 
@@ -828,6 +960,11 @@ Product and protocol names stay in Latin script in both locales and are never tr
 | `copy.home.imports.cards.1.bullets.0`   | <bdi>NetBox 3.6–4.2+</bdi>                                                  |
 | `copy.product.sections.6.nav`           | <bdi>NAC</bdi>                                                              |
 | `copy.notFound.eyebrow`                 | 404                                                                         |
+| `copy.howItRuns.labels.https`           | HTTPS                                                                       |
+| `copy.howItRuns.labels.web`             | web                                                                         |
+| `copy.howItRuns.labels.api`             | API                                                                         |
+| `copy.howItRuns.labels.db`              | PostgreSQL                                                                  |
+| `copy.howItRuns.labels.redis`           | Redis                                                                       |
 | `ui.footer.rights`                      | LanCompass                                                                  |
 | `ui.form.vendorOptions.0`               | Check Point                                                                 |
 | `ui.form.vendorOptions.1`               | FortiGate                                                                   |
@@ -838,4 +975,4 @@ Product and protocol names stay in Latin script in both locales and are never tr
 
 ---
 
-Totals at W1.3: 204 kept, 184 rewritten, 46 new. W2 (2026-11-06) added the rows marked "new (W2)" and changed those marked "rewritten (W2): facts"; count them with `grep -c "new (W2)"` and `grep -c "rewritten (W2)"`.
+Totals at W1.3: 204 kept, 184 rewritten, 46 new. W2 (2026-11-06) added the rows marked "new (W2)" and changed those marked "rewritten (W2): facts"; count them with `grep -c "new (W2)"` and `grep -c "rewritten (W2)"`. W4 (2026-11-06) added the rows marked "new (W4)": the figures' captions and notes, "What talks to what", and the figure labels (`grep -c "new (W4)"`).

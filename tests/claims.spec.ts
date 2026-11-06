@@ -132,6 +132,33 @@ function citedBlocks(file: string): Cited[] {
 }
 
 const copyFiles = ["en.ts", "he.ts"].map((f) => join(root, "src", "content", "copy", f));
+
+/** W5: the videos' captions, cards and "What the video shows" lists (src/content/videos.json):
+ *  every line names its rows in `claims`, in English and in Hebrew. */
+const videoFile = join(root, "src", "content", "videos.json");
+interface VideoLine {
+  en: string;
+  he: string;
+  claims?: string[];
+}
+function videoLines(): Cited[] {
+  const data = JSON.parse(readFileSync(videoFile, "utf8")) as Record<
+    string,
+    { title: VideoLine; takeaway: VideoLine; steps: VideoLine[] }
+  >;
+  return Object.entries(data)
+    .filter(([key]) => !key.startsWith("$"))
+    .flatMap(([key, b]) =>
+      [b.title, b.takeaway, ...b.steps].flatMap((line, i) =>
+        (["en", "he"] as const).map((lang) => ({
+          file: `${videoFile} ${key} line ${i + 1} ${lang}`,
+          line: 0,
+          text: line[lang],
+          ids: line.claims ?? [],
+        })),
+      ),
+    );
+}
 const mdxFiles = readdirSync(join(root, "src", "content", "pages")).flatMap((locale) =>
   readdirSync(join(root, "src", "content", "pages", locale))
     .filter((f) => f.endsWith(".mdx"))
@@ -149,6 +176,10 @@ const FIGURE_ALLOWLIST: { match: RegExp; reason: string }[] = [
     match: /WCAG 2\.1.*5568/,
     reason: "the accessibility page's metadata: the standards this site meets (a legal page)",
   },
+  {
+    match: /DC-A01/,
+    reason: "the demo estate's rack name, shown in the hebrew-native video (a label, not a claim)",
+  },
 ];
 /** Whole files outside the product's claims: the legal pages (W10 owns their wording). */
 const FILE_ALLOWLIST: { match: RegExp; reason: string }[] = [
@@ -162,7 +193,17 @@ const FILE_ALLOWLIST: { match: RegExp; reason: string }[] = [
 test.describe("claims register", () => {
   const rows = readRegister();
   const byId = new Map(rows.map((r) => [r.id, r]));
-  const cited = [...copyFiles.flatMap(citedStrings), ...mdxFiles.flatMap(citedBlocks)];
+  const cited = [
+    ...copyFiles.flatMap(citedStrings),
+    ...mdxFiles.flatMap(citedBlocks),
+    ...videoLines(),
+  ];
+
+  test("every video line (caption, card, step) cites at least one row (W5)", () => {
+    const lines = videoLines();
+    expect(lines.length).toBe(3 * 7 * 2);
+    expect(lines.filter((l) => l.ids.length === 0).map((l) => l.file)).toEqual([]);
+  });
 
   test("the register parses: unique ids, each row with a claim, a source, a version and pages", () => {
     expect(rows.length).toBeGreaterThan(60);

@@ -108,6 +108,12 @@ const singleDarkImage =
     : null;
 const plainName = name.replace(/<[^>]+>/g, "");
 const alt = decorative ? "" : fill(ui.screenshot.alt, { screen: plainName });
+/** W4: an annotated figure (AnnotatedScreen.astro) passes its marks as the default slot. The
+ *  picture and the marks then share one positioned box, so the marks cover exactly the picture
+ *  whatever mat a theme puts around it. Frames without marks render exactly as before. */
+const marked = Astro.slots.has("default") && image !== null;
+const Pic = marked ? "div" : Fragment;
+const picProps = marked ? { class: "shot-pic" } : {};
 ---
 
 <div
@@ -116,24 +122,36 @@ const alt = decorative ? "" : fill(ui.screenshot.alt, { screen: plainName });
   data-captured={image ? "true" : "false"}
 >
   <div class="shot-bar" aria-hidden="true"></div>
-  {image && picture ? (
-    <picture>
-      {picture.dark && <source media={darkMedia} srcset={picture.dark} sizes={sizes} />}
-      <img
-        src={picture.fallback.src}
-        srcset={picture.light}
-        sizes={sizes}
-        alt={alt}
-        loading={eager ? "eager" : "lazy"}
-        decoding="async"
-        width={image.width}
-        height={image.height}
-        class="shot-img"
-      />
-    </picture>
-  ) : image && singleImage && singleDarkImage ? (
-    <picture>
-      <source media={darkMedia} srcset={singleDarkImage.src} />
+  <Pic {...picProps}>
+    {image && picture ? (
+      <picture>
+        {picture.dark && <source media={darkMedia} srcset={picture.dark} sizes={sizes} />}
+        <img
+          src={picture.fallback.src}
+          srcset={picture.light}
+          sizes={sizes}
+          alt={alt}
+          loading={eager ? "eager" : "lazy"}
+          decoding="async"
+          width={image.width}
+          height={image.height}
+          class="shot-img"
+        />
+      </picture>
+    ) : image && singleImage && singleDarkImage ? (
+      <picture>
+        <source media={darkMedia} srcset={singleDarkImage.src} />
+        <img
+          src={singleImage.src}
+          width={singleImage.attributes.width}
+          height={singleImage.attributes.height}
+          alt={alt}
+          loading={eager ? "eager" : "lazy"}
+          decoding="async"
+          class="shot-img"
+        />
+      </picture>
+    ) : image && singleImage ? (
       <img
         src={singleImage.src}
         width={singleImage.attributes.width}
@@ -143,88 +161,79 @@ const alt = decorative ? "" : fill(ui.screenshot.alt, { screen: plainName });
         decoding="async"
         class="shot-img"
       />
-    </picture>
-  ) : image && singleImage ? (
-    <img
-      src={singleImage.src}
-      width={singleImage.attributes.width}
-      height={singleImage.attributes.height}
-      alt={alt}
-      loading={eager ? "eager" : "lazy"}
-      decoding="async"
-      class="shot-img"
-    />
-  ) : (
-    <div
-      class:list={["shot-placeholder", `pattern-${pattern}`]}
-      dir={screenDir}
-      role="img"
-      aria-label={fill(ui.screenshot.placeholder, { screen: plainName })}
-    >
-      <div class="ph-side">
-        <span class="ph-logo" />
-        {Array.from({ length: 5 }, (_, i) => (
-          <span class:list={["ph-nav", i === 2 && "is-active"]} />
-        ))}
-      </div>
-      <div class="ph-main">
-        <div class="ph-top">
-          <span class="ph-title" />
-          <span class="ph-btn" />
-        </div>
-        {pattern === "table" &&
-          Array.from({ length: 6 }, (_, i) => (
-            <div class="ph-row">
-              <span class="ph-cell w-30" />
-              <span class="ph-cell w-20" />
-              <span class:list={["ph-pill", i === 3 && "is-drift", i === 5 && "is-ok"]} />
-              <span class="ph-cell w-15" />
-            </div>
+    ) : (
+      <div
+        class:list={["shot-placeholder", `pattern-${pattern}`]}
+        dir={screenDir}
+        role="img"
+        aria-label={fill(ui.screenshot.placeholder, { screen: plainName })}
+      >
+        <div class="ph-side">
+          <span class="ph-logo" />
+          {Array.from({ length: 5 }, (_, i) => (
+            <span class:list={["ph-nav", i === 2 && "is-active"]} />
           ))}
-        {pattern === "cards" && (
-          <div class="ph-cards">
-            {Array.from({ length: 6 }, (_, i) => (
-              <div class:list={["ph-card", i === 0 && "is-wide"]}>
-                <span class="ph-cell w-40" />
-                <span class="ph-spark" />
+        </div>
+        <div class="ph-main">
+          <div class="ph-top">
+            <span class="ph-title" />
+            <span class="ph-btn" />
+          </div>
+          {pattern === "table" &&
+            Array.from({ length: 6 }, (_, i) => (
+              <div class="ph-row">
+                <span class="ph-cell w-30" />
+                <span class="ph-cell w-20" />
+                <span class:list={["ph-pill", i === 3 && "is-drift", i === 5 && "is-ok"]} />
+                <span class="ph-cell w-15" />
               </div>
             ))}
-          </div>
-        )}
-        {pattern === "rack" && (
-          <div class="ph-racks">
-            {Array.from({ length: 3 }, () => (
-              <div class="ph-rack">
-                {Array.from({ length: 10 }, (_, i) => (
-                  <span
-                    class:list={["ph-unit", i % 3 === 0 && "is-filled", i === 4 && "is-tall"]}
-                  />
-                ))}
-              </div>
-            ))}
-          </div>
-        )}
-        {pattern === "graph" && (
-          <svg class="ph-graph" viewBox="0 0 400 220" aria-hidden="true">
-            <path d="M60 50L200 40L340 60M60 50L120 160M200 40L210 170M340 60L300 170M120 160L210 170" />
-            <path class="ph-graph-obs" d="M300 170L360 190M210 170L300 170" />
-            {[
-              [60, 50],
-              [200, 40],
-              [340, 60],
-              [120, 160],
-              [210, 170],
-              [300, 170],
-              [360, 190],
-            ].map(([x, y]) => (
-              <rect x={(x ?? 0) - 18} y={(y ?? 0) - 9} width="36" height="18" rx="5" />
-            ))}
-          </svg>
-        )}
+          {pattern === "cards" && (
+            <div class="ph-cards">
+              {Array.from({ length: 6 }, (_, i) => (
+                <div class:list={["ph-card", i === 0 && "is-wide"]}>
+                  <span class="ph-cell w-40" />
+                  <span class="ph-spark" />
+                </div>
+              ))}
+            </div>
+          )}
+          {pattern === "rack" && (
+            <div class="ph-racks">
+              {Array.from({ length: 3 }, () => (
+                <div class="ph-rack">
+                  {Array.from({ length: 10 }, (_, i) => (
+                    <span
+                      class:list={["ph-unit", i % 3 === 0 && "is-filled", i === 4 && "is-tall"]}
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
+          {pattern === "graph" && (
+            <svg class="ph-graph" viewBox="0 0 400 220" aria-hidden="true">
+              <path d="M60 50L200 40L340 60M60 50L120 160M200 40L210 170M340 60L300 170M120 160L210 170" />
+              <path class="ph-graph-obs" d="M300 170L360 190M210 170L300 170" />
+              {[
+                [60, 50],
+                [200, 40],
+                [340, 60],
+                [120, 160],
+                [210, 170],
+                [300, 170],
+                [360, 190],
+              ].map(([x, y]) => (
+                <rect x={(x ?? 0) - 18} y={(y ?? 0) - 9} width="36" height="18" rx="5" />
+              ))}
+            </svg>
+          )}
+        </div>
+        <span class="ph-caption" set:html={name} />
       </div>
-      <span class="ph-caption" set:html={name} />
-    </div>
-  )}
+    )}
+    {marked && <slot />}
+  </Pic>
 </div>
 
 <style is:global>

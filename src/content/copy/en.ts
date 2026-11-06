@@ -23,6 +23,11 @@ export const en = {
       description:
         "IPAM, racks, discovery, the map, the design studio, config backup and compliance, NAC, monitoring, reports and dashboards, in one self-hosted install.",
     },
+    videos: {
+      title: "The videos, in words — LanCompass",
+      description:
+        "What each of the three LanCompass videos shows, step by step: the text version of every recording.",
+    },
     security: {
       title: "Security — LanCompass",
       // C-NET-2, C-RO-1, C-SEC-5, C-INST-4, C-SEC-1, C-SEC-14
@@ -388,13 +393,11 @@ export const en = {
     videos: {
       eyebrow: "Watch",
       title: "Three short videos from the demo network.",
+      // W5: each slot's title is its storyboard's (src/content/videos.json, cited there).
       items: [
-        { key: "drift-review-queue", title: "Work through the drift review queue" },
-        {
-          key: "documented-vs-observed",
-          title: "Links seen on the wire, missing from the documentation",
-        },
-        { key: "hebrew-native", title: "LanCompass in Hebrew, right to left" },
+        { key: "drift-review-queue" },
+        { key: "documented-vs-observed" },
+        { key: "hebrew-native" },
       ],
     },
     partners: {
@@ -698,6 +701,151 @@ export const en = {
       title: "See it on your own network.",
       text: "Design partners get a guided install and help moving their existing records across.",
       button: "Become a design partner",
+    },
+  },
+
+  /** W5: /videos/, each video's text alternative (its steps come from src/content/videos.json). */
+  videoText: {
+    eyebrow: "The videos, in words",
+    title: "What each video shows, step by step.",
+    lead: "The three videos on the home page are silent. Here is what each one shows, in the order it shows it, for anyone who cannot or would rather not play them. The captions say the same.",
+    inShort: "In short",
+    back: "Back to the videos",
+  },
+
+  /** W4: the annotated screens. Per screen key, the caption after "Fig. n —" and one note per
+   *  capture anchor W3 recorded (src/content/screen-anchors.json), keyed by the anchor's name.
+   *  A note names what is on the screen and nothing more. */
+  figures: {
+    "ipam-tree": {
+      // C-IPAM-1
+      caption: "The prefix hierarchy: sites, VRFs and prefixes in one tree.",
+      // C-IPAM-1
+      notes: { tree: "A site opens to its VRFs, and each VRF to its prefixes." },
+    },
+    rack: {
+      // C-RACK-3
+      caption: "A rack in Rack Studio, its lenses beside the elevation.",
+      // C-RACK-1
+      notes: { elevation: "The front elevation: each device drawn in the units it fills." },
+    },
+    "discovery-queue": {
+      // C-DISC-5
+      caption: "The Discovery queue: everything that waits for a decision.",
+      // C-DISC-5
+      notes: {
+        queue: "What waits for a decision, counted at the top.",
+        "first-group": "A group, named for what its rows would become.",
+      },
+    },
+    "map-ages": {
+      // C-MAP-1, C-MAP-2
+      caption: "Demo HQ’s map: one line per cable, and each line says how old it is.",
+      notes: {
+        // C-MAP-4
+        lens: "The Changes lens: what moved or went quiet since the date you pick.",
+        // C-MAP-2
+        canvas: "A cable’s card: when it was last verified on the wire.",
+      },
+    },
+    "ask-the-map": {
+      // C-MAP-5
+      caption: "Ask the map: a question, and its answer under the bar.",
+      // C-MAP-5
+      notes: { answer: "The answer: which device the address belongs to." },
+    },
+    "design-studio": {
+      // C-STU-6
+      caption: "A branch design in the studio, with one switch selected.",
+      notes: {
+        // C-STU-1
+        canvas: "The canvas: the design, drawn inside a slide.",
+        // C-STU-6
+        selected: "The selected switch; the inspector beside it holds its own look.",
+      },
+    },
+    compliance: {
+      // C-CFG-2
+      caption: "Compliance findings on the stored configs, by severity, pack and site.",
+      // C-CFG-2
+      notes: { section: "Each finding: the device, the rule, its pack and its references." },
+    },
+    nac: {
+      // C-NAC-1, C-NAC-2
+      caption: "NAC in its default mode: detection only.",
+      // C-NAC-2
+      notes: { mode: "The mode banner: detection only, dry run on, and no port touched." },
+    },
+    dashboard: {
+      // C-MON-1, C-DASH-1
+      caption: "The dashboard: what is offline, what failed, and the monitors’ events.",
+      // C-MON-1, C-DASH-1
+      notes: { grid: "Widgets on one record: offline devices, failed scans, monitor events." },
+    },
+    gallery: {
+      // C-DASH-3
+      caption: "The Dashboard Gallery, with its Showcase row.",
+      // C-DASH-3
+      notes: { showcase: "An entry to preview, to follow, or to make your own." },
+    },
+    licence: {
+      // C-LIC-1
+      caption:
+        "Settings → License in the evaluation: checked on this server, with no network call.",
+      // C-LIC-1
+      notes: { state: "The licence state: Evaluation, while no licence file is uploaded." },
+    },
+  },
+
+  /** W4: "What talks to what" (HowItRuns.astro): the drawing's labels and its text alternative. */
+  howItRuns: {
+    eyebrow: "What talks to what",
+    // C-INST-1, C-NET-1, C-RO-1
+    title: "One host, four images, nothing to the internet.",
+    desc: "Seven numbered parts; the numbered list under the drawing says what each one is.",
+    items: [
+      // C-INST-1, C-INST-2
+      "One Linux host with Docker: your own server, installed from one signed offline bundle.",
+      // C-INST-12
+      "Four images: the web tier, the API, PostgreSQL and Redis. The API’s scanner and discovery workers use the host’s network for layer-2 scans.",
+      // C-SEC-5
+      "People reach it in a browser, over HTTPS.",
+      // C-RO-2, C-INT-2, C-DISC-1
+      "It reads your network, with the scans and SNMP polls you configure, and your systems, through read-only connectors.",
+      // C-RO-1
+      "It writes to the network in only two places, DNS PTR publishing and NAC port actions, both opt-in and off by default: the dashed line.",
+      // C-NET-1, C-NET-2, C-LIC-1
+      "Nothing goes to the internet: no telemetry, and the licence is checked on the host.",
+      // C-INST-13, C-INST-7
+      "Backups go to a folder on the host, with restore drills.",
+    ],
+    labels: {
+      // C-INST-1, C-INST-2
+      host: "Your Linux host · Docker",
+      // C-SEC-5
+      people: "People, in a browser",
+      https: "HTTPS",
+      // C-NET-1, C-NET-2
+      internet: "The internet",
+      nothing: "nothing sent",
+      // C-INST-12
+      web: "web",
+      api: "API",
+      workers: "scanner, discovery: host network",
+      db: "PostgreSQL",
+      redis: "Redis",
+      // C-INST-13, C-INST-7
+      backups: "backups/ · restore drills",
+      // C-RO-2, C-DISC-1
+      network: "Your network",
+      networkSub: "scans, SNMP polls",
+      // C-INT-2
+      systems: "Your systems",
+      systemsSub: "read-only connectors",
+      reads: "reads",
+      // C-RO-1
+      writes: "DNS PTR, NAC port actions",
+      writesSub: "opt-in, off by default",
     },
   },
 

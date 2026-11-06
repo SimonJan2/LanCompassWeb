@@ -1,0 +1,269 @@
+---
+/**
+ * W4: a product screen as a numbered figure. The picture is ScreenshotFrame's (the focus crop in a
+ * narrow slot, the full window in a wide one); up to four numbered marks sit on it, placed only
+ * from W3's capture anchors (src/content/screen-anchors.json) for the build's set and the screen's
+ * locale, as percentages of the picture, so they scale; a numbered legend (ol) carries the same
+ * notes as text. Each mark is an in-page link to its legend item (#fig-<n>-<m>), which :target
+ * highlights. No JavaScript.
+ *
+ * A key, set or locale without anchors renders no marks and keeps its caption (lib/annotations).
+ * A cropped figure links to its full window, a same-origin image (no lightbox script).
+ */
+import { getImage } from "astro:assets";
+import ScreenshotFrame from "./ScreenshotFrame.astro";
+import anchorData from "../content/screen-anchors.json";
+import { fill, useUi, type Locale } from "../i18n";
+import { site } from "../config/site";
+import { figureMarks, type AnchorFile } from "../lib/annotations";
+import { findScreen, screenSets, type ScreenKey, type ScreenVariant } from "../lib/screens";
+
+interface Props {
+  screen: ScreenKey;
+  /** The page's locale; the screen is captured in the same one. */
+  locale: Locale;
+  /** The figure's number on its page: "Fig. n", and the ids #fig-<n> and #fig-<n>-<m>. */
+  n: number;
+  /** The caption after "Fig. n —" (inline HTML from the copy files). */
+  caption: string;
+  /** The notes, keyed by the anchor names W3 recorded; an anchor without a note gets no mark. */
+  notes: Record<string, string>;
+  variant?: ScreenVariant;
+  crop?: "full" | "wide";
+  sizes?: string;
+  widths?: number[];
+  single?: number;
+  singleDark?: boolean;
+  eager?: boolean;
+  class?: string;
+}
+
+const {
+  screen,
+  locale,
+  n,
+  caption,
+  notes,
+  variant = "full",
+  crop = "full",
+  sizes,
+  widths,
+  single,
+  singleDark,
+  eager,
+  class: className,
+} = Astro.props;
+const ui = useUi(locale);
+const sets = screenSets(site.theme);
+const picture = findScreen(sets[0]!, locale, screen, variant);
+const full = findScreen(sets[0]!, locale, screen, "full");
+/** The anchors that belong to the picture shown: the focus crop's own, or the full window's. */
+const shown: ScreenVariant = variant === "focus" && picture && picture !== full ? "focus" : "full";
+const marks = picture
+  ? figureMarks(anchorData as AnchorFile, {
+      sets,
+      locale,
+      screen,
+      variant: shown,
+      notes,
+      width: picture.width,
+      height: crop === "wide" ? picture.width / 2 : picture.height,
+    })
+  : [];
+/** A cropped figure (a focus crop, or the wide band of the loop) links to the whole window. */
+const cropped = shown === "focus" || crop === "wide";
+const fullLinks =
+  cropped && full
+    ? await Promise.all(
+        sets.map(async (set) => {
+          const src = findScreen(set, locale, screen, "full")!;
+          return { set, href: (await getImage({ src, width: src.width, format: "webp" })).src };
+        }),
+      )
+    : [];
+const label = fill(ui.figure.label, { n: String(n) });
+/** The frame's own options, passed on only when given (exactOptionalPropertyTypes). */
+const frame = Object.fromEntries(
+  Object.entries({ sizes, widths, single, singleDark, eager }).filter(([, v]) => v !== undefined),
+);
+---
+
+<figure class:list={["fig", className]} id={`fig-${n}`} data-cropped={cropped ? "true" : undefined}>
+  <ScreenshotFrame screen={screen} locale={locale} variant={variant} crop={crop} {...frame}>
+    {marks.length > 0 && (
+      <div class="fig-layer">
+        {marks.map((m, i) => (
+          <span class="fig-a" style={`--x:${m.x};--y:${m.y};--w:${m.w};--h:${m.h}`}>
+            <a
+              href={`#fig-${n}-${i + 1}`}
+              aria-label={`${fill(ui.figure.note, { m: String(i + 1) })}: ${m.text.replace(/<[^>]+>/g, "")}`}
+            >
+              {i + 1}
+            </a>
+          </span>
+        ))}
+      </div>
+    )}
+  </ScreenshotFrame>
+  {marks.length > 0 && (
+    <ol class="fig-notes" role="list">
+      {marks.map((m, i) => (
+        <li id={`fig-${n}-${i + 1}`}>
+          <span set:html={m.text} />
+        </li>
+      ))}
+    </ol>
+  )}
+  <figcaption class="fig-caption">
+    <span class="fig-no">{label}</span> — <span set:html={caption} />
+    {fullLinks.map((l) => (
+      <>
+        {" "}
+        <a class:list={["fig-full", fullLinks.length > 1 && `fig-full-${l.set}`]} href={l.href}>
+          {ui.figure.full}
+        </a>
+      </>
+    ))}
+  </figcaption>
+</figure>
+
+<style is:global>
+  /* The picture and the marks' layer share ScreenshotFrame's .shot-pic box, with no line gap
+     under the image, so the layer covers exactly the picture in every theme's frame. */
+  .fig .shot-pic {
+    position: relative;
+  }
+
+  .fig .shot-pic .shot-img {
+    display: block;
+  }
+
+  .fig .fig-layer {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* One mark: a frame around the anchor W3 recorded, and the numbered link on its starting
+     corner (the screen's own direction), kept inside the picture at every size. */
+  .fig .fig-a {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .fig .fig-a::before {
+    position: absolute;
+    inset-block-start: var(--y);
+    left: var(--x);
+    inline-size: var(--w);
+    block-size: var(--h);
+    border: 2px solid var(--lc-action);
+    border-radius: var(--lc-radius-sm);
+    content: "";
+  }
+
+  .fig .fig-a a {
+    position: absolute;
+    top: clamp(14px, var(--y), calc(100% - 14px));
+    left: clamp(14px, var(--x), calc(100% - 14px));
+    display: grid;
+    place-items: center;
+    inline-size: 28px;
+    block-size: 28px;
+    border: 2px solid var(--lc-paper-raised);
+    border-radius: 50%;
+    background: var(--lc-action);
+    color: var(--lc-action-text);
+    font-family: var(--lc-font-mono);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    translate: -50% -50%;
+    pointer-events: auto;
+  }
+
+  /* A right-to-left screen (the page's own locale) starts on the frame's right-hand corner. */
+  [dir="rtl"] .fig .fig-a a {
+    left: clamp(14px, calc(var(--x) + var(--w)), calc(100% - 14px));
+  }
+
+  .fig .fig-a a:hover {
+    background: var(--lc-action-hover);
+  }
+
+  .fig .fig-a a:focus-visible {
+    outline: 3px solid var(--lc-focus);
+    outline-offset: 2px;
+  }
+
+  /* The legend: the same numbers, as text. The targeted note is lit. */
+  .fig .fig-notes {
+    display: grid;
+    gap: 0.5rem 1.5rem;
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: fig-note;
+    font-size: var(--lc-text-small);
+  }
+
+  @media (min-width: 720px) {
+    .fig .fig-notes {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .fig .fig-notes li {
+    display: flex;
+    gap: 0.625rem;
+    padding: 0.25rem 0.375rem;
+    border-radius: var(--lc-radius-sm);
+    counter-increment: fig-note;
+    scroll-margin-block: 9rem 2rem;
+  }
+
+  .fig .fig-notes li::before {
+    display: grid;
+    flex: none;
+    place-items: center;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    border-radius: 50%;
+    background: var(--lc-action);
+    color: var(--lc-action-text);
+    content: counter(fig-note);
+    font-family: var(--lc-font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .fig .fig-notes li:target {
+    background: var(--lc-observed-wash);
+    color: var(--lc-ink);
+  }
+
+  .fig .fig-caption {
+    margin-block-start: 0.75rem;
+    color: var(--lc-ink-muted);
+    font-size: var(--lc-text-small);
+  }
+
+  .fig .fig-no {
+    color: var(--lc-ink);
+    font-weight: 600;
+  }
+
+  /* auto: the full window of the scheme's own set. */
+  @media (prefers-color-scheme: dark) {
+    .fig .fig-full-survey {
+      display: none;
+    }
+  }
+
+  @media not (prefers-color-scheme: dark) {
+    .fig .fig-full-night-chart {
+      display: none;
+    }
+  }
+</style>

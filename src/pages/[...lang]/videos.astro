@@ -1,0 +1,119 @@
+---
+/**
+ * W5: /videos/, the three product videos in words. For each video: its title, the steps it shows
+ * as a numbered list and its closing line, in the page's language: the storyboard of
+ * src/content/videos.json, the same lines as the recordings' captions and cards. Each home-page
+ * slot links here ("What the video shows"): the videos' text alternative (WCAG 1.2.1, AA in
+ * IS 5568), on a page of its own because the home page's first round trip has no room for it.
+ */
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SectionHeading from "../../components/SectionHeading.astro";
+import Contours from "../../components/motifs/Contours.astro";
+import { getCopy } from "../../content/copy";
+import { localeStaticPaths, pagePath, type Locale } from "../../i18n";
+import { stepHtml, storyboards } from "../../lib/videos";
+
+export const getStaticPaths = (() => localeStaticPaths()) satisfies GetStaticPaths;
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+const v = copy.videoText;
+const keys = copy.home.videos.items.map((item) => item.key);
+const back = `${pagePath(locale, "home")}#videos`;
+---
+
+<BaseLayout
+  locale={locale}
+  page="videos"
+  title={copy.meta.videos.title}
+  description={copy.meta.videos.description}
+>
+  <section class="videos-hero">
+    <Contours map="quiet" eager />
+    <div class="container-site">
+      <SectionHeading eyebrow={v.eyebrow} title={v.title} lead={v.lead} level={1} />
+    </div>
+  </section>
+
+  <div class="container-site videos-text">
+    {keys.map((key) => {
+      const board = storyboards[key]!;
+      return (
+        <section class="video-text" id={key} aria-labelledby={`${key}-title`}>
+          <h2 id={`${key}-title`} class="video-text-title">
+            {board.title[locale]}
+          </h2>
+          <ol class="video-text-steps" data-video-steps={key}>
+            {board.steps.map((step) => (
+              <li set:html={stepHtml(step, locale)} />
+            ))}
+          </ol>
+          <p class="video-text-end">
+            <strong>{v.inShort}:</strong> <span set:html={stepHtml(board.takeaway, locale)} />
+          </p>
+        </section>
+      );
+    })}
+    <p class="video-text-back">
+      <a href={back}>{v.back}</a>
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .videos-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding-block: clamp(3rem, 2rem + 4vw, 5.5rem) clamp(2.5rem, 2rem + 2vw, 3.5rem);
+    border-block-end: 1px solid var(--lc-rule);
+  }
+
+  .videos-text {
+    display: grid;
+    gap: 2.5rem;
+    padding-block: clamp(2.5rem, 2rem + 2vw, 4rem);
+  }
+
+  /* A reading column at the heading's start edge. */
+  .videos-text > * {
+    max-inline-size: 48rem;
+  }
+
+  .video-text {
+    scroll-margin-block-start: 6rem;
+  }
+
+  .video-text-title {
+    font-size: var(--lc-text-h3);
+  }
+
+  .video-text-steps {
+    display: grid;
+    gap: 0.5rem;
+    margin: 1rem 0 0;
+    padding-inline-start: 1.5rem;
+    color: var(--lc-ink);
+    list-style: decimal;
+  }
+
+  .video-text-steps li::marker {
+    color: var(--lc-ink-muted);
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-text-small);
+  }
+
+  .video-text-end {
+    margin-block-start: 1rem;
+    color: var(--lc-ink-muted);
+  }
+
+  .video-text-back {
+    font-size: var(--lc-text-small);
+  }
+</style>

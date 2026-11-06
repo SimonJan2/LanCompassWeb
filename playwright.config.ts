@@ -25,6 +25,7 @@ const themed = [
   "identity",
   "theme",
   "media",
+  "annotations",
 ].map((name) => `${name}.spec.ts`);
 
 export default defineConfig({

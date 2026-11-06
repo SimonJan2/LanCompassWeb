@@ -23,6 +23,7 @@ export function isLocale(value: string | undefined): value is Locale {
 export const pageKeys = [
   "home",
   "product",
+  "videos",
   "security",
   "design-partners",
   "contact",

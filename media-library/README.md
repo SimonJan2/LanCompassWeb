@@ -42,22 +42,24 @@ the product's two official themes. `scripts/capture-screenshots.mjs` writes them
 
 Re-capture: `scripts/capture-stack/README.md` → "Re-capture at a release".
 
-## Videos — `videos/<theme>-<ui>/<key>.*`
+## Videos — `videos/<set>-<ui>/<key>.*`
 
-Product walkthroughs (1280 × 720 WebM, at most 45 s) recorded by `scripts/record-video.mjs <key>`,
-each with a poster (`.jpg` and `.webp`, from the step marked `poster`) and captions in English
-and Hebrew (`.en.vtt`, `.he.vtt`) timed to the same steps. Each is a storyboard: a title card,
-five steps and an end card, in the site's identity, with a pointer dot the recorder draws in the
-capture page. The site's copies live in `public/media/<theme>/<key>.<ui>.*`.
+Product walkthroughs (1280 × 720 WebM, at most 45 s) recorded by `scripts/record-video.mjs <key>`
+on the throwaway capture stack loaded from the signed bundle (W5; `scripts/capture-stack/`), in
+the product's official themes: `survey` (Survey) and `night-chart` (Night chart). Each has a
+poster (`.jpg` and `.webp`, from the step marked `poster`) and captions in English and Hebrew
+(`.en.vtt`, `.he.vtt`) timed to the same steps. Each is a storyboard from
+`src/content/videos.json`: a title card, five steps and an end card, in the site's identity, with
+a pointer dot the recorder draws in the capture page. The site's copies live in
+`public/media/<set>/<key>.<ui>.*`.
 
-| Key                      | Story                                                                                                                      | Poster frame                   | Recorded (W1.3)                                          |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | -------------------------------------------------------- |
-| `drift-review-queue`     | "From a finding to a decision": the queue and its count, groups, why one finding was flagged, its ghost link, the decision | the ghost link on the topology | all four: light-en, light-he, nightwire-en, nightwire-he |
-| `documented-vs-observed` | "Seen on the wire, missing from the record": one site's topology, the queue's ghost links, three of them on the map        | the first ghost link           | all four                                                 |
-| `hebrew-native`          | "Built in Hebrew, not translated": dashboard, prefix hierarchy, the DC-A01 rack, the review queue, all in Hebrew RTL       | the RTL dashboard              | light-he, nightwire-he (always he UI)                    |
+| Key                      | Story                                                                                                                                                                          | Poster frame                  | Recorded (W5)                                                  |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------- | -------------------------------------------------------------- |
+| `drift-review-queue`     | "From a finding to a decision": the dashboard's undocumented counts, the one queue, a group's preview, Apply as one batch, Undo in one step (writes on the capture stack only) | the batch's preview           | all four: survey-en, survey-he, night-chart-en, night-chart-he |
+| `documented-vs-observed` | "Seen on the wire, missing from the record": Demo HQ's map and a line's age, Review's ghost links, the ghost link's card, the Changes lens, Ask the map                        | the aged line (its card open) | all four                                                       |
+| `hebrew-native`          | "Built in Hebrew, not translated": the RTL dashboard, the IP plan, the DC-A01 rack, the Hebrew design "תכנון DMZ חדש", the queue                                               | the RTL dashboard             | survey-he, night-chart-he (always he UI)                       |
 
-Folders: `videos/light-en/`, `videos/light-he/`, `videos/nightwire-en/`, `videos/nightwire-he/`.
+Folders: `videos/survey-en/`, `videos/survey-he/`, `videos/night-chart-en/`, `videos/night-chart-he/`.
 
-Not planned for read-only recording: the "Hebrew Excel import" and "Check Point gateway pull"
-videos. Both need a write to the demo estate (an import, or enabling the disabled demo source),
-which the capture rules do not allow; they wait for a later wave with a scratch estate.
+Not planned: the "Hebrew Excel import" and "Check Point gateway pull" videos (the demo estate has
+no data for them).

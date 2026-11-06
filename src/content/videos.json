@@ -1,0 +1,134 @@
+{
+  "$comment": "W5: the three videos' storyboards as text: the title card, five steps and the end card, in English and Hebrew, each citing its rows of docs/claims.md. scripts/record-video.mjs records from it (its captions and cards are these lines) and the site's 'What the video shows' lists read it (src/lib/videos.ts). Seconds are the step's length in the recording.",
+  "drift-review-queue": {
+    "title": { "en": "From a finding to a decision", "he": "מממצא להחלטה", "claims": ["C-PRD-1"] },
+    "takeaway": {
+      "en": "Every decision is one previewed batch, undone in one step.",
+      "he": "כל החלטה היא אצווה אחת עם תצוגה מקדימה, ומבטלים אותה בצעד אחד.",
+      "claims": ["C-DISC-4"]
+    },
+    "steps": [
+      {
+        "seconds": 6,
+        "en": "The dashboard: what the scans found that nobody documented.",
+        "he": "לוח הבקרה: מה שהסריקות מצאו ואף אחד לא תיעד.",
+        "claims": ["C-PRD-1"]
+      },
+      {
+        "seconds": 7,
+        "en": "Discovery: one queue for everything that waits for a decision, in groups.",
+        "he": "גילוי: תור אחד לכל מה שמחכה להחלטה, בקבוצות.",
+        "claims": ["C-DISC-5"]
+      },
+      {
+        "seconds": 7,
+        "poster": true,
+        "en": "A group's preview: what every row would become, before anything changes.",
+        "he": "התצוגה המקדימה של קבוצה: מה כל שורה תהפוך להיות, לפני שמשהו משתנה.",
+        "claims": ["C-DISC-4", "C-DISC-5"]
+      },
+      {
+        "seconds": 7,
+        "en": "Apply: the whole group is decided as one batch.",
+        "he": "החלה: כל הקבוצה מוחלטת באצווה אחת.",
+        "claims": ["C-DISC-4"]
+      },
+      {
+        "seconds": 7,
+        "en": "Undo: one step, and the queue is as it was.",
+        "he": "ביטול פעולה: צעד אחד, והתור חוזר להיות כמו שהיה.",
+        "claims": ["C-DISC-4"]
+      }
+    ]
+  },
+  "documented-vs-observed": {
+    "title": {
+      "en": "Seen on the wire, missing from the record",
+      "he": "נצפה ברשת, חסר בתיעוד",
+      "claims": ["C-PRD-2"]
+    },
+    "takeaway": {
+      "en": "What the wire shows and what the record says, on one map.",
+      "he": "מה שהרשת מראה ומה שהתיעוד אומר, על מפה אחת.",
+      "claims": ["C-PRD-1", "C-MAP-1"]
+    },
+    "steps": [
+      {
+        "seconds": 6,
+        "poster": true,
+        "en": "Demo HQ's map: one line per cable, and each line says how old it is.",
+        "he": "המפה של מטה דמו: קו אחד לכל כבל, וכל קו אומר בן כמה הוא.",
+        "claims": ["C-MAP-1", "C-MAP-2"]
+      },
+      {
+        "seconds": 6,
+        "en": "Review lists the links seen on the wire that the record lacks.",
+        "he": "בסקירה מופיעים הקישורים שנצפו ברשת וחסרים בתיעוד.",
+        "claims": ["C-PRD-2"]
+      },
+      {
+        "seconds": 7,
+        "en": "On the map it is a ghost link: seen on the wire, and not documented.",
+        "he": "במפה זה קישור רפאים: נצפה ברשת, ולא תועד.",
+        "claims": ["C-PRD-2", "C-MAP-1"]
+      },
+      {
+        "seconds": 6,
+        "en": "The Changes lens: what changed on the map in the last 7 days.",
+        "he": "עדשת „שינויים מאז”: מה השתנה במפה ב־7 הימים האחרונים.",
+        "claims": ["C-MAP-4", "C-MAP-2"]
+      },
+      {
+        "seconds": 7,
+        "en": "Ask the map: press Q, ask where something is, and the map answers.",
+        "he": "שואלים את המפה: לוחצים Q, שואלים איפה משהו נמצא, והמפה עונה.",
+        "claims": ["C-MAP-5"]
+      }
+    ]
+  },
+  "hebrew-native": {
+    "title": {
+      "en": "Built in Hebrew, not translated",
+      "he": "נבנה בעברית, לא תורגם אליה",
+      "claims": ["C-LANG-1"]
+    },
+    "takeaway": {
+      "en": "English and Hebrew complete, Arabic partial, and 21 more languages with their core screens.",
+      "he": "עברית ואנגלית מלאות, ערבית חלקית, ועוד 21 שפות עם המסכים העיקריים.",
+      "claims": ["C-LANG-1"]
+    },
+    "steps": [
+      {
+        "seconds": 6,
+        "poster": true,
+        "en": "The dashboard in Hebrew, laid out right to left.",
+        "he": "לוח הבקרה בעברית, בפריסה מימין לשמאל.",
+        "claims": ["C-LANG-2"]
+      },
+      {
+        "seconds": 7,
+        "en": "The IP plan in Hebrew, its addresses left to right in Latin script.",
+        "he": "תוכנית ה־IP בעברית, והכתובות בה משמאל לימין, באותיות לטיניות.",
+        "claims": ["C-LANG-2", "C-IPAM-2"]
+      },
+      {
+        "seconds": 6,
+        "en": "Rack DC-A01, its elevation labelled in Hebrew.",
+        "he": "הארון DC-A01, והשרטוט שלו עם תוויות בעברית.",
+        "claims": ["C-LANG-2", "C-RACK-1"]
+      },
+      {
+        "seconds": 6,
+        "en": "A design written in Hebrew, in the design studio.",
+        "he": "התכנון „תכנון DMZ חדש”, בעברית, בסטודיו התכנון.",
+        "claims": ["C-LANG-2", "C-STU-1"]
+      },
+      {
+        "seconds": 6,
+        "en": "Discovery's queue, in Hebrew too.",
+        "he": "וגם תור ההחלטות של הגילוי, בעברית.",
+        "claims": ["C-LANG-1", "C-DISC-5"]
+      }
+    ]
+  }
+}
