@@ -1,6 +1,33 @@
 import data from "../content/releases.json";
 import type { Locale } from "../i18n/locales";
 
+/** A file of a release, as /verify/ lists it: its name, its size in bytes and its SHA-256. */
+export interface ReleaseFile {
+  file: string;
+  bytes: number;
+  /** Lower-case hex, as sha256sum prints it. */
+  sha256: string;
+}
+
+/** The signed offline bundle of a release (W6), read from the bundle by command. */
+export interface ReleaseBundle extends ReleaseFile {
+  /** The bundle's `.sha256` file, the second file a pilot receives. */
+  checksumFile: ReleaseFile;
+  /** The folder `tar -xzf` creates. */
+  folder: string;
+  signed: boolean;
+  /** The id of the key that signed it (src/content/fingerprints.json). */
+  key: string;
+  claim: string;
+}
+
+/** The release's software bill of materials (W6, DECISIONS.md D-SBOM). */
+export interface ReleaseSbom extends ReleaseFile {
+  format: string;
+  components: number;
+  claim: string;
+}
+
 /** A product release, from src/content/releases.json (newest first). */
 export interface Release {
   version: string;
@@ -13,12 +40,19 @@ export interface Release {
   title: string;
   /** Its row in docs/claims.md. */
   claim: string;
+  bundle?: ReleaseBundle;
+  sbom?: ReleaseSbom;
 }
 
 export const releases: readonly Release[] = data.releases;
 
 /** The newest release: every "current release" mention on the site reads this. */
 export const latestRelease: Release = releases[0]!;
+
+/** A release by version, for the key history (src/content/fingerprints.json). */
+export function releaseByVersion(version: string): Release | undefined {
+  return releases.find((r) => r.version === version);
+}
 
 /** A release date in the page's language, e.g. "6 November 2026" / "6 בנובמבר 2026". */
 export function releaseDate(release: Release, locale: Locale): string {
@@ -29,4 +63,9 @@ export function releaseDate(release: Release, locale: Locale): string {
     year: "numeric",
     timeZone: "UTC",
   }).format(new Date(Date.UTC(y, m - 1, d)));
+}
+
+/** Bytes with thousands separators in Western digits, in both locales: 369,470,438. */
+export function formatBytes(bytes: number): string {
+  return new Intl.NumberFormat("en-US").format(bytes);
 }

@@ -1,0 +1,195 @@
+---
+/**
+ * W7: /licensing/ and /he/licensing/ — the licence as the product builds it (Docs settings.md
+ * § License, support.md § The licence, LICENSE, license.py at v0.7.0). Sections in order: try it
+ * first, the licence, before it ends (the states), read-only exactly, editions and prices
+ * (D-EDITIONS / D-PRICING defaults), questions buyers ask (a plain dl: no accordion, no script,
+ * no FAQ structured data). No "Buying from us" section: D-PROCUREMENT is unanswered.
+ */
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Prose from "../../components/Prose.astro";
+import SectionHeading from "../../components/SectionHeading.astro";
+import Contours from "../../components/motifs/Contours.astro";
+import { getCopy } from "../../content/copy";
+import { localeStaticPaths, pagePath, type Locale } from "../../i18n";
+
+export const getStaticPaths = (() => localeStaticPaths()) satisfies GetStaticPaths;
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+const l = copy.licensing;
+---
+
+<BaseLayout
+  locale={locale}
+  page="licensing"
+  title={copy.meta.licensing.title}
+  description={copy.meta.licensing.description}
+>
+  <section class="lc-hero">
+    <Contours map="quiet" eager />
+    <div class="container-site">
+      <SectionHeading eyebrow={l.eyebrow} title={l.title} lead={l.lead} level={1} />
+      <p class="lc-review">
+        <span class="todo-operator">
+          TODO(operator): legal review of this page before going public.
+        </span>
+      </p>
+    </div>
+  </section>
+
+  <div class="container-site lc-body">
+    <Prose class="lc-prose">
+      <section id="try" aria-labelledby="try-title">
+        <h2 id="try-title">{l.try.title}</h2>
+        <p set:html={l.try.text} />
+        <p set:html={l.try.agreement} />
+      </section>
+
+      <section id="licence" aria-labelledby="licence-title">
+        <h2 id="licence-title">{l.licence.title}</h2>
+        <p set:html={l.licence.text} />
+        <p set:html={l.licence.refused} />
+      </section>
+
+      <section id="before-it-ends" aria-labelledby="states-title">
+        <h2 id="states-title">{l.states.title}</h2>
+        <p set:html={l.states.lead} />
+        <table class="lc-states" data-licence-states>
+          <caption set:html={l.states.caption} />
+          <thead>
+            <tr>
+              <th scope="col">{l.states.state}</th>
+              <th scope="col">{l.states.does}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {l.states.rows.map((row) => (
+              <tr>
+                <th scope="row">{row.state}</th>
+                <td set:html={row.does} />
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p set:html={l.states.notices} />
+      </section>
+
+      <section id="read-only" aria-labelledby="read-only-title">
+        <h2 id="read-only-title">{l.readOnly.title}</h2>
+        <p set:html={l.readOnly.stops} />
+        <p>{l.readOnly.keepsTitle}</p>
+        <ul>
+          {l.readOnly.keeps.map((item) => (
+            <li set:html={item} />
+          ))}
+        </ul>
+        <p>
+          <strong>{l.readOnly.end}</strong>
+        </p>
+        <p set:html={l.readOnly.clock} />
+      </section>
+
+      <section id="editions" aria-labelledby="editions-title">
+        <h2 id="editions-title">{l.editions.title}</h2>
+        <p set:html={l.editions.text} />
+        <p>
+          <a href={`${pagePath(locale, "pilot")}#apply`}>{l.editions.link}</a>
+        </p>
+      </section>
+
+      <section id="questions" aria-labelledby="questions-title">
+        <h2 id="questions-title">{l.faq.title}</h2>
+        <dl class="lc-faq">
+          {l.faq.items.map((item) => (
+            <div>
+              <dt set:html={item.q} />
+              <dd set:html={item.a} />
+            </div>
+          ))}
+        </dl>
+      </section>
+    </Prose>
+  </div>
+</BaseLayout>
+
+<style>
+  .lc-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding-block: clamp(3rem, 2rem + 4vw, 6rem) clamp(2.5rem, 2rem + 2vw, 3.5rem);
+    border-block-end: 1px solid var(--lc-rule);
+  }
+
+  .lc-review {
+    margin-block-start: 1.25rem;
+  }
+
+  .lc-body {
+    padding-block: 3rem 5rem;
+  }
+
+  .lc-body :global(.lc-prose) {
+    max-inline-size: 52rem;
+  }
+
+  .lc-body section + section {
+    margin-block-start: 3.5rem;
+  }
+
+  /* Tailwind's preflight removes list markers. */
+  .lc-body ul {
+    list-style: disc;
+  }
+
+  .lc-states {
+    inline-size: 100%;
+    margin-block: 0.5rem 1rem;
+    border-collapse: collapse;
+    font-size: var(--lc-text-small);
+  }
+
+  .lc-states caption {
+    margin-block-end: 0.5rem;
+    color: var(--lc-ink-faint);
+    text-align: start;
+  }
+
+  .lc-states th,
+  .lc-states td {
+    padding-block: 0.625rem;
+    padding-inline: 0 0.875rem;
+    border-block-end: 1px solid var(--lc-rule);
+    text-align: start;
+    vertical-align: top;
+  }
+
+  .lc-states th {
+    color: var(--lc-ink);
+    font-weight: 600;
+  }
+
+  .lc-faq {
+    margin: 0;
+  }
+
+  .lc-faq > div {
+    padding-block: 1rem;
+    border-block-end: 1px solid var(--lc-rule);
+  }
+
+  .lc-faq dt {
+    color: var(--lc-ink);
+    font-weight: 600;
+  }
+
+  .lc-faq dd {
+    margin: 0.375rem 0 0;
+  }
+</style>

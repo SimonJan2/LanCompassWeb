@@ -5,9 +5,9 @@
     "home": "דף הבית של LanCompass",
     "product": "המוצר",
     "security": "אבטחה",
-    "designPartners": "שותפי פיתוח",
+    "pilot": "פיילוט",
     "docs": "תיעוד",
-    "cta": "להצטרפות כשותפי פיתוח",
+    "cta": "התחלת פיילוט",
     "menu": "תפריט",
     "closeMenu": "סגירת התפריט",
     "mobileLabel": "תפריט האתר"
@@ -26,7 +26,9 @@
     "howItWorks": "איך זה עובד",
     "integrations": "אינטגרציות",
     "security": "אבטחה",
-    "designPartners": "שותפי פיתוח",
+    "verify": "אימות חבילה",
+    "pilot": "פיילוט",
+    "licensing": "רישוי",
     "contact": "יצירת קשר",
     "privacy": "פרטיות",
     "accessibility": "נגישות",
@@ -114,7 +116,7 @@
     },
     "mailtoIntro": "אפשר לכתוב לנו בדוא״ל. הכפתור פותח את תוכנת הדואר עם תבנית קצרה למילוי.",
     "mailtoButton": "שליחת דוא״ל אל {email}",
-    "mailtoSubjectPartner": "בקשת הצטרפות לשותפי הפיתוח של LanCompass",
+    "mailtoSubjectPartner": "בקשה לפיילוט של LanCompass",
     "mailtoSubjectContact": "פנייה ל־LanCompass",
     "noContact": "TODO(operator): set PUBLIC_CONTACT_EMAIL — there is no contact address yet."
   },
@@ -131,9 +133,10 @@
   },
   "verification": {
     "title": "אימות גרסה",
-    "lead": "קובצי הגרסאות חתומים. לפני ההתקנה, בדקו את החתימה מול אחת מטביעות האצבע של המפתחות כאן.",
-    "kid": "מזהה מפתח",
-    "purpose": "שימוש",
-    "sha256": "טביעת אצבע <bdi>SHA-256</bdi>"
+    "lead": "חבילות ההתקנה של <bdi>LanCompass</bdi> חתומות. תוכנית ההתקנה מדפיסה את טביעת האצבע של המפתח שחתם על החבילה: השוו אותה לזו שכאן לפני שמתקינים.",
+    "kid": "מפתח",
+    "purpose": "תפקיד",
+    "sha256": "טביעת אצבע <bdi>SHA-256</bdi>",
+    "link": "איך בודקים חבילה, צעד אחר צעד"
   }
 }

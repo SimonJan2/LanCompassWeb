@@ -1,9 +1,10 @@
 ---
 /**
- * /security#verification. Renders only when src/content/fingerprints.json
- * lists at least one key (kid, purpose, SHA-256). Ships empty.
+ * /security#verification: the active signing keys of src/content/fingerprints.json (the release
+ * key, W6), each with its purpose and SHA-256 fingerprint, and a link to /verify/, where the
+ * three checks and the key history are. Renders nothing while the file is empty.
  */
-import { useUi, type Locale } from "../i18n";
+import { pagePath, useUi, type Locale } from "../i18n";
 import { getFingerprints } from "../lib/fingerprints";
 
 interface Props {
@@ -12,7 +13,7 @@ interface Props {
 
 const { locale } = Astro.props;
 const ui = useUi(locale).verification;
-const keys = getFingerprints();
+const keys = getFingerprints().filter((key) => key.lastRelease === null);
 ---
 
 {keys.length > 0 && (
@@ -23,31 +24,38 @@ const keys = getFingerprints();
     data-fingerprints
   >
     <h2 id="verification-title">{ui.title}</h2>
-    <p class="verification-lead">{ui.lead}</p>
-    <div class="verification-table-wrap">
-      <table class="verification-table">
-        <thead>
-          <tr>
-            <th scope="col">{ui.kid}</th>
-            <th scope="col">{ui.purpose}</th>
-            <th scope="col" set:html={ui.sha256} />
-          </tr>
-        </thead>
-        <tbody>
-          {keys.map((key) => (
-            <tr>
-              <td>
-                <code>{key.kid}</code>
-              </td>
-              <td>{key.purpose}</td>
-              <td>
-                <code class="fp">{key.sha256}</code>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <p class="verification-lead" set:html={ui.lead} />
+    {keys.map((key) => (
+      <dl class="verification-key" id={`key-${key.id}`}>
+        <div>
+          <dt>{ui.kid}</dt>
+          <dd>
+            {key.label[locale]}
+            {key.kid && (
+              <>
+                {" "}
+                <code dir="ltr">{key.kid}</code>
+              </>
+            )}
+          </dd>
+        </div>
+        <div>
+          <dt>{ui.purpose}</dt>
+          <dd>{key.purpose[locale]}</dd>
+        </div>
+        <div>
+          <dt set:html={ui.sha256} />
+          <dd>
+            <code class="fp" dir="ltr" data-fingerprint={key.id}>
+              {key.sha256}
+            </code>
+          </dd>
+        </div>
+      </dl>
+    ))}
+    <p class="verification-link">
+      <a href={`${pagePath(locale, "verify")}#check`}>{ui.link}</a>
+    </p>
   </section>
 )}
 
@@ -68,25 +76,34 @@ const keys = getFingerprints();
     color: var(--lc-ink-muted);
   }
 
-  .verification-table-wrap {
-    overflow-x: auto;
-  }
-
-  .verification-table {
-    inline-size: 100%;
-    border-collapse: collapse;
+  .verification-key {
+    display: grid;
+    gap: 0.75rem;
+    margin: 0;
     font-size: var(--lc-text-small);
   }
 
-  .verification-table th,
-  .verification-table td {
-    padding: 0.625rem 0.75rem;
-    border-block-end: 1px solid var(--lc-rule);
-    text-align: start;
-    vertical-align: top;
+  .verification-key dt {
+    color: var(--lc-ink-faint);
+    font-weight: 600;
+  }
+
+  .verification-key dd {
+    margin: 0.125rem 0 0;
+    color: var(--lc-ink);
   }
 
   .fp {
-    word-break: break-all;
+    overflow-wrap: anywhere;
+  }
+
+  .verification-link {
+    margin-block-start: 1.25rem;
+  }
+
+  .verification-link a {
+    color: var(--lc-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 </style>

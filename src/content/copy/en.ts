@@ -34,14 +34,27 @@ export const en = {
       description:
         "Your network data stays on your network. No telemetry, two opt-in writes, HTTPS by default, signed bundles, secrets encrypted at rest and an audit trail.",
     },
-    "design-partners": {
-      title: "Design partners — LanCompass",
+    verify: {
+      title: "Verify a download — LanCompass",
+      // C-VER-2, C-INST-4, C-VER-1, C-VER-6
       description:
-        "Work with us on LanCompass: a guided install, migration from your Excel, a direct line to the engineer, and early influence on what ships next.",
+        "Check a LanCompass bundle before you install it: the release’s files with their SHA-256, the three checks, the release key’s fingerprint and the SBOM.",
+    },
+    pilot: {
+      title: "Pilot — LanCompass",
+      // C-PILOT-2, C-PILOT-4, C-PILOT-6, C-PILOT-9
+      description:
+        "Run LanCompass on your own network: the first 30 days as ten steps, three success criteria you sign, support in Hebrew or English, and a clean exit.",
+    },
+    licensing: {
+      title: "Licensing — LanCompass",
+      // C-LIC-1, C-LIC-2, C-LIC-4, C-LIC-5
+      description:
+        "How the LanCompass licence works: 30 days to try with no licence file, a signed file checked offline, what each state does, and read-only that hides and deletes nothing.",
     },
     contact: {
       title: "Contact — LanCompass",
-      description: "Questions about LanCompass, editions or support plans. Write to us.",
+      description: "Questions about LanCompass, a pilot or the licence. Write to us.",
     },
     accessibility: {
       title: "Accessibility statement — LanCompass",
@@ -66,7 +79,7 @@ export const en = {
       title: "Your documentation and your network, in agreement.",
       // C-PRD-1
       lead: "LanCompass keeps IPAM, racks and cabling in one self-hosted system, discovers what is really on the wire, and shows every place where the two drift apart.",
-      primary: "Become a design partner",
+      primary: "Start a pilot",
       secondary: "See how it works",
       marginalia: ["10.20.0.0/16", "10.20.12.0/24 · lobby", "sw-core-02 → ap-lobby-3"],
     },
@@ -400,20 +413,22 @@ export const en = {
         { key: "hebrew-native" },
       ],
     },
-    partners: {
-      eyebrow: "Design partners",
-      title: "Shape LanCompass with us.",
-      lead: "We are looking for a small number of network teams to run LanCompass on real networks and tell us what is missing.",
-      getsTitle: "What you get",
+    /** W7: the pilot band (was the design-partners band). */
+    pilot: {
+      eyebrow: "Pilot",
+      title: "Try it on your own network.",
+      // C-PILOT-1
+      lead: "A pilot runs LanCompass on your server, under a written pilot agreement.",
+      getsTitle: "What a pilot gives you",
       gets: [
-        "A guided install on your own hardware",
-        "Migration from your Excel, done with you",
-        "A direct line to the engineer who builds it",
-        "Early influence on what ships next",
+        // C-PILOT-2
+        "The first 30 days as ten steps, each with its “done”",
+        // C-PILOT-4
+        "Three success criteria, signed before day one",
+        // C-PILOT-9
+        "A clean exit, confirmed in writing",
       ],
-      asksTitle: "What we ask",
-      asks: ["Honest feedback, regularly", "A reference, if it works for you"],
-      cta: "Become a design partner",
+      cta: "Start a pilot",
     },
   },
 
@@ -699,8 +714,9 @@ export const en = {
     ],
     cta: {
       title: "See it on your own network.",
-      text: "Design partners get a guided install and help moving their existing records across.",
-      button: "Become a design partner",
+      // C-PILOT-2, C-PILOT-4, C-PILOT-9
+      text: "A pilot: 30 days in ten steps, signed criteria, a clean exit.",
+      button: "Start a pilot",
     },
   },
 
@@ -849,51 +865,483 @@ export const en = {
     },
   },
 
-  partners: {
-    eyebrow: "Design partners",
-    title: "Run LanCompass on a real network, with the engineer on call.",
-    lead: "LanCompass is ready for its first partners: network teams of one to ten people who keep the network running and the documentation honest, often in regulated places, often on Check Point.",
-    getsTitle: "What you get",
-    gets: [
-      {
-        title: "A guided install",
-        text: "We install it with you, on your hardware, online or air-gapped.",
+  /** W6: /verify/. Every file name, size, hash and fingerprint on the page comes from
+   *  src/content/releases.json and src/content/fingerprints.json (read from the bundle by
+   *  command), and every command is built from them (src/lib/verify.ts): none is typed here.
+   *  `{version}`, `{date}`, `{format}`, `{components}` and `{bytes}` are filled from that data. */
+  verify: {
+    eyebrow: "Verify a download",
+    title: "Check the bundle before you install it.",
+    // C-INST-1, C-INST-4, C-VER-4
+    lead: "LanCompass reaches you as one signed offline bundle. Three checks, with tools every Linux host has, show that it is the bundle we released and that nothing in it changed on the way.",
+    release: {
+      title: "The current release",
+      // C-REL-1, C-VER-2
+      text: "LanCompass {version}, released on {date}: a signed offline bundle.",
+    },
+    // C-VER-2
+    files: {
+      title: "Its files",
+      // C-VER-9
+      lead: "A pilot receives the first two files from us. The third, the software bill of materials, is served from this page.",
+      caption: "The files of LanCompass {version}, each with its size and its SHA-256",
+      file: "File",
+      bytes: "Size (bytes)",
+      sha256: "SHA-256",
+    },
+    check: {
+      title: "How to check it",
+      // C-VER-3
+      lead: "Put the two files in one folder on the host and run the three steps there. Each step gives the command to copy, the output to expect, and what to do when you see anything else.",
+      run: "Run",
+      expect: "Expect",
+      otherwise: "If it differs",
+      checksum: {
+        title: "The checksum",
+        // C-VER-3
+        text: "The output must end in <code>OK</code>.",
+        // C-VER-3
+        otherwise:
+          "If it says <code>FAILED</code>, or anything but <code>OK</code>, the file was damaged or changed on the way. <strong>Do not install it; ask us for the bundle again.</strong>",
       },
-      {
-        title: "Migration from your Excel",
-        text: "We move your existing workbook across with you and check the result together.",
+      installer: {
+        title: "The installer’s own check",
+        // C-INST-4
+        text: "Extract the bundle and run its installer. Before it touches Docker, it checks every file against <code>SHA256SUMS</code>, checks the Ed25519 signature over <code>SHA256SUMS</code> with <code>openssl</code>, and prints the fingerprint of the key that signed it.",
+        // C-INST-4
+        otherwise:
+          "On any mismatch it stops before Docker is touched, and says that nothing was installed. <strong>Do not install; ask us for the bundle again.</strong>",
+        // C-INST-4, C-VER-4
+        byHand:
+          "To check by hand without installing, as a security reviewer would, run the two <code>openssl</code> lines the installer runs, in the extracted folder. The first checks the signature; the second prints the key’s fingerprint, in lower case and without colons.",
       },
-      {
-        title: "A direct line to the engineer",
-        text: "Questions go to the person who wrote the code, not to a queue.",
+      compare: {
+        title: "Compare the fingerprint",
+        // C-VER-4
+        text: "Compare the fingerprint the installer printed with the release key below, on this page — not only with the <code>INSTALL.md</code> inside the bundle.",
+        // C-VER-4
+        why: "The bundle carries its own public key and its own <code>INSTALL.md</code>: whoever could replace the bundle could replace both, so only a fingerprint read from a second place proves the key is ours.",
+        otherwise: "<strong>If they differ, do not install; ask us for the bundle again.</strong>",
       },
-      { title: "Early influence", text: "What you need shapes what ships next." },
-    ],
-    asksTitle: "What we ask",
-    asks: [
-      { title: "Feedback", text: "Tell us what works, what doesn’t, and what is missing." },
-      {
-        title: "A reference, if it works",
-        text: "Only if LanCompass earns it, and only with your agreement.",
-      },
-    ],
-    stepsTitle: "How it goes",
-    steps: [
-      { title: "Apply", text: "Tell us about your network in the form below." },
-      { title: "Talk", text: "A short call to see whether LanCompass fits." },
-      { title: "Install", text: "A guided install and the first import from your records." },
-      { title: "Use it, then tell us", text: "Regular check-ins while you run it." },
-    ],
-    pricing: "Editions and support plans are coming — talk to us.",
-    formTitle: "Apply to be a design partner",
-    formLead: "A few questions about your network, so the first call is a useful one.",
+    },
+    // C-VER-1
+    key: {
+      title: "The release key",
+      lead: "The key that signs every LanCompass bundle. The installer prints its fingerprint: compare the two, pair by pair.",
+      caption: "The release key’s SHA-256 fingerprint",
+      key: "Key",
+      purpose: "Purpose",
+      fingerprint: "SHA-256 fingerprint",
+      historyTitle: "Key history",
+      historyCaption: "Every key that has signed LanCompass bundles",
+      first: "First release",
+      last: "Last release",
+      state: "State",
+      active: "Active",
+      retired: "Retired",
+      retiredNone:
+        "Retired keys: none. When the key changes, the old key stays in this table with its last release, so an older bundle can still be checked.",
+    },
+    inside: {
+      title: "What is inside the bundle",
+      // C-VER-5
+      lead: "The bundle’s top folder, as <code>tar -tzf</code> lists it. <code>SHA256SUMS</code> lists every file, and the signature covers that list.",
+      // C-VER-5
+      items: [
+        {
+          files: ["install.sh"],
+          text: "The installer: it checks the bundle, loads the images, creates <code>.env</code> and starts LanCompass.",
+        },
+        {
+          files: ["upgrade.sh"],
+          text: "The upgrade to this version: a backup first, a restore drill after, the rollback steps printed.",
+        },
+        {
+          files: ["INSTALL.md", "INSTALL.he.md"],
+          text: "The install guide in English and in Hebrew, with the release key’s fingerprint in its first section.",
+        },
+        {
+          files: ["LICENSE"],
+          text: "The licence: LanCompass is used only under a written agreement.",
+        },
+        { files: ["CHANGELOG.md"], text: "The notes of every release, this one first." },
+        {
+          files: [
+            "SECURITY.md",
+            "THREAT_MODEL.md",
+            "THREAT_MODEL.he.md",
+            "docs/SECURITY_ANSWERS.md",
+          ],
+          // C-VER-5, C-SEC-12
+          text: "The security reviewer’s pack: how an install is defended, what it protects and from whom, and 63 answers, each beside the test or file that proves it.",
+        },
+        { files: ["sbom.cdx.json"], text: "The software bill of materials (below)." },
+        {
+          files: ["MANIFEST.json"],
+          text: "The version, the commit it was built from, the build time and the four images.",
+        },
+        {
+          files: ["SHA256SUMS", "SHA256SUMS.sig", "lancompass-release.pub"],
+          text: "The checksum of every file, the Ed25519 signature over that list, and the public key that checks it.",
+        },
+        {
+          files: ["images.tar.gz"],
+          text: "The four container images: <code>lancompass/api</code>, <code>lancompass/web</code>, <code>postgres:16-alpine</code> and <code>redis:7-alpine</code>.",
+        },
+        {
+          files: ["docker-compose.yml", "docker-compose.tls.yml", "docker-compose.primary.yml"],
+          text: "The Compose file, its HTTPS overlay, and the primary’s overlay for the opt-in warm standby.",
+        },
+        {
+          files: [".env.example"],
+          text: "The settings template the installer copies into <code>.env</code>.",
+        },
+        {
+          files: ["deploy/"],
+          text: "The warm standby kit, with its runbook in English and Hebrew, and a PostgreSQL access file for it.",
+        },
+      ],
+    },
+    sbom: {
+      title: "The SBOM",
+      // C-VER-6, C-SEC-13
+      text: "Every bundle carries a software bill of materials, <code>sbom.cdx.json</code>: a {format} file that lists {components} components — the four images, their operating systems and the libraries inside them.",
+      // C-VER-6
+      same: "The file served here is that same file: its SHA-256, in the table above, equals its line in the bundle’s <code>SHA256SUMS</code>.",
+      link: "Download the SBOM ({bytes} bytes)",
+    },
+    upgrades: {
+      title: "Supported versions and upgrades",
+      // C-VER-7
+      fixes: "Security fixes go to the latest release.",
+      // C-VER-10, C-INST-5
+      upgrade:
+        "An upgrade is a new bundle with a new version number and its notes (<code>CHANGELOG.md</code> inside it). It upgrades from the version you run now: its <code>upgrade.sh</code> takes a backup first, runs a restore drill after, and prints the rollback steps.",
+    },
+    get: {
+      title: "How to get the bundle",
+      // C-VER-9
+      text: "There is no public download. A pilot receives the bundle and its <code>.sha256</code> file from us, with the release key’s fingerprint.",
+      ask: "Ask us for the bundle",
+    },
+  },
+
+  /** W7: /pilot/ — the product's own way in, in its own words: Docs first-run.md (§ The first
+   *  30 days, § Success criteria), support.md (§ The pilot, § For a security review) and
+   *  LICENSE at v0.7.0. No step, promise or figure is added; the agreement's terms are not
+   *  stated (it is named, and the page stops there). */
+  pilot: {
+    eyebrow: "Pilot",
+    // C-PILOT-2
+    title: "Run LanCompass on your own network for 30 days.",
+    // C-PILOT-2, C-PILOT-4, C-PILOT-9
+    lead: "A pilot is the product’s own first month: ten steps on your server, three outcomes you agree and sign before day one, support while it runs, and a clean exit at the end.",
+    what: {
+      title: "What a pilot is",
+      // C-PILOT-1
+      text: "A pilot runs LanCompass on your own server, under a written pilot agreement that names its term, its sites and its users. The licence file that comes with the agreement is uploaded on day one.",
+      // C-VER-9, C-LIC-1, C-LIC-4, C-LIC-5
+      trying:
+        'To try LanCompass, you ask us for the bundle; no licence file is needed for its first 30 days. If no licence is uploaded by then, it becomes read-only: every page and record still opens, nothing is hidden or deleted, and a valid licence ends read-only at once. <a href="/licensing/">How the licence works</a>.',
+    },
+    need: {
+      title: "What you need before day one",
+      items: [
+        // C-INST-2
+        "A Linux host, a VM or bare metal, with Docker Engine 24 or newer and the Compose v2 plugin.",
+        // C-INST-3
+        "About 3 GB of disk space for the images, plus room for your data.",
+        // C-PILOT-10
+        "A user that can run Docker: <code>root</code>, or a member of the <code>docker</code> group; and <code>sha256sum</code>, <code>tar</code> and <code>gzip</code>.",
+        // C-PILOT-10
+        "A read-only account for each system you connect, such as Active Directory, vCenter and the firewall.",
+      ],
+    },
+    // C-PILOT-2, C-PILOT-3
+    days: {
+      title: "The first 30 days",
+      lead: "Ten steps, in order: the same path the release rehearsal walks on a server with no route out, in Hebrew first. Each step says where it happens and what “done” looks like.",
+      done: "Done:",
+      steps: [
+        {
+          title: "Install",
+          text: "On the server, follow sections 1–3 of <code>INSTALL.he.md</code> (or <code>INSTALL.md</code>): check the bundle with <code>sha256sum -c</code>, extract it, run <code>sh install.sh</code>.",
+          done: "the installer ends with <code>LanCompass &lt;version&gt; is running.</code> and the <code>https://</code> address, and the fingerprint it printed first matches the release key’s.",
+        },
+        {
+          title: "Set up in Hebrew",
+          text: "Open that address, choose Hebrew on the setup page and create the administrator. Then upload the licence file in <strong>Settings → License</strong>.",
+          done: "the dashboard opens in Hebrew, a colleague’s sign-in page is in Hebrew too, and Settings → License names your organisation.",
+        },
+        {
+          title: "Import",
+          text: "<strong>Import</strong> your address workbook (<code>.xlsx</code>) or a NetBox export; read the preview, then apply.",
+          done: "the plan’s rows are created, or skipped with a reason, and <strong>Subnets</strong> lists your subnets.",
+        },
+        {
+          title: "Scan",
+          text: "Run the dashboard’s <strong>Quick scan</strong> on one office subnet.",
+          done: "the scan completes, the first screen’s three counts fill, and what nobody documented waits in the <strong>Discovery Inbox</strong> for a person’s decision.",
+        },
+        {
+          title: "Connect",
+          text: "In <strong>Settings → Integrations</strong>, connect Active Directory, vCenter and the firewall, each with a read-only account: <em>Test</em>, <em>Preview</em>, then <em>Apply</em>.",
+          done: "each test passes, each preview shows its plan (a long one says it is still reading after 10 s), and the applied rows appear on their pages.",
+        },
+        {
+          title: "An alert",
+          text: "In <strong>Settings → Monitoring</strong>, add a mail channel to your relay and test it; then monitor one device.",
+          done: "the test mail arrives in Hebrew, and when that device stops answering, one message says so.",
+        },
+        {
+          title: "Colleagues over HTTPS",
+          text: "Turn on sign-in with Active Directory, with roles from your AD groups.",
+          done: "a colleague signs in at the <code>https://</code> address with their directory account and gets their group’s role.",
+        },
+        {
+          title: "Back up",
+          text: "In <strong>Settings → Backup &amp; Restore</strong>: nightly backups (on by default on a fresh install, 14 kept) and a restore drill.",
+          done: "a backup file in <code>backups/</code>, the drill passes, and a copy of one backup and of <code>.env</code> is kept off the server.",
+        },
+        {
+          title: "Upgrade",
+          text: "When the next bundle arrives, extract it into <code>incoming/</code> and run its <code>upgrade.sh</code> from the install folder.",
+          done: "it ends with <code>LanCompass is upgraded to &lt;version&gt;</code> and prints the rollback steps.",
+        },
+        {
+          title: "A support bundle",
+          text: "Download one in <strong>Settings → Support</strong> and send it as the pilot agreement says.",
+          done: "a ZIP with <code>manifest.json</code> reaches support, and the changelog records its SHA-256.",
+        },
+      ],
+    },
+    // C-PILOT-4, C-PILOT-5
+    criteria: {
+      title: "Success criteria",
+      lead: "Before day one, the pilot’s champion (who runs it) and its economic buyer (who decides to buy) agree on what the pilot must show, and sign it. A worksheet to copy into the pilot agreement:",
+      caption: "Success criteria: three outcomes, each measured in LanCompass",
+      columns: [
+        "Outcome we need",
+        "How LanCompass shows it",
+        "Day one",
+        "Target for day 30",
+        "Day 30",
+      ],
+      rows: [
+        {
+          outcome: "Our documentation matches the network",
+          shows:
+            "The first screen’s <em>observed hosts nobody documented</em> and <strong>Discovery</strong>’s open items",
+        },
+        {
+          outcome: "We hear about an outage before our users do",
+          shows:
+            "<strong>Incidents</strong> and each monitor’s availability; the alert’s time beside the outage’s",
+        },
+        {
+          outcome: "An auditor’s question is answered in minutes",
+          shows:
+            "<strong>Reports</strong>: the period’s report and its evidence pack, and the time it took",
+        },
+      ],
+      note: "Fill in the Day one column on the install day, from the product, and agree each target before you start. Replace an outcome with your own if it matters more — keep three, each measured in the product.",
+      signCaption: "Signed before day one",
+      signColumns: ["Signed", "Name", "Role", "Date"],
+      signRows: ["Champion", "Economic buyer"],
+      reviewTitle: "The day-30 review",
+      review:
+        "Open each measure in the product together, write its value beside the target, and decide: an order, an extension with new targets, or the end of the pilot.",
+    },
+    support: {
+      title: "Support during the pilot",
+      items: [
+        // C-PILOT-6
+        "<strong>Answers</strong> in Hebrew or English, on business days: a first answer by the next business day.",
+        // C-PILOT-7
+        "<strong>Upgrades</strong>: at most one every two weeks, each a bundle with a new version number and its notes, from the version you run now, with a backup first and a restore drill.",
+        // C-PILOT-8, C-INST-6
+        "<strong>Backups</strong>: a fresh install backs up nightly and keeps 14; the weekly restore drill checks the newest.",
+        // C-PILOT-8
+        "<strong>A support bundle</strong>, when support asks for one: you can open it yourself first, and the changelog keeps its SHA-256.",
+      ],
+    },
+    // C-PILOT-9
+    ends: {
+      title: "How a pilot ends",
+      lead: "Both sides leave cleanly, and say so in writing:",
+      steps: [
+        "Keep what you want first: a backup, a report, an export.",
+        "In the install folder, stop LanCompass and delete its data volumes: <code>docker compose down -v</code>.",
+        "Delete the install folder (<code>backups/</code>, <code>certs/</code> and <code>.env</code> are in it), the bundle files you copied, and the images it loaded.",
+        "Delete every support bundle you downloaded. Support deletes every support bundle it received, and both sides confirm it in writing.",
+      ],
+    },
+    reviewer: {
+      title: "For your security reviewer",
+      // C-SEC-12
+      text: "Every bundle carries the reviewer’s pack: <code>SECURITY.md</code>, the threat model in English and Hebrew, and <code>docs/SECURITY_ANSWERS.md</code> — 63 questions, each answer beside the test or file that proves it. Send your reviewer the pack rather than a summary.",
+      security: "How LanCompass handles security",
+      verify: "How to check the bundle you receive",
+    },
+    partner: {
+      title: "Become a design partner",
+      lead: "LanCompass is looking for its first design partners: network teams of one to ten people who keep the network running and the documentation honest, often in regulated places, often on Check Point.",
+      getsTitle: "What a partner gets",
+      gets: [
+        "A guided install, with you, on your hardware, online or air-gapped.",
+        "Your existing workbook moved across with you, and the result checked together.",
+        "A direct line to the engineer who wrote the code, not a queue.",
+        "Early influence: what you need shapes what ships next.",
+      ],
+      asksTitle: "What we ask",
+      asks: [
+        "Regular feedback: what works, what doesn’t, and what is missing.",
+        "A reference, only if LanCompass earns it.",
+      ],
+      // C-PILOT-9
+      leave:
+        "Either side can leave the way a pilot ends: cleanly, and in writing. Publicity is opt-in: we name you, quote you or show your logo only with your written agreement.",
+      none: "No partner is named on this site.",
+    },
+    apply: {
+      title: "Apply for a pilot",
+      lead: "A few questions about your network, so the first call is a useful one.",
+      // C-PILOT-6, C-LIC-7
+      pricing:
+        'Pilots come with support in Hebrew or English. Editions and prices follow the pilot: <a href="/licensing/">how the licence works</a>.',
+    },
+  },
+
+  /** W7: /licensing/ — the licence as built (Docs settings.md § License, support.md § The
+   *  licence, LICENSE, license.py at v0.7.0). Key ids, the trust store and the issuer are not
+   *  stated (operator internals); no edition, price or "free" (D-EDITIONS, D-PRICING). */
+  licensing: {
+    eyebrow: "Licensing",
+    title: "How the licence works.",
+    // C-LIC-1, C-LIC-2, C-LIC-5
+    lead: "Try LanCompass for 30 days without a licence file. Then a signed file, checked on your own server; and when a licence ends, read-only, with nothing hidden or deleted.",
+    try: {
+      title: "Try it first",
+      // C-LIC-1, C-NET-1
+      text: "No licence file is needed to try LanCompass: with none uploaded, everything works for 30 days from the install’s first start, offline.",
+      // C-PILOT-1
+      agreement:
+        'As every install, it runs under a written agreement: for a pilot, the pilot agreement. <a href="/pilot/">How a pilot works</a>.',
+    },
+    licence: {
+      title: "The licence",
+      // C-LIC-2
+      text: "A licence is a signed <code>.lclic</code> file. An administrator uploads it in <strong>Settings → License</strong>, and LanCompass checks it on your server, with no network call: changing one character of the file makes it invalid. Settings → License shows everyone signed in the customer, the kind of licence, the dates it runs between and the days left.",
+      // C-LIC-3
+      refused:
+        "A file that does not check — changed after it was signed, signed by a key the install does not trust, revoked, not started yet or already ended — is refused with its reason, and the licence in place stays. A renewal replaces the licence it renews.",
+    },
+    // C-LIC-4
+    states: {
+      title: "Before it ends",
+      lead: "Settings → License shows the licence’s state. What LanCompass does in each:",
+      caption: "The licence’s states, and what LanCompass does in each",
+      state: "State",
+      does: "What LanCompass does",
+      rows: [
+        {
+          state: "Evaluation",
+          does: "No licence yet: everything works for 30 days from the install’s first start. Administrators see a yellow banner in the last 7 days.",
+        },
+        { state: "Valid", does: "Everything works." },
+        {
+          state: "Ending soon",
+          does: "30 days or fewer left: everything works. Administrators see a yellow banner, and a notice goes out at 30, 14, 7 and 1 days left.",
+        },
+        {
+          state: "Ended — grace period",
+          does: "The end date has passed: everything still works for the licence’s grace, 14 days unless the licence says otherwise. Everyone sees a red banner, and a notice goes out each day.",
+        },
+        {
+          state: "Ended — read-only",
+          does: "After the grace, or after 30 days without a licence (<em>Evaluation ended — read-only</em>): read-only, below, with one notice.",
+        },
+      ],
+      notices: "The notices go through the channels your administrators already set up.",
+    },
+    // C-LIC-5, C-LIC-6
+    readOnly: {
+      title: "Read-only, exactly",
+      stops:
+        "What stops: a change made by a person or an API token. It is refused, and a grey banner says since when.",
+      keepsTitle: "What keeps working:",
+      keeps: [
+        "Every page opens and every record reads. Nothing is hidden or deleted.",
+        "Exports, backups and their restore drills, and the support bundle.",
+        "Signing in and out, and two-factor.",
+        "The work that watches the network: scans, syncs, polls and monitors.",
+      ],
+      end: "Uploading a valid licence ends read-only at once.",
+      clock:
+        "LanCompass checks the licence against the latest time it has seen, so winding the server’s clock back does not stretch a licence.",
+    },
+    editions: {
+      title: "Editions and prices",
+      // C-LIC-7
+      text: "At 0.7.0 every licence includes every feature. Editions and prices follow the pilot — talk to us.",
+      link: "Start a pilot",
+    },
+    faq: {
+      title: "Questions buyers ask",
+      items: [
+        {
+          q: "Does LanCompass call home?",
+          // C-NET-2, C-LIC-1
+          a: "No. It has no agent, no cloud account and no telemetry, and the licence is checked on your server with no network call.",
+        },
+        {
+          q: "What happens when a licence ends?",
+          // C-LIC-4, C-LIC-5
+          a: "Everything keeps working through the grace period, 14 days unless the licence says otherwise. Then LanCompass is read-only: nothing is hidden or deleted, and a valid licence ends read-only at once.",
+        },
+        {
+          q: "Do we need a licence to try it?",
+          // C-LIC-1, C-VER-9
+          a: "Not a licence file: everything works for 30 days from the install’s first start. You need the bundle, which we send for a pilot.",
+        },
+        {
+          q: "Does it run with no route out?",
+          // C-NET-1, C-LIC-1
+          a: "Yes. Everything it needs is inside the bundle, nothing is downloaded during the install or fetched while it runs, and the licence check makes no network call.",
+        },
+        {
+          q: "Is it open source?",
+          // C-LIC-8
+          a: 'No. LanCompass is not open source: its licence is proprietary. Third-party components keep their own licences, <a href="/verify/#sbom">listed in the SBOM</a>.',
+        },
+        {
+          q: "Are there editions?",
+          // C-LIC-7
+          a: "Not yet. At 0.7.0 every licence includes every feature; editions and prices follow the pilot.",
+        },
+        {
+          q: "How do we get the bundle?",
+          // C-VER-9
+          a: 'Ask us: there is no public download. A pilot receives the bundle and its checksum file with the release key’s fingerprint; <a href="/verify/">Verify a download</a> shows how to check them.',
+        },
+      ],
+    },
+  },
+
+  /** W7: the page left at /design-partners/ for static hosts without the nginx 301. */
+  moved: {
+    title: "This page has moved — LanCompass",
+    text: "The design-partner page is now the pilot page.",
+    link: "Go to the pilot page",
   },
 
   contact: {
     eyebrow: "Contact",
     title: "Talk to us.",
-    lead: "Questions about LanCompass, a design partnership, or an integration you need.",
-    pricing: "Editions and support plans are coming — talk to us.",
+    lead: "Questions about LanCompass, a pilot, or an integration you need.",
+    // C-PILOT-6, C-LIC-7
+    pricing:
+      'Pilots come with support in Hebrew or English. Editions and prices follow the pilot: <a href="/licensing/">how the licence works</a>.',
     emailLabel: "Email",
     formTitle: "Send a message",
   },

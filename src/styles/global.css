@@ -1,4 +1,6 @@
 @import "tailwindcss";
+/* W6: the release's SBOM is data (package names), not markup: Tailwind must not read it. */
+@source not "../../public/verify";
 @import "./tokens.css";
 @import "./fonts.css";
 

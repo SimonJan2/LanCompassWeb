@@ -39,7 +39,7 @@ test.describe("axe: zero violations", () => {
 
   test("forms (endpoint configured) have zero violations in both locales", async ({ page }) => {
     for (const locale of ["en", "he"] as const) {
-      for (const which of ["design-partners", "contact"] as const) {
+      for (const which of ["pilot", "contact"] as const) {
         await page.goto(`${formsBase()}${pathFor(locale, which)}`);
         // Show every error state too.
         await page.locator("form[data-lc-form] button[type=submit]").click();
@@ -78,9 +78,7 @@ test.describe("keyboard", () => {
         await page.evaluate(() => (document.activeElement as HTMLElement).innerText.trim()),
       );
     }
-    expect(seen).toEqual(
-      expect.arrayContaining(["Product", "Security", "Design partners", "Become a design partner"]),
-    );
+    expect(seen).toEqual(expect.arrayContaining(["Product", "Security", "Pilot", "Start a pilot"]));
   });
 
   test("language menu opens with the keyboard and closes with Escape", async ({ page }) => {
@@ -125,7 +123,7 @@ test.describe("keyboard", () => {
     await page.route("https://forms.example.com/**", (route) =>
       route.fulfill({ status: 200, body: "ok" }),
     );
-    await page.goto(`${formsBase()}/design-partners/`);
+    await page.goto(`${formsBase()}/pilot/`);
     const focusedName = () =>
       page.evaluate(() => {
         const el = document.activeElement as HTMLInputElement | null;

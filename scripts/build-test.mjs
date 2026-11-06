@@ -23,7 +23,9 @@ export const builds = [
     outDir: "dist-test-flags",
     env: {
       PUBLIC_SITE_URL: "http://127.0.0.1:4322",
-      PUBLIC_CONTACT_EMAIL: "hello@example.com",
+      // W6: no contact address here, so this build has no /.well-known/security.txt (a file
+      // without Contact is invalid; tests/verify.spec.ts). Its forms post to the endpoint.
+      PUBLIC_CONTACT_EMAIL: "",
       PUBLIC_DOCS_URL: "https://docs.example.com/",
       // The "Source code" link and its PUBLIC_GITHUB_URL flag are gone (DECISIONS.md D-GITHUB):
       // set here, it must change nothing (tests/flags.spec.ts).

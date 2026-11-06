@@ -13,7 +13,7 @@ test.describe("feature flags", () => {
     for (const locale of ["en", "he"] as const) {
       await page.goto(`${DEFAULT}${pathFor(locale, "home")}`);
       await expect(page.locator('[data-flag="docs"]')).toHaveCount(0);
-      for (const which of ["design-partners", "contact"] as const) {
+      for (const which of ["pilot", "contact"] as const) {
         await page.goto(`${DEFAULT}${pathFor(locale, which)}`);
         await expect(page.locator("form[data-lc-form]")).toHaveCount(0);
         const mailto = page.locator("[data-form-fallback] a[data-mailto]");
@@ -32,7 +32,7 @@ test.describe("feature flags", () => {
         "href",
         FLAG_VALUES.docs,
       );
-      for (const which of ["design-partners", "contact"] as const) {
+      for (const which of ["pilot", "contact"] as const) {
         await page.goto(`${FLAGS}${pathFor(locale, which)}`);
         const form = page.locator("form[data-lc-form]");
         await expect(form).toHaveAttribute("action", FLAG_VALUES.form);
@@ -55,12 +55,28 @@ test.describe("feature flags", () => {
     }
   });
 
-  test("the fingerprint block is absent while fingerprints.json is empty", async ({ page }) => {
+  test("the fingerprint block shows the release key (W6: fingerprints.json has it)", async ({
+    page,
+  }) => {
     for (const base of [DEFAULT, FLAGS]) {
       for (const locale of ["en", "he"] as const) {
         await page.goto(`${base}${pathFor(locale, "security")}`);
-        await expect(page.locator("#verification")).toHaveCount(0);
+        await expect(page.locator("#verification")).toHaveCount(1);
+        await expect(page.locator('#verification [data-fingerprint="release"]')).toHaveText(
+          /^([0-9A-F]{2}:){31}[0-9A-F]{2}$/,
+        );
       }
+    }
+  });
+
+  test("without a contact address, /security#disclosure shows the TODO(operator) marker", async ({
+    page,
+  }) => {
+    for (const locale of ["en", "he"] as const) {
+      await page.goto(`${FLAGS}${pathFor(locale, "security")}`);
+      await expect(page.locator("#disclosure ~ p .todo-operator").first()).toContainText(
+        "TODO(operator): set PUBLIC_CONTACT_EMAIL",
+      );
     }
   });
 });

@@ -1,36 +1,14 @@
 import raw from "../content/fingerprints.json";
+import { parseFingerprints, type Fingerprint } from "./fingerprint-schema";
 
-/** One release-signing key, as published on /security#verification. */
-export interface Fingerprint {
-  kid: string;
-  purpose: string;
-  sha256: string;
-}
+export type { Fingerprint } from "./fingerprint-schema";
 
-const SHA256 = /^(?:[0-9A-F]{2}:){31}[0-9A-F]{2}$|^[0-9a-f]{64}$/i;
-
-function isFingerprint(value: unknown): value is Fingerprint {
-  if (typeof value !== "object" || value === null) return false;
-  const v = value as Record<string, unknown>;
-  return (
-    typeof v["kid"] === "string" &&
-    v["kid"] !== "" &&
-    typeof v["purpose"] === "string" &&
-    v["purpose"] !== "" &&
-    typeof v["sha256"] === "string" &&
-    SHA256.test(v["sha256"])
-  );
-}
-
-/** Keys from `src/content/fingerprints.json`. A malformed entry fails the build. */
+/** Keys from `src/content/fingerprints.json`, active first. A malformed entry fails the build. */
 export function getFingerprints(): Fingerprint[] {
-  const list: unknown[] = Array.isArray(raw) ? raw : [];
-  return list.map((entry, index) => {
-    if (!isFingerprint(entry)) {
-      throw new Error(
-        `src/content/fingerprints.json entry ${index} needs kid, purpose and a SHA-256 fingerprint`,
-      );
-    }
-    return entry;
-  });
+  return parseFingerprints(raw);
+}
+
+/** The key that signs the current bundles (the one entry without a last release). */
+export function activeReleaseKey(): Fingerprint | undefined {
+  return getFingerprints().find((key) => key.lastRelease === null && key.kid === undefined);
 }

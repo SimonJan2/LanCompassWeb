@@ -73,9 +73,26 @@ component rules and `src/styles/auto.css` the auto-only ones. A small Vite plugi
 `astro.config.mjs` (`themeCss`) assembles the stylesheet per theme, so a light build carries
 no dark CSS at all. Colours outside CSS (OG images, icons, manifest, contour files) come from
 `src/lib/palette.ts`.
-Release-key fingerprints for `/security#verification` live in `src/content/fingerprints.json`
-(`[{ "kid": "...", "purpose": "...", "sha256": "AB:CD:..." }]`). The block renders only when
-the list is not empty; it ships empty.
+Signing keys live in `src/content/fingerprints.json` (W6): one entry per key,
+`{ "id": "release", "label": {en, he}, "purpose": {en, he}, "sha256": "C0:47:…", "firstRelease":
+"0.6.0", "lastRelease": null, "claim": "C-VER-1" }` (`kid` only for a licence key). The value is
+the SHA-256 of the key's DER form, upper case and colon-separated, exactly as the installer
+prints it; a malformed entry fails the build. `/security#verification` shows the active keys,
+and `/verify/` the release key with its history: a retired key stays, with its `lastRelease`.
+
+**At each release** (W6): add the release's `bundle` and `sbom` facts to
+`src/content/releases.json`, each value copied from a command on the signed bundle
+(`sha256sum`, `stat -c %s`, the `.sha256` file, the SBOM's `specVersion` and `components`), copy
+the SBOM byte for byte into `public/verify/`, and rebuild. `/.well-known/security.txt` (RFC 9116)
+is written only when `PUBLIC_CONTACT_EMAIL` and `PUBLIC_SITE_URL` are both set; it expires 180
+days after the build, so rebuild before then.
+
+The way in (W7): `/pilot/` (the product's first 30 days, the success worksheet, support, the
+clean exit, the design-partner offer and the application form at `#apply`) and `/licensing/`
+(the evaluation, the licence, its states, read-only, editions and prices, buyers' questions).
+Every call to action goes to `/pilot/#apply`. The old `/design-partners/` answers 301 in
+`docker/nginx/site.conf`; for any other host the build leaves a meta-refresh page there (not in
+the sitemap). Both pages carry a visible legal-review marker until the wording is reviewed.
 
 Videos: drop files into `public/media/<survey|night-chart>/` as described in
 `public/media/README.md`.

@@ -5,9 +5,9 @@
     "home": "LanCompass home",
     "product": "Product",
     "security": "Security",
-    "designPartners": "Design partners",
+    "pilot": "Pilot",
     "docs": "Docs",
-    "cta": "Become a design partner",
+    "cta": "Start a pilot",
     "menu": "Menu",
     "closeMenu": "Close menu",
     "mobileLabel": "Site menu"
@@ -26,7 +26,9 @@
     "howItWorks": "How it works",
     "integrations": "Integrations",
     "security": "Security",
-    "designPartners": "Design partners",
+    "verify": "Verify a download",
+    "pilot": "Pilot",
+    "licensing": "Licensing",
     "contact": "Contact",
     "privacy": "Privacy",
     "accessibility": "Accessibility",
@@ -114,7 +116,7 @@
     },
     "mailtoIntro": "Write to us by email. The button opens your mail app with a short template to fill in.",
     "mailtoButton": "Email {email}",
-    "mailtoSubjectPartner": "LanCompass design partner application",
+    "mailtoSubjectPartner": "LanCompass pilot application",
     "mailtoSubjectContact": "LanCompass enquiry",
     "noContact": "TODO(operator): set PUBLIC_CONTACT_EMAIL — there is no contact address yet."
   },
@@ -131,9 +133,10 @@
   },
   "verification": {
     "title": "Verify a release",
-    "lead": "Release artifacts are signed. Check a signature against one of these key fingerprints before you install.",
-    "kid": "Key ID",
+    "lead": "LanCompass bundles are signed. The installer prints the fingerprint of the key that signed the bundle: compare it with this one before you install.",
+    "kid": "Key",
     "purpose": "Purpose",
-    "sha256": "SHA-256 fingerprint"
+    "sha256": "SHA-256 fingerprint",
+    "link": "How to check a bundle, step by step"
   }
 }

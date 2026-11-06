@@ -1,0 +1,547 @@
+---
+/**
+ * W6: /verify/ and /he/verify/ — the current release, its files with their sizes and SHA-256, how
+ * to check the bundle (three steps: command, expected output, what a mismatch means), the release
+ * key with its history, what is inside the bundle, the SBOM, supported versions and how to get
+ * the bundle. Every value comes from src/content/releases.json and fingerprints.json; every
+ * command from src/lib/verify.ts. Commands are selectable text: no script beyond the site's own.
+ * Without a bundle or its key in the data, the page shows a TODO(operator) marker instead of a
+ * value (DECISIONS.md D-FINGERPRINTS: the value must equal the bundle and INSTALL.md §1).
+ */
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SectionHeading from "../../components/SectionHeading.astro";
+import Contours from "../../components/motifs/Contours.astro";
+import { getCopy } from "../../content/copy";
+import { fill, localeStaticPaths, pagePath, type Locale } from "../../i18n";
+import { getFingerprints } from "../../lib/fingerprints";
+import { formatBytes, latestRelease, releaseByVersion, releaseDate } from "../../lib/releases";
+import { verifySteps } from "../../lib/verify";
+
+export const getStaticPaths = (() => localeStaticPaths()) satisfies GetStaticPaths;
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+const v = copy.verify;
+const release = latestRelease;
+const bundle = release.bundle;
+const sbom = release.sbom;
+const keys = getFingerprints().filter((k) => k.kid === undefined);
+const key = bundle ? keys.find((k) => k.id === bundle.key) : undefined;
+const steps = bundle && key ? verifySteps(bundle, key) : undefined;
+const sbomHref = sbom ? `/verify/${sbom.file}` : undefined;
+/** "Ask us for the bundle": the pilot's application (W7, DECISIONS.md D-LICENCE-PATH). */
+const askHref = `${pagePath(locale, "pilot")}#apply`;
+const dateHtml = (version: string) => {
+  const r = releaseByVersion(version);
+  return r ? `<time datetime="${r.date}">${releaseDate(r, locale)}</time>` : "";
+};
+const values = {
+  version: release.version,
+  date: dateHtml(release.version),
+  format: sbom?.format ?? "",
+  components: String(sbom?.components ?? ""),
+  bytes: sbom ? formatBytes(sbom.bytes) : "",
+};
+const t = (s: string) => fill(s, values);
+const files = bundle ? [bundle, bundle.checksumFile, ...(sbom ? [sbom] : [])] : [];
+const todo = "TODO(operator): the release facts are missing from src/content/releases.json";
+const todoKey =
+  "TODO(operator): the release key's fingerprint is missing or disagrees with the bundle (src/content/fingerprints.json)";
+---
+
+<BaseLayout
+  locale={locale}
+  page="verify"
+  title={copy.meta.verify.title}
+  description={copy.meta.verify.description}
+>
+  <section class="verify-hero">
+    <Contours map="quiet" eager />
+    <div class="container-site">
+      <SectionHeading eyebrow={v.eyebrow} title={v.title} lead={v.lead} level={1} />
+    </div>
+  </section>
+
+  <div class="container-site verify-body">
+    <section id="release" aria-labelledby="release-title">
+      <h2 id="release-title">{v.release.title}</h2>
+      <p set:html={t(v.release.text)} data-release={release.version} />
+    </section>
+
+    <section id="files" aria-labelledby="files-title">
+      <h2 id="files-title">{v.files.title}</h2>
+      {bundle ? (
+        <>
+          <p set:html={v.files.lead} />
+          <table class="vf-table" data-release-files>
+            <caption set:html={t(v.files.caption)} />
+            <thead>
+              <tr>
+                <th scope="col">{v.files.file}</th>
+                <th scope="col">{v.files.bytes}</th>
+                <th scope="col" set:html={v.files.sha256} />
+              </tr>
+            </thead>
+            <tbody>
+              {files.map((f) => (
+                <tr data-file={f.file}>
+                  <th scope="row">
+                    {f === sbom ? (
+                      <a href={sbomHref} type="application/json">
+                        <code dir="ltr">{f.file}</code>
+                      </a>
+                    ) : (
+                      <code dir="ltr">{f.file}</code>
+                    )}
+                  </th>
+                  <td class="tabular" data-bytes>
+                    {formatBytes(f.bytes)}
+                  </td>
+                  <td>
+                    <code dir="ltr" class="hash" data-sha256>
+                      {f.sha256}
+                    </code>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      ) : (
+        <p>
+          <span class="todo-operator">{todo}</span>
+        </p>
+      )}
+    </section>
+
+    <section id="check" aria-labelledby="check-title">
+      <h2 id="check-title">{v.check.title}</h2>
+      <p set:html={v.check.lead} />
+      {steps && key ? (
+        <ol class="vs-steps" role="list">
+          <li class="vs-step" id="step-checksum">
+            <h3 class="vs-title">
+              <span class="vs-n tabular" aria-hidden="true">
+                1
+              </span>
+              {v.check.checksum.title}
+            </h3>
+            <dl class="vs-dl">
+              <dt>{v.check.run}</dt>
+              <dd>
+                <pre dir="ltr" data-run><code dir="ltr">{steps.checksum.run.join("\n")}</code></pre>
+              </dd>
+              <dt>{v.check.expect}</dt>
+              <dd>
+                <pre
+                  dir="ltr"
+                  class="vs-out"
+                  data-expect
+                ><code dir="ltr">{steps.checksum.expect.join("\n")}</code></pre>
+                <p set:html={v.check.checksum.text} />
+              </dd>
+              <dt>{v.check.otherwise}</dt>
+              <dd>
+                <p set:html={v.check.checksum.otherwise} />
+              </dd>
+            </dl>
+          </li>
+          <li class="vs-step" id="step-installer">
+            <h3 class="vs-title">
+              <span class="vs-n tabular" aria-hidden="true">
+                2
+              </span>
+              {v.check.installer.title}
+            </h3>
+            <p set:html={v.check.installer.text} />
+            <dl class="vs-dl">
+              <dt>{v.check.run}</dt>
+              <dd>
+                <pre
+                  dir="ltr"
+                  data-run
+                ><code dir="ltr">{steps.installer.run.join("\n")}</code></pre>
+              </dd>
+              <dt>{v.check.expect}</dt>
+              <dd>
+                <pre
+                  dir="ltr"
+                  class="vs-out"
+                  data-expect
+                ><code dir="ltr">{steps.installer.expect.join("\n")}</code></pre>
+              </dd>
+              <dt>{v.check.otherwise}</dt>
+              <dd>
+                <pre
+                  dir="ltr"
+                  class="vs-out"
+                  data-mismatch
+                ><code dir="ltr">{steps.mismatch.join("\n")}</code></pre>
+                <p set:html={v.check.installer.otherwise} />
+              </dd>
+            </dl>
+            <p set:html={v.check.installer.byHand} />
+            <dl class="vs-dl">
+              <dt>{v.check.run}</dt>
+              <dd>
+                <pre dir="ltr" data-run><code dir="ltr">{steps.byHand.run.join("\n")}</code></pre>
+              </dd>
+              <dt>{v.check.expect}</dt>
+              <dd>
+                <pre
+                  dir="ltr"
+                  class="vs-out"
+                  data-expect
+                ><code dir="ltr">{steps.byHand.expect.join("\n")}</code></pre>
+              </dd>
+            </dl>
+          </li>
+          <li class="vs-step" id="step-compare">
+            <h3 class="vs-title">
+              <span class="vs-n tabular" aria-hidden="true">
+                3
+              </span>
+              {v.check.compare.title}
+            </h3>
+            <p set:html={v.check.compare.text} />
+            <p set:html={v.check.compare.why} />
+            <dl class="vs-dl">
+              <dt>{v.check.expect}</dt>
+              <dd>
+                <pre dir="ltr" class="vs-out" data-expect><code dir="ltr">{key.sha256}</code></pre>
+              </dd>
+              <dt>{v.check.otherwise}</dt>
+              <dd>
+                <p set:html={v.check.compare.otherwise} />
+              </dd>
+            </dl>
+          </li>
+        </ol>
+      ) : (
+        <p>
+          <span class="todo-operator">{todoKey}</span>
+        </p>
+      )}
+    </section>
+
+    <section id="release-key" aria-labelledby="release-key-title">
+      <h2 id="release-key-title">{v.key.title}</h2>
+      <p set:html={v.key.lead} />
+      {key ? (
+        <dl class="vk-key" id={`key-${key.id}`}>
+          <div>
+            <dt>{v.key.key}</dt>
+            <dd>{key.label[locale]}</dd>
+          </div>
+          <div>
+            <dt>{v.key.purpose}</dt>
+            <dd>{key.purpose[locale]}</dd>
+          </div>
+          <div>
+            <dt set:html={v.key.fingerprint} />
+            <dd>
+              <code dir="ltr" class="fp" data-fingerprint={key.id}>
+                {key.sha256}
+              </code>
+            </dd>
+          </div>
+        </dl>
+      ) : (
+        <p>
+          <span class="todo-operator">{todoKey}</span>
+        </p>
+      )}
+      <h3 class="vk-history-title">{v.key.historyTitle}</h3>
+      <table class="vf-table" data-key-history>
+        <caption set:html={v.key.historyCaption} />
+        <thead>
+          <tr>
+            <th scope="col">{v.key.key}</th>
+            <th scope="col" set:html={v.key.fingerprint} />
+            <th scope="col">{v.key.first}</th>
+            <th scope="col">{v.key.last}</th>
+            <th scope="col">{v.key.state}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {keys.map((k) => (
+            <tr data-key={k.id}>
+              <th scope="row">{k.label[locale]}</th>
+              <td>
+                <code dir="ltr" class="fp">
+                  {k.sha256}
+                </code>
+              </td>
+              <td>
+                <bdi>{k.firstRelease}</bdi> <span set:html={`(${dateHtml(k.firstRelease)})`} />
+              </td>
+              <td>
+                {k.lastRelease ? (
+                  <>
+                    <bdi>{k.lastRelease}</bdi> <span set:html={`(${dateHtml(k.lastRelease)})`} />
+                  </>
+                ) : (
+                  "—"
+                )}
+              </td>
+              <td>{k.lastRelease ? v.key.retired : v.key.active}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {keys.every((k) => k.lastRelease === null) && <p set:html={v.key.retiredNone} />}
+    </section>
+
+    <section id="inside" aria-labelledby="inside-title">
+      <h2 id="inside-title">{v.inside.title}</h2>
+      <p set:html={v.inside.lead} />
+      <dl class="vi-list">
+        {v.inside.items.map((item) => (
+          <div>
+            <dt>
+              {item.files.map((f, i) => (
+                <>
+                  {i > 0 && " "}
+                  <code dir="ltr">{f}</code>
+                </>
+              ))}
+            </dt>
+            <dd set:html={item.text} />
+          </div>
+        ))}
+      </dl>
+    </section>
+
+    <section id="sbom" aria-labelledby="sbom-title">
+      <h2 id="sbom-title" set:html={v.sbom.title} />
+      {sbom ? (
+        <>
+          <p set:html={t(v.sbom.text)} data-sbom-components={sbom.components} />
+          <p set:html={v.sbom.same} />
+          <p>
+            <a href={sbomHref} type="application/json" data-sbom-link set:html={t(v.sbom.link)} />
+          </p>
+        </>
+      ) : (
+        <p>
+          <span class="todo-operator">{todo}</span>
+        </p>
+      )}
+    </section>
+
+    <section id="upgrades" aria-labelledby="upgrades-title">
+      <h2 id="upgrades-title">{v.upgrades.title}</h2>
+      <p set:html={v.upgrades.fixes} />
+      <p set:html={v.upgrades.upgrade} />
+    </section>
+
+    <section id="get" aria-labelledby="get-title">
+      <h2 id="get-title">{v.get.title}</h2>
+      <p set:html={v.get.text} />
+      <p>
+        <a href={askHref} data-ask-bundle>
+          {v.get.ask}
+        </a>
+      </p>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .verify-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding-block: clamp(3rem, 2rem + 4vw, 5.5rem) clamp(2.5rem, 2rem + 2vw, 3.5rem);
+    border-block-end: 1px solid var(--lc-rule);
+  }
+
+  .verify-body {
+    display: grid;
+    gap: 3.5rem;
+    padding-block: 3rem 5rem;
+    color: var(--lc-ink-muted);
+  }
+
+  .verify-body > section {
+    max-inline-size: 60rem;
+  }
+
+  .verify-body h2 {
+    margin-block-end: 0.875rem;
+    padding-block-start: 0.75rem;
+    border-block-start: 1px solid var(--lc-rule-strong);
+    color: var(--lc-ink);
+    font-size: clamp(1.375rem, 1.2rem + 0.7vw, 1.75rem);
+  }
+
+  .verify-body h3 {
+    color: var(--lc-ink);
+    font-size: var(--lc-text-h3);
+  }
+
+  .verify-body p {
+    max-inline-size: 46rem;
+    margin-block: 0 0.875rem;
+  }
+
+  .verify-body a {
+    color: var(--lc-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .verify-body :global(strong) {
+    color: var(--lc-ink);
+  }
+
+  .verify-body pre {
+    margin: 0 0 0.75rem;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--lc-rule-strong);
+    background: var(--lc-paper-raised);
+    color: var(--lc-ink);
+    font-size: var(--lc-text-small);
+    line-height: 1.55;
+    text-align: left;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .verify-body pre.vs-out {
+    border-style: dashed;
+    color: var(--lc-ink-muted);
+  }
+
+  .verify-body pre code {
+    font-size: 1em;
+  }
+
+  .vf-table {
+    inline-size: 100%;
+    margin-block: 0.5rem 1rem;
+    border-collapse: collapse;
+    font-size: var(--lc-text-small);
+  }
+
+  .vf-table caption {
+    margin-block-end: 0.5rem;
+    color: var(--lc-ink-faint);
+    text-align: start;
+  }
+
+  .vf-table th,
+  .vf-table td {
+    padding-block: 0.625rem;
+    padding-inline: 0 0.75rem;
+    border-block-end: 1px solid var(--lc-rule);
+    text-align: start;
+    vertical-align: top;
+  }
+
+  .vf-table thead th {
+    color: var(--lc-ink);
+    font-weight: 600;
+  }
+
+  .vf-table tbody th {
+    font-weight: 500;
+  }
+
+  .vf-table code,
+  .vk-key code {
+    overflow-wrap: anywhere;
+    color: var(--lc-ink);
+  }
+
+  .vs-steps {
+    display: grid;
+    gap: 2.5rem;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .vs-step {
+    padding-block-start: 1rem;
+    border-block-start: 1px solid var(--lc-ink);
+  }
+
+  .vs-title {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    margin-block-end: 0.75rem;
+  }
+
+  .vs-n {
+    font-family: var(--lc-font-mono);
+  }
+
+  .vs-dl,
+  .vk-key,
+  .vi-list {
+    margin: 0 0 1rem;
+  }
+
+  .vs-dl dt,
+  .vk-key dt {
+    margin-block-end: 0.375rem;
+    color: var(--lc-ink-faint);
+    font-size: var(--lc-text-xs);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  :lang(he) .vs-dl dt,
+  :lang(he) .vk-key dt {
+    letter-spacing: 0;
+  }
+
+  .vs-dl dd,
+  .vk-key dd {
+    margin: 0 0 1rem;
+  }
+
+  .vk-key {
+    display: grid;
+    gap: 0.25rem;
+    padding: 1.25rem;
+    border: 1px solid var(--lc-ink);
+    background: var(--lc-paper-raised);
+  }
+
+  .vk-key dd {
+    color: var(--lc-ink);
+  }
+
+  .vk-key .fp {
+    font-size: var(--lc-text-small);
+  }
+
+  .vk-history-title {
+    margin-block: 2rem 0.5rem;
+  }
+
+  .vi-list > div {
+    padding-block: 0.75rem;
+    border-block-end: 1px solid var(--lc-rule);
+  }
+
+  .vi-list dt {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.5rem;
+    color: var(--lc-ink);
+  }
+
+  .vi-list dd {
+    margin: 0.25rem 0 0;
+  }
+</style>

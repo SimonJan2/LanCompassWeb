@@ -66,8 +66,25 @@ test.describe("forbidden content", () => {
       for (const wrong of misspellings) {
         expect(`${prose}\n${meta}`, `misspelling "${wrong}"`).not.toContain(wrong);
       }
+      // W7: /licensing/ answers "Is it open source?" with "No … not open source" (C-LIC-8); those
+      // two phrases are the only "open source" any page may carry.
+      const claimsText =
+        p.page === "licensing" ? all.replace(/Is it open source\?|is not open source/g, "") : all;
       for (const claim of forbiddenClaims) {
-        expect(all).not.toMatch(claim);
+        expect(claimsText).not.toMatch(claim);
+      }
+      // W7 (class X): no price, no "free", no "per month / per year", no "coming" editions line.
+      for (const never of [
+        /\bfree\b/i,
+        /חינם/,
+        /\bper (?:month|year)\b/i,
+        /[₪€]/,
+        /support plans are coming/i,
+        /תוכניות תמיכה בדרך/,
+        /\btrial\b/i,
+        /\b(?:sign[- ]up|checkout|countdown)\b/i,
+      ]) {
+        expect(all, `${never}`).not.toMatch(never);
       }
       // No downloads in W1.
       const downloads = await page.evaluate(() =>
@@ -162,6 +179,43 @@ test.describe("the site at the newest release (W2)", () => {
       " * TODO(operator): native Hebrew copy review of this file (docs/copy/he-review.md) before going public.",
     ]);
   });
+});
+
+test.describe("verify and disclosure (W6)", () => {
+  for (const locale of ["en", "he"] as const) {
+    const prefix = locale === "en" ? "" : "/he";
+
+    test(`${locale}: /verify/ says what is inside, what is supported and how to get the bundle`, async ({
+      page,
+    }) => {
+      await page.goto(`${prefix}/verify/`);
+      for (const id of ["inside", "upgrades", "get"]) {
+        await expect(page.locator(`section#${id} h2`), `#${id}`).toHaveCount(1);
+      }
+      const files = await page.locator("#inside dt code").allTextContents();
+      for (const f of ["install.sh", "upgrade.sh", "SHA256SUMS.sig", "lancompass-release.pub"]) {
+        expect(files).toContain(f);
+      }
+      await expect(page.locator('a[href$=".tar.gz"]')).toHaveCount(0);
+    });
+
+    test(`${locale}: /security#disclosure exists, without GitHub`, async ({ page }) => {
+      await page.goto(`${prefix}/security/`);
+      const heading = page.locator("h2#disclosure");
+      await expect(heading).toHaveCount(1);
+      const section = await heading.evaluate((h) => {
+        let text = "";
+        for (let el = h.nextElementSibling; el && el.tagName !== "H2"; el = el.nextElementSibling)
+          text += `${(el as HTMLElement).innerText}\n`;
+        return text;
+      });
+      expect(section).toContain("hello@example.com");
+      expect(section).not.toMatch(/github/i);
+      await expect(page.locator('a[href="/verify/"], a[href="/he/verify/"]').first()).toHaveCount(
+        1,
+      );
+    });
+  }
 });
 
 test.describe("accessibility statement", () => {

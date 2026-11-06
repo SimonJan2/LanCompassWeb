@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { FLAGS, FLAG_VALUES, pathFor } from "./helpers";
+import { DEFAULT, FLAGS, FLAG_VALUES, pathFor } from "./helpers";
 
 async function fillPartner(page: import("@playwright/test").Page) {
   const form = page.locator("form[data-lc-form]");
@@ -22,7 +22,7 @@ test.describe("forms", () => {
 
   for (const locale of ["en", "he"] as const) {
     test(`required fields show inline errors in ${locale}`, async ({ page }) => {
-      await page.goto(`${FLAGS}${pathFor(locale, "design-partners")}`);
+      await page.goto(`${FLAGS}${pathFor(locale, "pilot")}`);
       const form = page.locator("form[data-lc-form]");
       let posted = false;
       page.on("request", (r) => {
@@ -48,8 +48,22 @@ test.describe("forms", () => {
     });
   }
 
+  test("W7: without an endpoint, the pilot's mailto subject names the pilot", async ({ page }) => {
+    for (const [locale, subject] of [
+      ["en", "LanCompass pilot application"],
+      ["he", "בקשה לפיילוט של LanCompass"],
+    ] as const) {
+      await page.goto(`${DEFAULT}${pathFor(locale, "pilot")}`);
+      await expect(page.locator("#apply h2")).toHaveText(
+        locale === "en" ? "Apply for a pilot" : "בקשה לפיילוט",
+      );
+      const href = await page.locator("[data-form-fallback] a[data-mailto]").getAttribute("href");
+      expect(new URL(href!).searchParams.get("subject")).toBe(subject);
+    }
+  });
+
   test("a valid application posts every field to the endpoint", async ({ page }) => {
-    await page.goto(`${FLAGS}/design-partners/`);
+    await page.goto(`${FLAGS}/pilot/`);
     await fillPartner(page);
     const req = page.waitForRequest(FLAG_VALUES.form);
     await page.locator("form[data-lc-form] button[type=submit]").click();
@@ -63,7 +77,7 @@ test.describe("forms", () => {
   });
 
   test("a filled honeypot stops the submission", async ({ page }) => {
-    await page.goto(`${FLAGS}/design-partners/`);
+    await page.goto(`${FLAGS}/pilot/`);
     await fillPartner(page);
     await page
       .locator("[data-honeypot]")
@@ -85,7 +99,7 @@ test.describe("forms", () => {
     test.use({ javaScriptEnabled: false });
 
     test("native validation blocks an empty form, and a valid one posts", async ({ page }) => {
-      await page.goto(`${FLAGS}/he/design-partners/`);
+      await page.goto(`${FLAGS}/he/pilot/`);
       const form = page.locator("form[data-lc-form]");
       let posted = false;
       page.on("request", (r) => {

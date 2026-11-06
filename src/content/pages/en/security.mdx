@@ -94,8 +94,23 @@ Every change is recorded in an audit trail with the person who made it. You can 
 
 {/* C-SEC-12, C-SEC-13 */}
 
-Every bundle carries the reviewer’s pack: `SECURITY.md`, the threat model in English and Hebrew (`THREAT_MODEL.md`, `THREAT_MODEL.he.md`) and `docs/SECURITY_ANSWERS.md` — 63 questions a security review asks, each answer beside the test or file that proves it. The bundle also carries a CycloneDX software bill of materials (SBOM) that names every image’s OS packages. Release downloads are not published on this site yet.
+Every bundle carries the reviewer’s pack: `SECURITY.md`, the threat model in English and Hebrew (`THREAT_MODEL.md`, `THREAT_MODEL.he.md`) and `docs/SECURITY_ANSWERS.md` — 63 questions a security review asks, each answer beside the test or file that proves it. The bundle also carries a CycloneDX software bill of materials (SBOM) that names every image’s OS packages.
 
-## Reporting a vulnerability
+{/* C-VER-2, C-VER-1, C-VER-6 */}
 
-If you find a security problem in LanCompass, please write to <ContactEmail subject="LanCompass security report" /> rather than opening a public issue. Tell us what you found and how to reproduce it. We aim to acknowledge reports within a few days.
+The current release’s files with their checksums, the release key’s fingerprint, the three checks to run before you install, and the SBOM itself are on [Verify a download](/verify/).
+
+<h2 id="disclosure">Reporting a vulnerability</h2>
+
+{/* C-VER-8, C-VER-7 */}
+
+If you find a security problem in LanCompass, please write to <ContactEmail subject="LanCompass security report" />. Please do not open a public issue about it.
+
+A useful report says:
+
+- what you found, and where;
+- the LanCompass version you run;
+- how to reproduce it, step by step;
+- what an attacker could do with it.
+
+We aim to acknowledge reports within a few days. Fixes go to the latest release.

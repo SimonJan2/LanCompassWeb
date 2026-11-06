@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "id": "release",
+    "label": { "en": "Release key", "he": "מפתח הגרסאות" },
+    "purpose": {
+      "en": "Signs the offline bundles, from 0.6.0",
+      "he": "חותם על חבילות ההתקנה, מגרסה 0.6.0"
+    },
+    "sha256": "C0:47:0E:92:CE:F4:F9:DC:EC:DC:35:23:D5:8D:2A:82:DF:8E:B6:73:04:31:E3:AD:B2:47:D6:D2:17:E5:51:8D",
+    "firstRelease": "0.6.0",
+    "lastRelease": null,
+    "claim": "C-VER-1"
+  }
+]

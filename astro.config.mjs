@@ -8,6 +8,9 @@ import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { loadEnv } from "vite";
 import { defaultLocale, localeCodes } from "./src/i18n/locales.ts";
+import { SECURITY_TXT_PATH, securityTxt } from "./src/lib/security-txt.ts";
+import { markRules } from "./src/lib/annotations.ts";
+import { getCopy } from "./src/content/copy/index.ts";
 
 const env = loadEnv(process.env.NODE_ENV ?? "production", process.cwd(), "PUBLIC_");
 const siteUrl = (env.PUBLIC_SITE_URL || "http://localhost:4321").replace(/\/$/, "");
@@ -68,6 +71,63 @@ function themeCss() {
 }
 
 /**
+ * The figure marks' positions (AnnotatedScreen.astro) as a stylesheet: `virtual:lancompass/
+ * figure-marks.css`, one rule per mark the build can draw (markRules in src/lib/annotations.ts),
+ * from W3's anchors, the copy's notes and each capture's size. AnnotatedScreen imports it, so
+ * Vite bundles it into the page's own CSS file: no extra request, and no inline style attribute,
+ * which the CSP (`style-src 'self'`) would block. The sets follow screenSets() in
+ * src/lib/screens.ts (that module globs images, which a config cannot load).
+ * @returns {import("vite").Plugin}
+ */
+function figureMarksCss() {
+  const id = "virtual:lancompass/figure-marks.css";
+  // A path-like id without the \0 prefix, so Vite's CSS pipeline handles it (as UnoCSS does).
+  const resolved = "/__lancompass_figure_marks.css";
+  const root = fileURLToPath(new URL("./src/", import.meta.url));
+  const anchorsFile = join(root, "content/screen-anchors.json");
+  /** @type {Record<string, string[]>} */
+  const setsFor = { light: ["survey"], dark: ["night-chart"], auto: ["survey", "night-chart"] };
+  return {
+    name: "lancompass:figure-marks-css",
+    enforce: "pre",
+    resolveId(source) {
+      return source === id ? resolved : null;
+    },
+    async load(loadId) {
+      if (loadId !== resolved) return null;
+      this.addWatchFile(anchorsFile);
+      const anchors = JSON.parse(await readFile(anchorsFile, "utf8"));
+      const sets = /** @type {("survey" | "night-chart")[]} */ (setsFor[siteTheme]);
+      /** @type {Map<string, { width: number; height: number } | null>} */
+      const sizes = new Map();
+      for (const locale of localeCodes) {
+        for (const screen of Object.keys(getCopy(locale).figures)) {
+          for (const variant of /** @type {const} */ (["full", "focus"])) {
+            const name = variant === "focus" ? `${screen}.focus.png` : `${screen}.png`;
+            const file = join(root, "assets/screens", sets[0] ?? "survey", locale, name);
+            let size = null;
+            try {
+              const png = await readFile(file);
+              size = { width: png.readUInt32BE(16), height: png.readUInt32BE(20) };
+            } catch {
+              size = null;
+            }
+            sizes.set(`${locale}/${screen}/${variant}`, size);
+          }
+        }
+      }
+      const css = markRules(anchors, {
+        sets,
+        locales: localeCodes,
+        notes: (locale) => getCopy(locale).figures,
+        size: (locale, screen, variant) => sizes.get(`${locale}/${screen}/${variant}`) ?? null,
+      });
+      return `/* The figure marks' positions (astro.config.mjs → figureMarksCss). */\n${css}\n`;
+    },
+  };
+}
+
+/**
  * Moves /<locale>/404/index.html to /<locale>/404.html, where static hosts that
  * serve the nearest 404.html (Cloudflare Pages) look for it.
  * @returns {import("astro").AstroIntegration}
@@ -111,6 +171,30 @@ function headersFormAction() {
   };
 }
 
+/**
+ * W6: writes /.well-known/security.txt (RFC 9116) only when PUBLIC_CONTACT_EMAIL and
+ * PUBLIC_SITE_URL are both set (DECISIONS.md D-CONTACT); otherwise the build has no such file.
+ * Expires is 180 days after the build. See src/lib/security-txt.ts.
+ * @returns {import("astro").AstroIntegration}
+ */
+function securityTxtFile() {
+  return {
+    name: "lancompass:security-txt",
+    hooks: {
+      "astro:build:done": async ({ dir }) => {
+        const text = securityTxt({
+          contactEmail: env.PUBLIC_CONTACT_EMAIL,
+          siteUrl: env.PUBLIC_SITE_URL,
+          now: new Date(),
+        });
+        if (text === null) return;
+        await mkdir(fileURLToPath(new URL(".well-known/", dir)), { recursive: true });
+        await writeFile(fileURLToPath(new URL(SECURITY_TXT_PATH, dir)), text);
+      },
+    },
+  };
+}
+
 export default defineConfig({
   site: siteUrl,
   output: "static",
@@ -130,15 +214,17 @@ export default defineConfig({
     mdx(),
     sitemap({
       i18n: { defaultLocale, locales: Object.fromEntries(localeCodes.map((code) => [code, code])) },
-      filter: (page) => !/\/404\/?$/.test(page),
+      // W7: /design-partners/ is a redirect to /pilot/ (D-PILOT), not a page to index.
+      filter: (page) => !/\/404\/?$/.test(page) && !/\/design-partners\/?$/.test(page),
     }),
     headersFormAction(),
     localized404(),
+    securityTxtFile(),
   ],
   devToolbar: { enabled: false },
   prefetch: false,
   vite: {
-    plugins: [themeCss(), tailwindcss()],
+    plugins: [themeCss(), figureMarksCss(), tailwindcss()],
     // Never inline scripts into HTML: the CSP has no 'unsafe-inline' for scripts.
     build: { assetsInlineLimit: 0 },
   },

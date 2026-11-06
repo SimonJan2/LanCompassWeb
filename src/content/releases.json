@@ -1,5 +1,5 @@
 {
-  "$comment": "Product releases, newest first: the one source for every current-release mention on the site. Read from the product's CHANGELOG.md at each tag (docs/claims.md C-REL-1..4). title is the first line of the release's CHANGELOG section (0.6.1 has only a Fixed list). 0.5.0 was never tagged (CHANGELOG: \"never tagged or published\"), so its tag is null. W6 adds the bundle facts, W8 reads the notes.",
+  "$comment": "Product releases, newest first: the one source for every current-release mention on the site. Read from the product's CHANGELOG.md at each tag (docs/claims.md C-REL-1..4). title is the first line of the release's CHANGELOG section (0.6.1 has only a Fixed list). 0.5.0 was never tagged (CHANGELOG: \"never tagged or published\"), so its tag is null. W6: bundle and sbom are the signed release's facts, each value copied from a command's output on the bundle itself (sha256sum, stat, the .sha256 file, the SBOM's specVersion and components; night C's report quotes them): /verify/ shows them. Releases without them (no bundle on the build host) show none. W8 reads the notes.",
   "releases": [
     {
       "version": "0.7.0",
@@ -7,7 +7,29 @@
       "tag": "v0.7.0",
       "commit": "6d248a18",
       "title": "The topology arc 2, \"A map that tells the truth\", and its expansion, the design studio",
-      "claim": "C-REL-1"
+      "claim": "C-REL-1",
+      "bundle": {
+        "file": "lancompass-0.7.0-offline.tar.gz",
+        "bytes": 369470438,
+        "sha256": "13b573f5a0268e16e32026aa9fef73ad1006853c99e066bcc523f7f6377e41d8",
+        "checksumFile": {
+          "file": "lancompass-0.7.0-offline.tar.gz.sha256",
+          "bytes": 98,
+          "sha256": "c0034fa2e6b651384664b8d74067c5b3b7318802f6c287ba5cbbf08653da12e0"
+        },
+        "folder": "lancompass-0.7.0-offline",
+        "signed": true,
+        "key": "release",
+        "claim": "C-VER-2"
+      },
+      "sbom": {
+        "file": "lancompass-0.7.0-offline.sbom.cdx.json",
+        "bytes": 195452,
+        "sha256": "f41842558d45eff588451252ecd3229cb8c3348b9e9d0e889e8151d90f1511c1",
+        "format": "CycloneDX 1.5",
+        "components": 625,
+        "claim": "C-VER-6"
+      }
     },
     {
       "version": "0.6.1",

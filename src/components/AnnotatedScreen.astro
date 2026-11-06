@@ -15,7 +15,10 @@ import ScreenshotFrame from "./ScreenshotFrame.astro";
 import anchorData from "../content/screen-anchors.json";
 import { fill, useUi, type Locale } from "../i18n";
 import { site } from "../config/site";
-import { figureMarks, type AnchorFile } from "../lib/annotations";
+import { figureMarks, markClass, MARKED_PICTURES, type AnchorFile } from "../lib/annotations";
+// Each mark's position, as rules in this page's stylesheet (astro.config.mjs → figureMarksCss):
+// the CSP blocks style attributes.
+import "virtual:lancompass/figure-marks.css";
 import { findScreen, screenSets, type ScreenKey, type ScreenVariant } from "../lib/screens";
 
 interface Props {
@@ -70,6 +73,11 @@ const marks = picture
       height: crop === "wide" ? picture.width / 2 : picture.height,
     })
   : [];
+if (marks.length > 0 && !MARKED_PICTURES.some((p) => p.variant === shown && p.crop === crop)) {
+  throw new Error(
+    `AnnotatedScreen ${screen}: marks on a ${shown} / ${crop} picture have no position rules; add it to MARKED_PICTURES (src/lib/annotations.ts)`,
+  );
+}
 /** A cropped figure (a focus crop, or the wide band of the loop) links to the whole window. */
 const cropped = shown === "focus" || crop === "wide";
 const fullLinks =
@@ -93,7 +101,7 @@ const frame = Object.fromEntries(
     {marks.length > 0 && (
       <div class="fig-layer">
         {marks.map((m, i) => (
-          <span class="fig-a" style={`--x:${m.x};--y:${m.y};--w:${m.w};--h:${m.h}`}>
+          <span class={`fig-a ${markClass(m)}`}>
             <a
               href={`#fig-${n}-${i + 1}`}
               aria-label={`${fill(ui.figure.note, { m: String(i + 1) })}: ${m.text.replace(/<[^>]+>/g, "")}`}

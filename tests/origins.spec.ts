@@ -17,6 +17,27 @@ test.describe("no third parties", () => {
     });
   }
 
+  test("built HTML has no inline style or script: the CSP (no 'unsafe-inline') would block it", () => {
+    // `astro preview` sends no CSP, so the browser tests cannot see a violation; nginx can
+    // (tests/container.spec.ts). This holds the rule in every build: no style attribute, no
+    // <style> element, and no <script> without src except the JSON-LD data block.
+    const { theme, dist } = siteProject();
+    const dirs = theme === "light" ? ["dist-test", "dist-test-flags"] : [dist];
+    for (const dir of dirs) {
+      const offenders: string[] = [];
+      for (const { file, html } of builtHtml(dir)) {
+        const body = html.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/g, "");
+        for (const m of body.matchAll(/<[a-zA-Z][^>]*\sstyle=["'][^"']*["']/g)) {
+          offenders.push(`${file}: ${m[0].slice(0, 80)}`);
+        }
+        for (const m of body.matchAll(/<style[\s>]|<script(?![^>]*\ssrc=)[^>]*>/g)) {
+          offenders.push(`${file}: ${m[0].slice(0, 80)}`);
+        }
+      }
+      expect(offenders, dir).toEqual([]);
+    }
+  });
+
   test("built HTML references no external origin except configured PUBLIC_* links", () => {
     const attr = /\s(?:src|href|srcset|poster|action|content)=["']([^"']+)["']/g;
     const { theme, dist } = siteProject();

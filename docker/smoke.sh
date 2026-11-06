@@ -14,10 +14,22 @@ check() { # description, expected, actual
 status() { curl -s -o /dev/null -w '%{http_code}' "$@"; }
 header() { curl -s -D - -o /dev/null "$2" ${3:+-H "$3"} | tr -d '\r' | grep -i "^$1:" | head -1 | cut -d' ' -f2-; }
 
-for path in / /product/ /videos/ /security/ /design-partners/ /contact/ /accessibility/ /privacy/ \
-            /he/ /he/product/ /he/videos/ /he/security/ /he/design-partners/ /he/contact/ /he/accessibility/ /he/privacy/; do
+for path in / /product/ /videos/ /security/ /verify/ /pilot/ /licensing/ /contact/ /accessibility/ /privacy/ \
+            /he/ /he/product/ /he/videos/ /he/security/ /he/verify/ /he/pilot/ /he/licensing/ /he/contact/ /he/accessibility/ /he/privacy/; do
   check "GET $path" 200 "$(status "$BASE$path")"
 done
+check "/design-partners/ → 301" 301 "$(status "$BASE/design-partners/")"
+check "/design-partners/ redirect target" "/pilot/" "$(header location "$BASE/design-partners/")"
+check "/he/design-partners/ → 301" 301 "$(status "$BASE/he/design-partners/")"
+check "/he/design-partners/ redirect target" "/he/pilot/" "$(header location "$BASE/he/design-partners/")"
+sbom="$(curl -s "$BASE/verify/" | grep -o '/verify/[^"]*\.sbom\.cdx\.json' | head -1)"
+check "SBOM served" 200 "$(status "$BASE$sbom")"
+check "SBOM is JSON" "application/json; charset=utf-8" "$(header content-type "$BASE$sbom")"
+case "$(status "$BASE/.well-known/security.txt")" in
+  200) check "security.txt is UTF-8 text" "text/plain; charset=utf-8" "$(header content-type "$BASE/.well-known/security.txt")" ;;
+  404) check "no security.txt without PUBLIC_CONTACT_EMAIL and PUBLIC_SITE_URL" 404 404 ;;
+  *) check "security.txt 200 or 404" 200 "$(status "$BASE/.well-known/security.txt")" ;;
+esac
 for path in /sitemap-index.xml /robots.txt /site.webmanifest /favicon.svg /og/he/home.png /healthz; do
   check "GET $path" 200 "$(status "$BASE$path")"
 done

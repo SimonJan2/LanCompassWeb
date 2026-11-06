@@ -21,6 +21,17 @@ is the JSON-LD data block, which browsers never execute and CSP does not govern.
 
 `/_astro/*` files are content-hashed, so they get `Cache-Control: public, max-age=31536000, immutable`.
 
+Two same-origin files need their content types, and nothing else (the CSP is unchanged: no new
+origin):
+
+| File                                                 | Content type                      | Written                                                                                                                                    |
+| ---------------------------------------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `/.well-known/security.txt`                          | `text/plain; charset=utf-8`       | by the build (`astro.config.mjs`, RFC 9116), only when `PUBLIC_CONTACT_EMAIL` and `PUBLIC_SITE_URL` are both set; `Expires` 180 days ahead |
+| `/verify/lancompass-<version>-offline.sbom.cdx.json` | `application/json; charset=utf-8` | copied from `public/verify/`, byte-identical to the release's SBOM                                                                         |
+
+`security.txt` is unsigned. Without a contact address there is no file: a `security.txt` without
+`Contact` is invalid. Rebuild at least every 180 days, or the file's `Expires` passes.
+
 ## nginx
 
 ```nginx
@@ -48,6 +59,12 @@ server {
     # Trailing-slash URLs map to directory index files (Astro build.format "directory").
     location / {
         try_files $uri $uri/index.html $uri.html =404;
+    }
+
+    # The design-partners page is now the pilot page (W7). The build also leaves a small
+    # meta-refresh page at the old URL for hosts without this rule.
+    location ~ ^/(he/)?design-partners/?$ {
+        return 301 /$1pilot/;
     }
 
     # Locale-aware 404 pages.

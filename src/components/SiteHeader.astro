@@ -16,7 +16,7 @@ const ui = useUi(locale);
 const links: { page: PageKey; label: string }[] = [
   { page: "product", label: ui.nav.product },
   { page: "security", label: ui.nav.security },
-  { page: "design-partners", label: ui.nav.designPartners },
+  { page: "pilot", label: ui.nav.pilot },
 ];
 ---
 
@@ -46,7 +46,7 @@ const links: { page: PageKey; label: string }[] = [
     </nav>
     <div class="header-actions">
       <LanguageSwitcher locale={locale} page={page} />
-      <Button href={`${pagePath(locale, "design-partners")}#apply`} class="header-cta">
+      <Button href={`${pagePath(locale, "pilot")}#apply`} class="header-cta">
         {ui.nav.cta}
       </Button>
       <MobileNav locale={locale} page={page} links={links} />

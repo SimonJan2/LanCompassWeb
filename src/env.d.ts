@@ -10,6 +10,9 @@ interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
 
+/** The figure marks' positions, generated at build time (astro.config.mjs → figureMarksCss). */
+declare module "virtual:lancompass/figure-marks.css";
+
 declare namespace App {
   interface Locals {
     /** Set by a page: every Icon on it is drawn inline, none as a <use> of /icons.svg. */

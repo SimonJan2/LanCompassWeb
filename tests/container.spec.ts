@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { expect, test } from "@playwright/test";
 import { pages } from "./helpers";
 
@@ -35,4 +37,45 @@ test.describe("container: enforced CSP", () => {
       expect(problems).toEqual([]);
     });
   }
+
+  test("W7: /design-partners/ answers 301 to /pilot/, in both locales", async ({ request }) => {
+    for (const [from, to] of [
+      ["/design-partners/", "/pilot/"],
+      ["/design-partners", "/pilot/"],
+      ["/he/design-partners/", "/he/pilot/"],
+      ["/he/design-partners", "/he/pilot/"],
+    ] as const) {
+      const res = await request.get(`${base}${from}`, { maxRedirects: 0 });
+      expect(res.status(), from).toBe(301);
+      expect(res.headers()["location"], from).toBe(to);
+      expect(res.headers()["x-content-type-options"], from).toBe("nosniff");
+    }
+    const pilot = await request.get(`${base}/pilot/`);
+    expect(pilot.status()).toBe(200);
+  });
+
+  test("W6: the SBOM is JSON and security.txt is UTF-8 text, both under the CSP", async ({
+    request,
+  }) => {
+    const releases = JSON.parse(
+      readFileSync(join(process.cwd(), "src", "content", "releases.json"), "utf8"),
+    ) as { releases: { sbom?: { file: string; bytes: number } }[] };
+    const sbom = releases.releases[0]!.sbom!;
+    const res = await request.get(`${base}/verify/${sbom.file}`);
+    expect(res.status()).toBe(200);
+    expect(res.headers()["content-type"]).toBe("application/json; charset=utf-8");
+    expect(res.headers()["x-content-type-options"]).toBe("nosniff");
+    expect((await res.body()).length).toBe(sbom.bytes);
+    // The image has a security.txt only when it was built with PUBLIC_CONTACT_EMAIL and
+    // PUBLIC_SITE_URL (DECISIONS.md D-CONTACT); without them, 404.
+    const txt = await request.get(`${base}/.well-known/security.txt`);
+    if (process.env["EXPECT_SECURITY_TXT"] === "1") expect(txt.status()).toBe(200);
+    if (txt.status() === 200) {
+      expect(txt.headers()["content-type"]).toBe("text/plain; charset=utf-8");
+      expect(txt.headers()["content-security-policy"]).toContain("default-src 'self'");
+      expect(await txt.text()).toMatch(/^Contact: mailto:/);
+    } else {
+      expect(txt.status()).toBe(404);
+    }
+  });
 });

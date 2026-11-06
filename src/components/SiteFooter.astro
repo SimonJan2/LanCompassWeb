@@ -22,13 +22,15 @@ const columns = [
       { href: `${home}#how-it-works`, label: f.howItWorks },
       { href: `${home}#integrations`, label: f.integrations },
       { href: pagePath(locale, "security"), label: f.security },
+      { href: pagePath(locale, "verify"), label: f.verify },
       ...(site.docsUrl ? [{ href: site.docsUrl, label: f.docs, flag: "docs" }] : []),
     ],
   },
   {
     title: f.company,
     links: [
-      { href: pagePath(locale, "design-partners"), label: f.designPartners },
+      { href: pagePath(locale, "pilot"), label: f.pilot },
+      { href: pagePath(locale, "licensing"), label: f.licensing },
       { href: pagePath(locale, "contact"), label: f.contact },
     ],
   },

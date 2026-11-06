@@ -36,7 +36,7 @@ const { locale } = Astro.props;
 Astro.locals.inlineIcons = locale === "en";
 const copy = getCopy(locale);
 const h = copy.home;
-const partnersHref = `${pagePath(locale, "design-partners")}#apply`;
+const pilotHref = `${pagePath(locale, "pilot")}#apply`;
 const productHref = pagePath(locale, "product");
 const offlineIcons: IconName[] = ["offline", "eye", "lock", "key", "users", "log"];
 /** The newest release (src/content/releases.json), for the datasheet and What's new. */
@@ -93,7 +93,7 @@ const atlasRows = h.atlas.rows.map((row) => ({
         <h1 id="hero-title" class="hero-title" set:html={h.hero.title} />
         <p class="hero-lead" set:html={h.hero.lead} />
         <div class="hero-ctas">
-          <Button href={partnersHref}>{h.hero.primary}</Button>
+          <Button href={pilotHref}>{h.hero.primary}</Button>
           <Button href="#how-it-works" variant="secondary" arrow>
             {h.hero.secondary}
           </Button>
@@ -320,7 +320,7 @@ const atlasRows = h.atlas.rows.map((row) => ({
     </div>
   </section>
 
-  <!-- 360° Night band: design partners -->
+  <!-- 360° Night band: the pilot (W7) -->
   <section
     class="section defer-render surface-night partners-band"
     aria-labelledby="partners-title"
@@ -331,29 +331,18 @@ const atlasRows = h.atlas.rows.map((row) => ({
         <p class="partners-bearing" aria-hidden="true" dir="ltr">
           360°
         </p>
-        <Eyebrow>{h.partners.eyebrow}</Eyebrow>
-        <h2 id="partners-title" class="partners-title" set:html={h.partners.title} />
-        <p class="text-lead partners-lead" set:html={h.partners.lead} />
-        <Button href={partnersHref}>{h.partners.cta}</Button>
+        <Eyebrow>{h.pilot.eyebrow}</Eyebrow>
+        <h2 id="partners-title" class="partners-title" set:html={h.pilot.title} />
+        <p class="text-lead partners-lead" set:html={h.pilot.lead} />
+        <Button href={pilotHref}>{h.pilot.cta}</Button>
       </div>
       <div class="partners-lists">
         <div>
-          <h3 class="group-title">{h.partners.getsTitle}</h3>
+          <h3 class="group-title">{h.pilot.getsTitle}</h3>
           <ul class="partners-list" role="list">
-            {h.partners.gets.map((item) => (
+            {h.pilot.gets.map((item) => (
               <li>
                 <Icon name="check" size={18} class="partners-check" />
-                <span set:html={item} />
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <h3 class="group-title">{h.partners.asksTitle}</h3>
-          <ul class="partners-list" role="list">
-            {h.partners.asks.map((item) => (
-              <li>
-                <Icon name="arrow" size={18} class="partners-check" />
                 <span set:html={item} />
               </li>
             ))}

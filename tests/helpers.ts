@@ -57,8 +57,10 @@ export function builtHtml(dir: string): { file: string; html: string }[] {
   return out;
 }
 
-/** Pages allowed to show a TODO(operator) marker in visible text (listed in the W1 session report). */
-export const todoAllowed = new Set<PageKey>(["privacy", "accessibility"]);
+/** Pages allowed to show a TODO(operator) marker in visible text (listed in the W1 session report):
+ *  the legal pages, and since W7 the pilot and licensing pages, which carry the legal-review
+ *  marker until the operator's lawyer has read them (night C report). */
+export const todoAllowed = new Set<PageKey>(["privacy", "accessibility", "pilot", "licensing"]);
 
 /** What a Playwright project serves (playwright.config.ts → projects[].metadata). */
 export interface SiteProject {

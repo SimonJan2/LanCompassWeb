@@ -58,7 +58,9 @@ const productPages = [
 interface DomFigure {
   id: string;
   screen: string;
-  marks: { href: string; text: string; label: string; style: string }[];
+  /** `style`: the position the browser applies (computed custom properties, from the page's
+   *  stylesheet); `inline`: whether the mark carries a style attribute (the CSP forbids it). */
+  marks: { href: string; text: string; label: string; style: string; inline: boolean }[];
   notes: { id: string; text: string }[];
   caption: string;
 }
@@ -70,11 +72,15 @@ async function readFigures(page: Page): Promise<DomFigure[]> {
       screen: f.querySelector<HTMLElement>(".shot")?.dataset["screen"] ?? "",
       marks: [...f.querySelectorAll<HTMLElement>(".fig-a")].map((span) => {
         const a = span.querySelector("a")!;
+        const css = getComputedStyle(span);
         return {
           href: a.getAttribute("href") ?? "",
           text: (a.textContent ?? "").trim(),
           label: a.getAttribute("aria-label") ?? "",
-          style: span.getAttribute("style") ?? "",
+          style: ["--x", "--y", "--w", "--h"]
+            .map((p) => `${p}:${css.getPropertyValue(p).trim()}`)
+            .join(";"),
+          inline: span.hasAttribute("style"),
         };
       }),
       notes: [...f.querySelectorAll<HTMLElement>(".fig-notes li")].map((li) => ({
@@ -124,7 +130,8 @@ test.describe("W4: annotated figures", () => {
             return [...f.querySelectorAll<HTMLElement>(".fig-a")].map((span) => {
               const a = span.querySelector("a")!;
               const r = a.getBoundingClientRect();
-              const v = (name: string) => parseFloat(span.style.getPropertyValue(name)) / 100;
+              const v = (name: string) =>
+                parseFloat(getComputedStyle(span).getPropertyValue(name)) / 100;
               return {
                 id: `${f.id} mark ${a.textContent}`,
                 pic: pic.toJSON(),
@@ -183,6 +190,11 @@ test.describe("W4: annotated figures", () => {
           f.marks.map((m) => m.style),
           f.id,
         ).toEqual(mine);
+        // The position comes from the stylesheet, never a style attribute (the CSP blocks those).
+        expect(
+          f.marks.filter((m) => m.inline).length,
+          `${f.id}: marks with a style attribute`,
+        ).toBe(0);
         if (JSON.stringify(mine) !== JSON.stringify(expected(other))) differsFromOther++;
       }
       // The two locales' captures differ (the Hebrew window is mirrored by the product itself),

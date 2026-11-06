@@ -5,7 +5,7 @@ import CompassMark from "./CompassMark.astro";
 import Eyebrow from "./Eyebrow.astro";
 import Contours from "./motifs/Contours.astro";
 import { getCopy } from "../content/copy";
-import { pagePath, type Locale } from "../i18n";
+import { pagePath, useUi, type Locale } from "../i18n";
 
 interface Props {
   locale: Locale;
@@ -36,6 +36,9 @@ const n = copy.notFound;
         <div class="nf-actions">
           <Button href={pagePath(locale, "home")} arrow>
             {n.home}
+          </Button>
+          <Button href={`${pagePath(locale, "pilot")}#apply`} variant="secondary">
+            {useUi(locale).nav.cta}
           </Button>
         </div>
       </div>
@@ -74,6 +77,9 @@ const n = copy.notFound;
   }
 
   .nf-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
     margin-block-start: 2rem;
   }
 

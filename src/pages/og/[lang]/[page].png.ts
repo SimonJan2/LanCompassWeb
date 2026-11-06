@@ -31,15 +31,21 @@ export const GET: APIRoute = async ({ props }) => {
   } else if (page === "product") {
     eyebrow = copy.product.eyebrow;
     title = copy.product.title;
-  } else if (page === "design-partners") {
-    eyebrow = copy.partners.eyebrow;
-    title = copy.partners.title;
+  } else if (page === "pilot") {
+    eyebrow = copy.pilot.eyebrow;
+    title = copy.pilot.title;
+  } else if (page === "licensing") {
+    eyebrow = copy.licensing.eyebrow;
+    title = copy.licensing.title;
   } else if (page === "contact") {
     eyebrow = copy.contact.eyebrow;
     title = copy.contact.lead;
   } else if (page === "videos") {
     eyebrow = copy.videoText.eyebrow;
     title = copy.videoText.title;
+  } else if (page === "verify") {
+    eyebrow = copy.verify.eyebrow;
+    title = copy.verify.title;
   } else {
     const entry = await getEntry("pages", `${locale}/${page}`);
     eyebrow = entry?.data.eyebrow ?? copy.meta[page].title;
