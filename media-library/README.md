@@ -3,39 +3,44 @@
 Product imagery captured from the LanCompass demo estate, kept for later use. The site only
 reads `src/assets/screens/` and `public/media/`; nothing in this folder is built or served.
 
-Every file shows the fictional demo estate only. It was captured read-only: the scripts sign
-in, set the theme and language in the capture browser's `localStorage`, navigate and scroll.
-They never approve, dismiss, edit or save anything in the product.
+Every file shows the fictional demo estate only. Screens come from the signed release bundle on
+a throwaway stack (`scripts/capture-stack/`), where the capture only navigates, scrolls,
+selects and opens panels; the few writes a frame needs (a comment with a reply and a signed
+version on each demo design) are staged on that stack beforehand and listed in
+`screens/CAPTURED.json`. Videos were recorded read-only on a development stack (W1.3; W5
+re-records them).
 
-## Screens — `screens/<theme>/<locale>/<screen>.png`
+## Screens — `screens/<set>/<locale>/<key>.png` and `<key>.focus.png`
 
-2× PNGs at 1440 × 900 (2880 × 1800 px), one per site screenshot slot, in both interface
-languages and two product themes:
+2× PNGs at 1440 × 900 (2880 × 1800 px) of the full window, and a focus crop around each key's
+main element (its box plus 24 px, at least 760 × 475 CSS px), in both interface languages and
+the product's two official themes. `scripts/capture-screenshots.mjs` writes them into
+`src/assets/screens/<set>/` (what the site builds) and copies them here.
 
-| Theme                | Folder               | Use                                                                |
-| -------------------- | -------------------- | ------------------------------------------------------------------ |
-| Light                | `screens/light/`     | The light site's set (copied into `src/assets/screens/light/`).    |
-| LanCompass Nightwire | `screens/nightwire/` | The dark site's set (copied into `src/assets/screens/nightwire/`). |
+| Theme       | Folder                 | Use                                   |
+| ----------- | ---------------------- | ------------------------------------- |
+| Survey      | `screens/survey/`      | The light site's set (`auto`: light). |
+| Night chart | `screens/night-chart/` | The dark site's set (`auto`: dark).   |
 
-| Screen              | Product route                                                                                                        |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `dashboard`         | `/`                                                                                                                  |
-| `ipam-tree`         | `/tree` (prefix hierarchy)                                                                                           |
-| `rack`              | `/racks/<DC-A01>` (elevation)                                                                                        |
-| `topology-observed` | `/topology?scope=…&focus=edge:obs-…` (the review queue's ghost-link deep link; Observed layer on in view state only) |
-| `review`            | `/review`                                                                                                            |
-| `deep-discovery`    | `/discovery` (the demo estate has no Deep Discovery identities, so this is the discovery inbox)                      |
-| `nac`               | `/nac`                                                                                                               |
-| `compliance`        | `/reports`, scrolled to the compliance section                                                                       |
+| Key                 | Product route (ids looked up at capture time)                                        |
+| ------------------- | ------------------------------------------------------------------------------------ |
+| `dashboard`         | `/`                                                                                  |
+| `ipam-tree`         | `/tree` (prefix hierarchy)                                                           |
+| `rack`              | `/racks/<DC-A01>` (elevation)                                                        |
+| `topology-observed` | `/review` → a ghost row's `focus=edge:obs-…` link                                    |
+| `review`            | `/review`, scrolled to the ghost-link section                                        |
+| `nac`               | `/nac` (overview: detection only)                                                    |
+| `compliance`        | `/reports`, scrolled to the compliance section                                       |
+| `discovery-queue`   | `/discovery` (the one queue)                                                         |
+| `map-ages`          | `/topology?scope=site:<Demo HQ>&view=1&since=7d`, one line's card open (its age)     |
+| `ask-the-map`       | `/topology?scope=site:<Demo HQ>&view=1&q=where is <an HQ address>`                   |
+| `design-studio`     | `/topology?d=<Branch refresh \| תכנון DMZ חדש>`, the switch selected, inspector open |
+| `rack-studio`       | `/racks/<DC-A01>?lens=power`                                                         |
+| `ip-plan`           | `/prefixes/<10.130.100.0/24>?tab=plan&view=grid`                                     |
+| `licence`           | `/settings/license` (evaluation)                                                     |
+| `gallery`           | `/gallery`                                                                           |
 
-Re-capture:
-
-```bash
-docker run --rm --network host --user "$(id -u):$(id -g)" -e HOME=/tmp \
-  -e LANCOMPASS_DEMO_URL=http://localhost:3010 -e LANCOMPASS_DEMO_USER -e LANCOMPASS_DEMO_PASS \
-  -e LANCOMPASS_CAPTURE_THEME=nightwire -e LANCOMPASS_CAPTURE_DIR=/app/media-library/screens/nightwire \
-  -v "$PWD":/app -w /app mcr.microsoft.com/playwright:v1.64.0-noble node scripts/capture-screenshots.mjs
-```
+Re-capture: `scripts/capture-stack/README.md` → "Re-capture at a release".
 
 ## Videos — `videos/<theme>-<ui>/<key>.*`
 

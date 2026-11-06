@@ -1,0 +1,542 @@
+{
+  "keys": {
+    "dashboard": {
+      "route": "/",
+      "follow": null,
+      "ready": "[data-tour-id=\"tour:dash-grid\"]",
+      "focus": "[data-tour-id=\"tour:dash-grid\"]",
+      "clips": {
+        "survey/en": {
+          "x": 240,
+          "y": 28,
+          "width": 1200,
+          "height": 872
+        },
+        "survey/he": {
+          "x": 0,
+          "y": 28,
+          "width": 1200,
+          "height": 872
+        },
+        "night-chart/en": {
+          "x": 240,
+          "y": 28,
+          "width": 1200,
+          "height": 872
+        },
+        "night-chart/he": {
+          "x": 0,
+          "y": 28,
+          "width": 1200,
+          "height": 872
+        }
+      }
+    },
+    "ipam-tree": {
+      "route": "/tree",
+      "follow": null,
+      "ready": "[role=\"tree\"] [role=\"treeitem\"]",
+      "focus": "[role=\"tree\"]",
+      "clips": {
+        "survey/en": {
+          "x": 240,
+          "y": 174,
+          "width": 1200,
+          "height": 702
+        },
+        "survey/he": {
+          "x": 0,
+          "y": 174,
+          "width": 1200,
+          "height": 702
+        },
+        "night-chart/en": {
+          "x": 240,
+          "y": 174,
+          "width": 1200,
+          "height": 702
+        },
+        "night-chart/he": {
+          "x": 0,
+          "y": 174,
+          "width": 1200,
+          "height": 702
+        }
+      }
+    },
+    "rack": {
+      "route": "/racks/<DC-A01>",
+      "follow": null,
+      "ready": "main svg",
+      "focus": "the largest svg in main (the elevation)",
+      "clips": {
+        "survey/en": {
+          "x": 334,
+          "y": 0,
+          "width": 760,
+          "height": 900
+        },
+        "survey/he": {
+          "x": 346,
+          "y": 0,
+          "width": 760,
+          "height": 900
+        },
+        "night-chart/en": {
+          "x": 334,
+          "y": 0,
+          "width": 760,
+          "height": 900
+        },
+        "night-chart/he": {
+          "x": 346,
+          "y": 0,
+          "width": 760,
+          "height": 900
+        }
+      }
+    },
+    "topology-observed": {
+      "route": "/review",
+      "follow": "a[href*=\"/topology?\"][href*=\"focus=edge:obs-\"]",
+      "ready": ".react-flow__edge.topo-focus",
+      "focus": ".react-flow__edge.topo-focus",
+      "clips": {
+        "survey/en": {
+          "x": 541,
+          "y": 335,
+          "width": 760,
+          "height": 475
+        },
+        "survey/he": {
+          "x": 301,
+          "y": 335,
+          "width": 760,
+          "height": 475
+        },
+        "night-chart/en": {
+          "x": 541,
+          "y": 335,
+          "width": 760,
+          "height": 475
+        },
+        "night-chart/he": {
+          "x": 301,
+          "y": 335,
+          "width": 760,
+          "height": 475
+        }
+      }
+    },
+    "review": {
+      "route": "/review",
+      "follow": null,
+      "ready": "[data-page-meta]",
+      "focus": "the card holding the ghost-link rows",
+      "clips": {
+        "survey/en": {
+          "x": 240,
+          "y": 56,
+          "width": 1200,
+          "height": 510
+        },
+        "survey/he": {
+          "x": 0,
+          "y": 56,
+          "width": 1200,
+          "height": 510
+        },
+        "night-chart/en": {
+          "x": 240,
+          "y": 56,
+          "width": 1200,
+          "height": 510
+        },
+        "night-chart/he": {
+          "x": 0,
+          "y": 56,
+          "width": 1200,
+          "height": 510
+        }
+      }
+    },
+    "nac": {
+      "route": "/nac",
+      "follow": null,
+      "ready": "[data-nac-banner]",
+      "focus": "the detection banner and the first card (findings by kind)",
+      "clips": {
+        "survey/en": {
+          "x": 240,
+          "y": 47,
+          "width": 1200,
+          "height": 475
+        },
+        "survey/he": {
+          "x": 0,
+          "y": 47,
+          "width": 1200,
+          "height": 475
+        },
+        "night-chart/en": {
+          "x": 240,
+          "y": 47,
+          "width": 1200,
+          "height": 475
+        },
+        "night-chart/he": {
+          "x": 0,
+          "y": 47,
+          "width": 1200,
+          "height": 475
+        }
+      }
+    },
+    "compliance": {
+      "route": "/reports",
+      "follow": null,
+      "ready": "#report-compliance",
+      "focus": "#report-compliance",
+      "clips": {
+        "survey/en": {
+          "x": 240,
+          "y": 0,
+          "width": 1200,
+          "height": 900
+        },
+        "survey/he": {
+          "x": 0,
+          "y": 48,
+          "width": 1200,
+          "height": 792
+        },
+        "night-chart/en": {
+          "x": 240,
+          "y": 0,
+          "width": 1200,
+          "height": 900
+        },
+        "night-chart/he": {
+          "x": 0,
+          "y": 48,
+          "width": 1200,
+          "height": 792
+        }
+      }
+    },
+    "discovery-queue": {
+      "route": "/discovery",
+      "follow": null,
+      "ready": "[data-queue] li[data-queue-group]",
+      "focus": "[data-queue]",
+      "clips": {
+        "survey/en": {
+          "x": 240,
+          "y": 158,
+          "width": 1200,
+          "height": 520
+        },
+        "survey/he": {
+          "x": 0,
+          "y": 158,
+          "width": 1200,
+          "height": 520
+        },
+        "night-chart/en": {
+          "x": 240,
+          "y": 158,
+          "width": 1200,
+          "height": 520
+        },
+        "night-chart/he": {
+          "x": 0,
+          "y": 158,
+          "width": 1200,
+          "height": 520
+        }
+      }
+    },
+    "map-ages": {
+      "route": "/topology?scope=site:<Demo HQ>&view=1&since=7d",
+      "follow": null,
+      "ready": ".topo-canvas .react-flow__edge",
+      "focus": "the open line card with its age, and the Changes lens chip",
+      "clips": {
+        "survey/en": {
+          "x": 430,
+          "y": 106,
+          "width": 760,
+          "height": 581
+        },
+        "survey/he": {
+          "x": 363,
+          "y": 106,
+          "width": 760,
+          "height": 581
+        },
+        "night-chart/en": {
+          "x": 430,
+          "y": 106,
+          "width": 760,
+          "height": 581
+        },
+        "night-chart/he": {
+          "x": 363,
+          "y": 106,
+          "width": 760,
+          "height": 581
+        }
+      }
+    },
+    "ask-the-map": {
+      "route": "/topology?scope=site:<Demo HQ>&view=1&q=where%20is%20%3Can%20address%3E",
+      "follow": null,
+      "ready": "[data-question-answer]",
+      "focus": "[data-question-answer]",
+      "clips": {
+        "survey/en": {
+          "x": 240,
+          "y": 0,
+          "width": 1200,
+          "height": 475
+        },
+        "survey/he": {
+          "x": 0,
+          "y": 0,
+          "width": 1200,
+          "height": 475
+        },
+        "night-chart/en": {
+          "x": 240,
+          "y": 0,
+          "width": 1200,
+          "height": 475
+        },
+        "night-chart/he": {
+          "x": 0,
+          "y": 0,
+          "width": 1200,
+          "height": 475
+        }
+      }
+    },
+    "design-studio": {
+      "route": "/topology?d=<Branch refresh>",
+      "follow": null,
+      "ready": ".design-canvas",
+      "focus": "the selected object at the canvas's inner edge and the inspector beside it",
+      "clips": {
+        "survey/en": {
+          "x": 680,
+          "y": 230,
+          "width": 760,
+          "height": 520
+        },
+        "survey/he": {
+          "x": 0,
+          "y": 230,
+          "width": 760,
+          "height": 520
+        },
+        "night-chart/en": {
+          "x": 680,
+          "y": 230,
+          "width": 760,
+          "height": 520
+        },
+        "night-chart/he": {
+          "x": 0,
+          "y": 230,
+          "width": 760,
+          "height": 520
+        }
+      }
+    },
+    "rack-studio": {
+      "route": "/racks/<DC-A01>?lens=power",
+      "follow": null,
+      "ready": "[data-lens=\"power\"][aria-pressed=\"true\"]",
+      "focus": "the largest svg in main (the rack, power lens)",
+      "clips": {
+        "survey/en": {
+          "x": 334,
+          "y": 0,
+          "width": 760,
+          "height": 900
+        },
+        "survey/he": {
+          "x": 346,
+          "y": 0,
+          "width": 760,
+          "height": 900
+        },
+        "night-chart/en": {
+          "x": 334,
+          "y": 0,
+          "width": 760,
+          "height": 900
+        },
+        "night-chart/he": {
+          "x": 346,
+          "y": 0,
+          "width": 760,
+          "height": 900
+        }
+      }
+    },
+    "ip-plan": {
+      "route": "/prefixes/<10.130.100.0/24>?tab=plan&view=grid",
+      "follow": null,
+      "ready": "[data-address-map]",
+      "focus": "[data-address-map]",
+      "clips": {
+        "survey/en": {
+          "x": 240,
+          "y": 89,
+          "width": 864,
+          "height": 811
+        },
+        "survey/he": {
+          "x": 336,
+          "y": 89,
+          "width": 864,
+          "height": 811
+        },
+        "night-chart/en": {
+          "x": 240,
+          "y": 89,
+          "width": 864,
+          "height": 811
+        },
+        "night-chart/he": {
+          "x": 336,
+          "y": 89,
+          "width": 864,
+          "height": 811
+        }
+      }
+    },
+    "licence": {
+      "route": "/settings/license",
+      "follow": null,
+      "ready": "[data-license-state=\"evaluation\"]",
+      "focus": "[data-license-state=\"evaluation\"]",
+      "clips": {
+        "survey/en": {
+          "x": 239,
+          "y": 0,
+          "width": 760,
+          "height": 475
+        },
+        "survey/he": {
+          "x": 444,
+          "y": 0,
+          "width": 760,
+          "height": 475
+        },
+        "night-chart/en": {
+          "x": 239,
+          "y": 0,
+          "width": 760,
+          "height": 475
+        },
+        "night-chart/he": {
+          "x": 444,
+          "y": 0,
+          "width": 760,
+          "height": 475
+        }
+      }
+    },
+    "gallery": {
+      "route": "/gallery",
+      "follow": null,
+      "ready": "[data-gallery-collection=\"showcase\"]",
+      "focus": "[data-gallery-collection=\"showcase\"]",
+      "clips": {
+        "survey/en": {
+          "x": 240,
+          "y": 0,
+          "width": 1200,
+          "height": 900
+        },
+        "survey/he": {
+          "x": 0,
+          "y": 0,
+          "width": 1200,
+          "height": 900
+        },
+        "night-chart/en": {
+          "x": 240,
+          "y": 0,
+          "width": 1200,
+          "height": 900
+        },
+        "night-chart/he": {
+          "x": 0,
+          "y": 0,
+          "width": 1200,
+          "height": 900
+        }
+      }
+    }
+  },
+  "$comment": "W3: where the site's product screens come from. Written by scripts/capture-screenshots.mjs.",
+  "product_version": "0.7.0",
+  "bundle_sha256": "13b573f5a0268e16e32026aa9fef73ad1006853c99e066bcc523f7f6377e41d8",
+  "release_key_fingerprint": "C0:47:0E:92:CE:F4:F9:DC:EC:DC:35:23:D5:8D:2A:82:DF:8E:B6:73:04:31:E3:AD:B2:47:D6:D2:17:E5:51:8D",
+  "captured_on": "2026-11-06",
+  "demo_estate_loaded_at": "2026-11-06T14:58:31+02:00",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "device_scale_factor": 2,
+  "sets": ["night-chart", "survey"],
+  "locales": ["en", "he"],
+  "staged_writes": [
+    {
+      "lang": "en",
+      "design": "Branch refresh",
+      "design_id": 3,
+      "comment": {
+        "id": 5,
+        "on": "object d-demo-br-sw BR-SW-01",
+        "body": "Check the uplink speed on this switch before the cut-over."
+      },
+      "reply": {
+        "id": 6,
+        "body": "Confirmed: 10G on both ends."
+      },
+      "version": {
+        "id": 1,
+        "name": "Reviewed for the branch cut-over",
+        "signed_at": "2026-11-06T12:59:17.275030Z"
+      }
+    },
+    {
+      "lang": "he",
+      "removed_comment": 3,
+      "reason": "re-pinned to an object"
+    },
+    {
+      "lang": "he",
+      "design": "תכנון DMZ חדש",
+      "design_id": 4,
+      "comment": {
+        "id": 7,
+        "on": "object d-demo-dmz-core CORE-SW-01",
+        "body": "לבדוק את מהירות הקישור במתג הזה לפני ההעברה."
+      },
+      "reply": {
+        "id": 8,
+        "body": "נבדק: 10G בשני הקצוות."
+      },
+      "version": {
+        "id": 2,
+        "name": "נבדק לפני ההעברה",
+        "signed_at": "2026-11-06T12:59:17.336580Z"
+      }
+    }
+  ]
+}

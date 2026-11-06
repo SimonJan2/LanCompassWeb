@@ -46,7 +46,7 @@ const major = ticksOf((deg) => deg % 45 === 0, 12);
     ))}
 </svg>
 
-<style>
+<style is:global>
   .bearing-scale {
     display: block;
     direction: ltr;
@@ -56,18 +56,18 @@ const major = ticksOf((deg) => deg % 45 === 0, 12);
     overflow: visible;
   }
 
-  .scale-base,
-  .tick {
+  .bearing-scale .scale-base,
+  .bearing-scale .tick {
     stroke: var(--lc-rule-strong);
     stroke-width: 1;
     vector-effect: non-scaling-stroke;
   }
 
-  .tick-mid {
+  .bearing-scale .tick-mid {
     stroke: var(--lc-ink-faint);
   }
 
-  .tick-mark {
+  .bearing-scale .tick-mark {
     stroke: var(--lc-drift);
     stroke-width: 2;
     vector-effect: non-scaling-stroke;

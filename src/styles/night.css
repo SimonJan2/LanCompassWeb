@@ -36,8 +36,9 @@
   border-block-start: 1px solid var(--lc-lamp-rule);
 }
 
-/* Product screenshots (Nightwire, near-black) sit on the table as objects: a mat of card
-   indigo inside the strong hairline, with a little more room around the window. */
+/* Product screenshots (Night chart, the page's own indigo since W3) sit on the table as
+   objects: a mat of card indigo inside the strong hairline, with a little more room around the
+   window, so a Night chart window never melts into a Night chart page. */
 :root[data-theme="dark"] .shot {
   padding: 0 0.625rem 0.625rem;
 }

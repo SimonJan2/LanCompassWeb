@@ -1,0 +1,59 @@
+# The capture stack's Compose override (W3), used only through scripts/capture-stack/dc.sh with
+# the env file make-env.mjs writes. It turns the signed bundle's docker-compose.yml into a
+# throwaway stack beside any other LanCompass on the host:
+#   - Postgres, Redis and the web tier rebound to loopback ports from the env file (the bundle
+#     publishes Postgres on 127.0.0.1:5432 and the web tier on every interface);
+#   - the stack's own bridge (subnet and name from the env file) and the web tier's pinned
+#     address on it, which the API trusts for X-Forwarded-For;
+#   - the host-network workers' database and Redis URLs on those loopback ports;
+#   - scans limited to the stack's own bridge (SCAN_* in the env file), SNMP traps off;
+#   - backups into a scratch folder.
+# Written after the product's own night-run pattern (roadmap TOPOLOGY2_NIGHT_K/stack).
+services:
+  db:
+    ports: !override
+      - "127.0.0.1:${DB_PORT}:5432"
+  redis:
+    ports: !override
+      - "127.0.0.1:${REDIS_PORT}:6379"
+  api:
+    environment:
+      LANCOMPASS_TRUSTED_PROXIES: "127.0.0.1,::1,${WEB_IP}"
+      SCAN_NETWORKS: ${SCAN_NETWORKS}
+      SCAN_ONLY_CONFIGURED: "true"
+    volumes: !override
+      - ${BACKUPS_DIR}:/backups
+  scanner:
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@127.0.0.1:${DB_PORT}/${POSTGRES_DB}
+      REDIS_URL: redis://127.0.0.1:${REDIS_PORT}/0
+      SCAN_NETWORKS: ${SCAN_NETWORKS}
+      SCAN_ONLY_CONFIGURED: "true"
+      SCAN_INTERFACE: ${SCAN_INTERFACE}
+      SNMP_TRAPS_ENABLED: "false"
+    volumes: !override
+      - ${BACKUPS_DIR}:/backups
+  discovery:
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@127.0.0.1:${DB_PORT}/${POSTGRES_DB}
+      REDIS_URL: redis://127.0.0.1:${REDIS_PORT}/0
+      SCAN_NETWORKS: ${SCAN_NETWORKS}
+      SCAN_ONLY_CONFIGURED: "true"
+      SCAN_INTERFACE: ${SCAN_INTERFACE}
+    volumes: !override
+      - ${BACKUPS_DIR}:/backups
+  web:
+    ports: !override
+      - "127.0.0.1:${WEB_PORT}:3000"
+    networks:
+      lancompass:
+        ipv4_address: ${WEB_IP}
+
+networks:
+  lancompass:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: ${BRIDGE_NAME}
+    ipam:
+      config:
+        - subnet: ${NET_SUBNET}

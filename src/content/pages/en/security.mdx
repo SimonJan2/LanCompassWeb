@@ -1,55 +1,93 @@
 ---
 eyebrow: Security
 title: Your network data stays on your network.
-lead: LanCompass is built to run inside networks that can’t, or shouldn’t, talk to the internet. This page explains what it reads, what it writes, and how it protects what it stores.
-updated: "2026-10-11"
+lead: LanCompass is built to run inside networks that can’t, or shouldn’t, talk to the internet. This page explains what it reads, what it writes, how it installs, and how it protects what it stores.
+updated: "2026-11-06"
 legalReview: false
 ---
 import ContactEmail from "../../../components/ContactEmail.astro";
 
+{/* Every product paragraph cites its row of docs/claims.md in the comment above it. */}
+
 ## Data never leaves your network
 
-LanCompass is self-hosted. It runs on your own Linux host with one `docker compose up`, and it works fully offline: there is no cloud dependency and nothing it needs from the internet to run.
+{/* C-NET-1, C-INST-1, C-INST-2 */}
+
+LanCompass is self-hosted. It installs on your own Linux host from one signed offline bundle, and it runs with no internet connection: everything it needs is inside the bundle, and nothing is downloaded during the install or fetched while it runs.
 
 ## No telemetry
 
-LanCompass sends no usage data, crash reports or analytics anywhere. Alerts go only to the channels you configure: webhook, email, Discord, Telegram or syslog.
+{/* C-NET-2, C-LIC-1, C-MON-2 */}
+
+LanCompass has no agent, no cloud account and no telemetry: nothing leaves your server except the network operations you configure. The licence is checked on your server, with no network call. Notifications go only to the channels you configure: webhook, email, Discord, Telegram or syslog.
 
 ## Read-only by default
+
+{/* C-RO-1, C-NAC-2 */}
 
 LanCompass reads the network. It writes to it in exactly two places, and both are opt-in and off by default:
 
 - **DNS PTR publishing** to PowerDNS or over RFC 2136. Off until you turn it on.
-- **NAC port actions.** NAC starts with detection only. Enforcement is optional and guarded: it is off by default and needs SNMPv3 with encryption.
+- **NAC port actions.** NAC starts with detection only. Enforcement is optional and guarded: it is off by default, starts in dry run, and needs SNMPv3 with authentication and encryption.
+
+{/* C-RO-2 */}
 
 Everything else — discovery, SNMP, integrations, config backup — only reads.
 
+## A signed bundle, checked before it installs
+
+{/* C-INST-4 */}
+
+The installer checks every file in the bundle against its checksum list, checks the bundle’s Ed25519 signature, and prints the release key’s SHA-256 fingerprint. If anything does not match, it stops before it touches Docker, and nothing is installed.
+
+## HTTPS and hardened defaults
+
+{/* C-SEC-5, C-SEC-6, C-SEC-7, C-SEC-8 */}
+
+A fresh install serves HTTPS, with a certificate it generates or one you provide, and every web response carries security headers. The containers run as non-root users, the database password is generated at install, and the API listens on loopback only, so the web interface is the one door from the network.
+
 ## Secrets at rest
 
-Stored credentials are encrypted at rest with AES-256-GCM. For the secrets you give LanCompass at install time, each one can be read from a file instead of the environment through the `*_FILE` convention (for example `LANCOMPASS_PASSWORD_FILE`), so it never sits in your environment or Compose file. That works with Docker secrets.
+{/* C-SEC-1, C-SEC-2, C-SEC-9 */}
+
+Stored credentials are encrypted at rest with AES-256-GCM. For the secrets you give LanCompass at install time, each one can be read from a file instead of the environment through the `*_FILE` convention (for example `LANCOMPASS_PASSWORD_FILE`), so it never sits in your environment or Compose file. That works with Docker secrets. The master key can be rotated with a command that re-wraps every stored credential.
 
 ## SSH host-key pinning
+
+{/* C-SEC-3 */}
 
 Config backups run over SSH, and LanCompass pins each device’s host key. A device that presents a different key is not trusted silently.
 
 ## Config secrets are masked
 
+{/* C-SEC-4 */}
+
 Stored configs have their secrets masked, such as SNMP communities and user and enable secrets. Viewing a stored revision or a diff needs the `config:read` permission, which API tokens must also carry.
 
-## Authentication
+## Accounts and sign-in
+
+{/* C-AUTH-1, C-AUTH-2, C-AUTH-3, C-AUTH-4 */}
 
 - Local accounts with TOTP multi-factor authentication
 - OIDC single sign-on
-- LDAP and Active Directory sign-in
+- LDAP and Active Directory sign-in; a person the directory disables loses access within 15 minutes
 - Scoped API tokens for automation
+
+{/* C-SEC-10, C-SEC-11 */}
+
+A failed sign-in is written to the audit trail, and disabling a user ends their sessions and stops their API tokens at once.
 
 ## Audit trail
 
-Changes are recorded in an audit trail that you can filter and export, and LanCompass can forward audit events to syslog.
+{/* C-SEC-14 */}
 
-## Offline install and SBOM
+Every change is recorded in an audit trail with the person who made it. You can export it, and LanCompass can forward audit events to syslog.
 
-For hosts with no internet access there is an offline bundle. It carries the container images, the Compose file, an install script that verifies checksums, a CycloneDX software bill of materials (SBOM) and a manifest. Release downloads are not published on this site yet.
+## For your security review
+
+{/* C-SEC-12, C-SEC-13 */}
+
+Every bundle carries the reviewer’s pack: `SECURITY.md`, the threat model in English and Hebrew (`THREAT_MODEL.md`, `THREAT_MODEL.he.md`) and `docs/SECURITY_ANSWERS.md` — 63 questions a security review asks, each answer beside the test or file that proves it. The bundle also carries a CycloneDX software bill of materials (SBOM) that names every image’s OS packages. Release downloads are not published on this site yet.
 
 ## Reporting a vulnerability
 

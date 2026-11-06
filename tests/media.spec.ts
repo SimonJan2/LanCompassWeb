@@ -171,6 +171,166 @@ for (const [path, pageLang, browserLocale] of [
   });
 }
 
+/** The W3 screen sets: every key in Survey and Night chart, en and he, full and focus crop. */
+const screensDir = join(process.cwd(), "src", "assets", "screens");
+const W3_KEYS = [
+  "dashboard",
+  "ipam-tree",
+  "rack",
+  "topology-observed",
+  "review",
+  "nac",
+  "compliance",
+  "discovery-queue",
+  "map-ages",
+  "ask-the-map",
+  "design-studio",
+  "rack-studio",
+  "ip-plan",
+  "licence",
+  "gallery",
+];
+/** A PNG's width and height, from its IHDR chunk. */
+function pngSize(file: string): { width: number; height: number } {
+  const b = readFileSync(file);
+  return { width: b.readUInt32BE(16), height: b.readUInt32BE(20) };
+}
+
+test.describe("screen sets on disk (W3)", () => {
+  test.beforeEach(() => {
+    test.skip(siteProject().theme !== "light", "a source check: light project only");
+  });
+  const record = JSON.parse(
+    readFileSync(join(process.cwd(), "media-library", "screens", "CAPTURED.json"), "utf8"),
+  ) as { sets: string[]; locales: string[]; undone?: string[]; keys: Record<string, unknown> };
+  const anchors = JSON.parse(
+    readFileSync(join(process.cwd(), "src", "content", "screen-anchors.json"), "utf8"),
+  ) as Record<
+    string,
+    Record<
+      string,
+      Record<
+        string,
+        {
+          clip: { x: number; y: number; width: number; height: number };
+          full: { name: string; x: number; y: number; w: number; h: number }[];
+          focus: { name: string; x: number; y: number; w: number; h: number }[];
+        }
+      >
+    >
+  >;
+
+  test("only the survey and night-chart sets; no light or nightwire screen folder", () => {
+    expect(readdirSync(screensDir).sort()).toEqual(["night-chart", "survey"]);
+    expect(
+      readdirSync(join(process.cwd(), "media-library", "screens"))
+        .filter((f) => !f.endsWith(".json"))
+        .sort(),
+    ).toEqual(["night-chart", "survey"]);
+    expect(record.sets).toEqual(["night-chart", "survey"]);
+  });
+
+  test("each of the fifteen keys exists in both sets and both locales, full and crop (or is listed as undone)", () => {
+    const undone = new Set(record.undone ?? []);
+    for (const set of ["survey", "night-chart"])
+      for (const locale of ["en", "he"])
+        for (const key of W3_KEYS) {
+          if (undone.has(`${set}/${locale}/${key}`)) continue;
+          for (const file of [`${key}.png`, `${key}.focus.png`])
+            expect(
+              existsSync(join(screensDir, set, locale, file)),
+              `${set}/${locale}/${file}`,
+            ).toBe(true);
+        }
+  });
+
+  test("full windows are 2,880 × 1,800; crops are at least 1,520 wide", () => {
+    for (const set of ["survey", "night-chart"])
+      for (const locale of ["en", "he"])
+        for (const file of readdirSync(join(screensDir, set, locale)).filter((f) =>
+          f.endsWith(".png"),
+        )) {
+          const { width, height } = pngSize(join(screensDir, set, locale, file));
+          if (file.endsWith(".focus.png")) {
+            expect(width, file).toBeGreaterThanOrEqual(1520);
+            expect(height, file).toBeGreaterThanOrEqual(950);
+          } else expect([width, height], `${set}/${locale}/${file}`).toEqual([2880, 1800]);
+        }
+  });
+
+  test("every crop has its clip recorded, and every anchor lies inside its image", () => {
+    for (const set of ["survey", "night-chart"])
+      for (const locale of ["en", "he"])
+        for (const key of W3_KEYS) {
+          const a = anchors[set]?.[locale]?.[key];
+          expect(a, `${set}/${locale}/${key}`).toBeTruthy();
+          const crop = pngSize(join(screensDir, set, locale, `${key}.focus.png`));
+          expect([a!.clip.width * 2, a!.clip.height * 2]).toEqual([crop.width, crop.height]);
+          for (const n of a!.full) {
+            expect(n.x + n.w, `${key} ${n.name}`).toBeLessThanOrEqual(2880);
+            expect(n.y + n.h, `${key} ${n.name}`).toBeLessThanOrEqual(1800);
+            expect(Math.min(n.x, n.y, n.w, n.h)).toBeGreaterThanOrEqual(0);
+          }
+          for (const n of a!.focus) {
+            expect(n.x + n.w, `${key} ${n.name} (crop)`).toBeLessThanOrEqual(crop.width);
+            expect(n.y + n.h, `${key} ${n.name} (crop)`).toBeLessThanOrEqual(crop.height);
+            expect(Math.min(n.x, n.y, n.w, n.h)).toBeGreaterThanOrEqual(0);
+          }
+        }
+  });
+
+  test("the retired deep-discovery key appears nowhere in src/", () => {
+    const hits: string[] = [];
+    const walk = (dir: string) => {
+      for (const e of readdirSync(dir, { withFileTypes: true })) {
+        const full = join(dir, e.name);
+        if (e.isDirectory()) walk(full);
+        else if (/\.(astro|ts|json|mdx|css|mjs)$/.test(e.name))
+          if (readFileSync(full, "utf8").includes("deep-discovery")) hits.push(full);
+      }
+    };
+    walk(join(process.cwd(), "src"));
+    expect(hits).toEqual([]);
+  });
+});
+
+test.describe("screen slots", () => {
+  /** The capture set a project's build shows (src/lib/screens.ts → findScreen). */
+  const screenSet = () => (siteProject().theme === "dark" ? "night-chart" : "survey");
+  const captured = (locale: string, key: string) =>
+    [`${key}.png`, `${key}.focus.png`].some((f) =>
+      existsSync(join(process.cwd(), "src", "assets", "screens", screenSet(), locale, f)),
+    );
+
+  for (const [path, locale] of [
+    ["/", "en"],
+    ["/he/", "he"],
+  ] as const) {
+    test(`${path}: a key without a capture renders the placeholder frame with its alt text`, async ({
+      page,
+    }) => {
+      await page.goto(path);
+      const keys = await page
+        .locator("#whats-new .shot[data-screen]")
+        .evaluateAll((els) => els.map((el) => el.getAttribute("data-screen")!));
+      expect(keys).toEqual(["map-ages", "ask-the-map", "design-studio"]);
+      for (const key of keys) {
+        const frame = page.locator(`#whats-new .shot[data-screen="${key}"]`);
+        if (captured(locale, key)) {
+          await expect(frame).toHaveAttribute("data-captured", "true");
+          await expect(frame.locator("img")).toHaveAttribute("alt", /\S/);
+        } else {
+          await expect(frame).toHaveAttribute("data-captured", "false");
+          const placeholder = frame.locator(".shot-placeholder[role=img]");
+          await expect(placeholder).toHaveCount(1);
+          await expect(placeholder).toHaveAttribute("aria-label", /\S{3,}/);
+          await expect(frame.locator("img")).toHaveCount(0);
+        }
+      }
+    });
+  }
+});
+
 test.describe("recordings on disk", () => {
   const files = (ext: string) =>
     ["light", "nightwire"].flatMap((set) =>

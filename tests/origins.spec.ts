@@ -27,7 +27,7 @@ test.describe("no third parties", () => {
             {
               dir: "dist-test-flags",
               site: FLAGS,
-              allowed: [FLAG_VALUES.docs, FLAG_VALUES.github, FLAG_VALUES.form],
+              allowed: [FLAG_VALUES.docs, FLAG_VALUES.form],
             },
           ]
         : [{ dir: dist, site: siteBase(), allowed: [FLAG_VALUES.form] }];

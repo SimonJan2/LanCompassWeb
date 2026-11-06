@@ -14,7 +14,6 @@ export const DEFAULT = "http://127.0.0.1:4321";
 export const FLAGS = "http://127.0.0.1:4322";
 export const FLAG_VALUES = {
   docs: "https://docs.example.com/",
-  github: "https://github.com/example/lancompass",
   form: "https://forms.example.com/submit",
   email: "hello@example.com",
 };

@@ -227,6 +227,51 @@ test.describe("identity: distance from NetBox Labs", () => {
   }
 });
 
+test.describe("identity: the screenshot frame stands off the page (W3)", () => {
+  // Since W3 the screens are in the site's own pair (Survey, Night chart): the window's edge,
+  // its strong hairline, must be measurably distinct from the ground it sits on.
+  for (const path of ["/", "/product/", "/he/product/"]) {
+    test(`${path}: every frame's edge is ΔE2000 ≥ 10 from its page ground`, async ({ page }) => {
+      await page.goto(path);
+      const pairs = await page.evaluate(() => {
+        const ctx = document.createElement("canvas").getContext("2d")!;
+        const norm = (c: string) => {
+          const m = c.match(/^color\(srgb ([\d.]+) ([\d.]+) ([\d.]+)(?: \/ ([\d.]+))?\)$/);
+          if (m) {
+            const [r, g, b] = [m[1], m[2], m[3]].map((v) => Math.round(Number(v) * 255));
+            return `rgba(${r}, ${g}, ${b}, ${m[4] ?? 1})`;
+          }
+          ctx.fillStyle = "#010203";
+          ctx.fillStyle = c;
+          const out = String(ctx.fillStyle);
+          return out === "#010203" ? c : out;
+        };
+        const opaque = (bg: string) => bg && bg !== "transparent" && !/rgba\(.*,\s*0\)$/.test(bg);
+        return [...document.querySelectorAll<HTMLElement>(".shot")].map((shot) => {
+          let node = shot.parentElement;
+          let ground = "rgb(255, 255, 255)";
+          while (node) {
+            const bg = getComputedStyle(node).backgroundColor;
+            if (opaque(bg)) {
+              ground = bg;
+              break;
+            }
+            node = node.parentElement;
+          }
+          return { edge: norm(getComputedStyle(shot).borderTopColor), ground: norm(ground) };
+        });
+      });
+      expect(pairs.length).toBeGreaterThan(0);
+      const night = rendersDark();
+      for (const { edge, ground } of pairs) {
+        const g = parseColour(ground, night ? NIGHT : PAPER)!;
+        const e = parseColour(edge, g)!;
+        expect(deltaE2000(toLab(e), toLab(g)), `${edge} on ${ground}`).toBeGreaterThanOrEqual(10);
+      }
+    });
+  }
+});
+
 test.describe("identity: the Night chart (dark theme)", () => {
   const tokens = readTokens();
 

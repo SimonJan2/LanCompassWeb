@@ -1,17 +1,17 @@
 ---
 /**
  * A product screenshot in a device-less window frame drawn in CSS. Serves the
- * capture from src/assets/screens/<set>/<locale>/<screen>.png (set: light, or nightwire
+ * capture from src/assets/screens/<set>/<locale>/<screen>.png (set: survey, or night-chart
  * in a dark build; an auto build ships both in one <picture>) through Astro's image
- * pipeline (AVIF + WebP at 800 and 1600 px, explicit size; two widths keep the markup short
+ * pipeline (WebP at 800 and 1600 px, explicit size; two widths keep the markup short
  * — 800 covers phones, 1600 covers 2× desktop frames). While a capture is missing it
  * renders a schematic placeholder of the same 16:10 shape. Screenshots are never
  * mirrored: the frame takes the screenshot's own direction.
  */
-import { Picture, getImage } from "astro:assets";
+import { getImage } from "astro:assets";
 import { fill, locales, useUi, type Locale } from "../i18n";
 import { site } from "../config/site";
-import { findScreen, type ScreenKey } from "../lib/screens";
+import { findScreen, type ScreenKey, type ScreenVariant } from "../lib/screens";
 
 interface Props {
   screen: ScreenKey;
@@ -21,11 +21,22 @@ interface Props {
   screenLocale?: Locale;
   sizes?: string;
   eager?: boolean;
-  /** One WebP at this width instead of a full AVIF + WebP srcset: for small, repeated
-   *  frames (the atlas previews), where the srcset markup would outweigh the benefit. */
+  /** One WebP at this width instead of a srcset: for small, repeated frames (the atlas
+   *  previews), where the srcset markup would outweigh the benefit. Light set only in auto. */
   single?: number;
+  /** The srcset's WebP widths (default 800 and 1600). A narrow slot takes [800]: one URL per
+   *  set keeps the home page inside its first round trip. */
+  widths?: number[];
+  /** With `single`, in an auto build: the dark set's image behind a prefers-color-scheme: dark
+   *  source too (one URL each), for single frames that must follow the scheme. */
+  singleDark?: boolean;
+  /** A preview that repeats what the text beside it names (the atlas): empty alt text. */
+  decorative?: boolean;
   /** Editorial crop: the frame's shape. Captures are 16:10; "wide" crops to 2:1 from the top. */
   crop?: "full" | "wide";
+  /** "focus": a narrow slot shows the capture's focus crop (`<key>.focus.png`) when there is
+   *  one, so its text stays readable; "full" (default) shows the whole window. */
+  variant?: ScreenVariant;
   class?: string;
 }
 
@@ -36,44 +47,54 @@ const {
   sizes = "(min-width: 1200px) 640px, (min-width: 768px) 50vw, 100vw",
   eager = false,
   single,
+  widths = [800, 1600],
+  singleDark = false,
+  decorative = false,
   crop = "full",
+  variant = "full",
   class: className,
 } = Astro.props;
 const ui = useUi(locale);
 const name = ui.screenshot.screens[screen];
-const image = findScreen(site.theme, screenLocale, screen);
-/** auto: the Nightwire capture behind a prefers-color-scheme: dark source, so the browser
- *  fetches only the one that matches. Kept lean so the Hebrew home page stays inside its first
- *  round trip (10 TCP segments) and its LCP budget: WebP only (no AVIF sources), and the small
- *  single-width atlas previews stay light in both schemes. */
-const darkImage = site.theme === "auto" ? findScreen("nightwire", screenLocale, screen) : null;
+const image = findScreen(site.theme, screenLocale, screen, variant);
+/** WebP only, in every theme (W2): every image URL in the HTML is an incompressible hash, and
+ *  the home page must stay inside its first round trip (10 TCP segments) for its LCP budget.
+ *  auto: the dark-set capture behind a prefers-color-scheme: dark source, so the browser
+ *  fetches only the one that matches; the small single-width atlas previews stay light (and step
+ *  aside under a dark scheme: AtlasIndex.astro). */
+const darkImage =
+  site.theme === "auto" ? findScreen("night-chart", screenLocale, screen, variant) : null;
 const darkMedia = "(prefers-color-scheme: dark)";
-const srcset = async (src: NonNullable<typeof image>, format: "webp") => {
+const srcset = async (src: NonNullable<typeof image>) => {
+  const fit = widths.filter((w) => w <= src.width);
   const out = await Promise.all(
-    [800, 1600]
-      .filter((w) => w <= src.width)
-      .map(async (w) => `${(await getImage({ src, width: w, format })).src} ${w}w`),
+    (fit.length ? fit : [src.width]).map(
+      async (w) => `${(await getImage({ src, width: w, format: "webp" })).src} ${w}w`,
+    ),
   );
   return out.join(", ");
 };
-const autoPicture =
-  image && darkImage && !single
+const picture =
+  image && !single
     ? {
-        dark: await srcset(darkImage, "webp"),
-        light: await srcset(image, "webp"),
+        dark: darkImage ? await srcset(darkImage) : null,
+        light: await srcset(image),
         fallback: await getImage({
           src: image,
-          width: Math.min(1600, image.width),
+          width: Math.min(Math.max(...widths), image.width),
           format: "webp",
         }),
       }
     : null;
 const pattern =
-  screen === "rack"
+  screen === "rack" || screen === "rack-studio"
     ? "rack"
-    : screen === "topology-observed"
+    : screen === "topology-observed" ||
+        screen === "map-ages" ||
+        screen === "ask-the-map" ||
+        screen === "design-studio"
       ? "graph"
-      : screen === "dashboard"
+      : screen === "dashboard" || screen === "gallery"
         ? "cards"
         : "table";
 const screenDir = locales[screenLocale].dir;
@@ -81,7 +102,12 @@ const singleImage =
   image && single
     ? await getImage({ src: image, width: Math.min(single, image.width), format: "webp" })
     : null;
+const singleDarkImage =
+  singleImage && singleDark && darkImage
+    ? await getImage({ src: darkImage, width: Math.min(single!, darkImage.width), format: "webp" })
+    : null;
 const plainName = name.replace(/<[^>]+>/g, "");
+const alt = decorative ? "" : fill(ui.screenshot.alt, { screen: plainName });
 ---
 
 <div
@@ -89,23 +115,32 @@ const plainName = name.replace(/<[^>]+>/g, "");
   data-screen={screen}
   data-captured={image ? "true" : "false"}
 >
-  <div class="shot-bar" aria-hidden="true">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-  {image && autoPicture ? (
+  <div class="shot-bar" aria-hidden="true"></div>
+  {image && picture ? (
     <picture>
-      <source media={darkMedia} srcset={autoPicture.dark} sizes={sizes} />
+      {picture.dark && <source media={darkMedia} srcset={picture.dark} sizes={sizes} />}
       <img
-        src={autoPicture.fallback.src}
-        srcset={autoPicture.light}
+        src={picture.fallback.src}
+        srcset={picture.light}
         sizes={sizes}
-        alt={fill(ui.screenshot.alt, { screen: plainName })}
+        alt={alt}
         loading={eager ? "eager" : "lazy"}
         decoding="async"
         width={image.width}
         height={image.height}
+        class="shot-img"
+      />
+    </picture>
+  ) : image && singleImage && singleDarkImage ? (
+    <picture>
+      <source media={darkMedia} srcset={singleDarkImage.src} />
+      <img
+        src={singleImage.src}
+        width={singleImage.attributes.width}
+        height={singleImage.attributes.height}
+        alt={alt}
+        loading={eager ? "eager" : "lazy"}
+        decoding="async"
         class="shot-img"
       />
     </picture>
@@ -114,18 +149,7 @@ const plainName = name.replace(/<[^>]+>/g, "");
       src={singleImage.src}
       width={singleImage.attributes.width}
       height={singleImage.attributes.height}
-      alt={fill(ui.screenshot.alt, { screen: plainName })}
-      loading={eager ? "eager" : "lazy"}
-      decoding="async"
-      class="shot-img"
-    />
-  ) : image ? (
-    <Picture
-      src={image}
-      formats={["avif", "webp"]}
-      widths={[800, 1600].filter((w) => w <= image.width)}
-      sizes={sizes}
-      alt={fill(ui.screenshot.alt, { screen: plainName })}
+      alt={alt}
       loading={eager ? "eager" : "lazy"}
       decoding="async"
       class="shot-img"
@@ -203,7 +227,12 @@ const plainName = name.replace(/<[^>]+>/g, "");
   )}
 </div>
 
-<style>
+<style is:global>
+  /* The window: since W3 the product's own themes are the site's pair (a Survey window on
+     survey paper, a Night chart window on Night chart), so the frame gives the window an edge
+     of its own: the strong hairline (ΔE2000 ≥ 10 from the page ground, tests/identity.spec.ts),
+     a raised plate and a sunk title bar, and a box-shadow in the site's indigo, never black.
+     (Comments here avoid bare Tailwind words: Tailwind scans every file for class names.) */
   .shot {
     overflow: hidden;
     border: 1px solid var(--lc-rule-strong);
@@ -212,45 +241,47 @@ const plainName = name.replace(/<[^>]+>/g, "");
     box-shadow: 0 30px 60px -40px var(--lc-shadow);
   }
 
-  .shot-bar {
-    display: flex;
-    gap: 6px;
-    padding: 9px 12px;
-    border-block-end: 1px solid var(--lc-rule);
-    background: var(--lc-paper-raised);
-    direction: ltr;
+  /* The title bar's three window dots, drawn (no elements: W2 keeps the home page inside its
+     first round trip): 8 px rings at the bar's left, whatever the reading direction. */
+  .shot .shot-bar {
+    --dot: radial-gradient(
+      circle,
+      transparent 3px,
+      var(--lc-rule-strong) 3px 4px,
+      transparent 4.5px
+    );
+    block-size: 27px;
+    border-block-end: 1px solid var(--lc-rule-strong);
+    background:
+      var(--dot) 12px 9px / 8px 8px no-repeat,
+      var(--dot) 26px 9px / 8px 8px no-repeat,
+      var(--dot) 40px 9px / 8px 8px no-repeat,
+      var(--lc-paper-sunk);
   }
 
-  .shot-bar span {
-    inline-size: 8px;
-    block-size: 8px;
-    border: 1px solid var(--lc-rule-strong);
-    border-radius: 50%;
-  }
-
-  .shot-img {
+  .shot .shot-img {
     inline-size: 100%;
     block-size: auto;
   }
 
-  .shot :global(picture) {
+  .shot picture {
     display: block;
   }
 
   /* Editorial crop: a wide band from the top of the capture. */
-  .crop-wide :global(picture) {
+  .shot.crop-wide picture {
     aspect-ratio: 2 / 1;
     overflow: hidden;
   }
 
-  .crop-wide .shot-img {
+  .shot.crop-wide .shot-img {
     block-size: 100%;
     object-fit: cover;
     object-position: top;
   }
 
   /* Placeholder: a schematic of the product in the site's own paper tones. */
-  .shot-placeholder {
+  .shot .shot-placeholder {
     position: relative;
     display: grid;
     grid-template-columns: 15% 1fr;
@@ -258,11 +289,11 @@ const plainName = name.replace(/<[^>]+>/g, "");
     background: var(--lc-paper-raised);
   }
 
-  .crop-wide .shot-placeholder {
+  .shot.crop-wide .shot-placeholder {
     aspect-ratio: 2 / 1;
   }
 
-  .ph-side {
+  .shot .ph-side {
     display: flex;
     flex-direction: column;
     gap: 9%;
@@ -271,7 +302,7 @@ const plainName = name.replace(/<[^>]+>/g, "");
     background: var(--lc-paper);
   }
 
-  .ph-logo {
+  .shot .ph-logo {
     inline-size: 60%;
     block-size: 6%;
     border-radius: 2px;
@@ -279,17 +310,17 @@ const plainName = name.replace(/<[^>]+>/g, "");
     opacity: 0.75;
   }
 
-  .ph-nav {
+  .shot .ph-nav {
     block-size: 3.5%;
     border-radius: 2px;
     background: var(--lc-rule);
   }
 
-  .ph-nav.is-active {
+  .shot .ph-nav.is-active {
     background: var(--lc-ink-faint);
   }
 
-  .ph-main {
+  .shot .ph-main {
     display: flex;
     flex-direction: column;
     gap: 3.5%;
@@ -297,28 +328,28 @@ const plainName = name.replace(/<[^>]+>/g, "");
     min-inline-size: 0;
   }
 
-  .ph-top {
+  .shot .ph-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
     block-size: 8%;
   }
 
-  .ph-title {
+  .shot .ph-title {
     inline-size: 32%;
     block-size: 55%;
     border-radius: 2px;
     background: var(--lc-rule-strong);
   }
 
-  .ph-btn {
+  .shot .ph-btn {
     inline-size: 14%;
     block-size: 70%;
     border-radius: 2px;
     background: var(--lc-action);
   }
 
-  .ph-row {
+  .shot .ph-row {
     display: flex;
     align-items: center;
     gap: 4%;
@@ -327,26 +358,26 @@ const plainName = name.replace(/<[^>]+>/g, "");
     border-block-end: 1px solid var(--lc-rule);
   }
 
-  .ph-cell {
+  .shot .ph-cell {
     block-size: 36%;
     border-radius: 2px;
     background: var(--lc-rule);
   }
 
-  .w-15 {
+  .shot .w-15 {
     inline-size: 15%;
   }
-  .w-20 {
+  .shot .w-20 {
     inline-size: 20%;
   }
-  .w-30 {
+  .shot .w-30 {
     inline-size: 30%;
   }
-  .w-40 {
+  .shot .w-40 {
     inline-size: 40%;
   }
 
-  .ph-pill {
+  .shot .ph-pill {
     inline-size: 11%;
     block-size: 50%;
     border-radius: 2px;
@@ -354,24 +385,24 @@ const plainName = name.replace(/<[^>]+>/g, "");
     box-shadow: inset 0 0 0 1px var(--lc-observed);
   }
 
-  .ph-pill.is-drift {
+  .shot .ph-pill.is-drift {
     background: var(--lc-drift-wash);
     box-shadow: inset 0 0 0 1px var(--lc-drift);
   }
 
-  .ph-pill.is-ok {
+  .shot .ph-pill.is-ok {
     background: var(--lc-documented-wash);
     box-shadow: inset 0 0 0 1px var(--lc-documented-line);
   }
 
-  .ph-cards {
+  .shot .ph-cards {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 4%;
     flex: 1;
   }
 
-  .ph-card {
+  .shot .ph-card {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -381,15 +412,15 @@ const plainName = name.replace(/<[^>]+>/g, "");
     background: var(--lc-paper);
   }
 
-  .ph-card.is-wide {
+  .shot .ph-card.is-wide {
     grid-column: span 2;
   }
 
-  .ph-card .ph-cell {
+  .shot .ph-card .ph-cell {
     block-size: 8px;
   }
 
-  .ph-spark {
+  .shot .ph-spark {
     block-size: 30%;
     border-block-end: 1.5px solid var(--lc-observed);
     background: linear-gradient(to top, var(--lc-observed-wash), transparent);
@@ -406,14 +437,14 @@ const plainName = name.replace(/<[^>]+>/g, "");
     );
   }
 
-  .ph-racks {
+  .shot .ph-racks {
     display: flex;
     justify-content: center;
     gap: 8%;
     flex: 1;
   }
 
-  .ph-rack {
+  .shot .ph-rack {
     display: flex;
     flex-direction: column;
     gap: 3%;
@@ -423,43 +454,43 @@ const plainName = name.replace(/<[^>]+>/g, "");
     border-radius: 2px;
   }
 
-  .ph-unit {
+  .shot .ph-unit {
     flex: 1;
     border-radius: 1px;
     background: var(--lc-paper-sunk);
   }
 
-  .ph-unit.is-filled {
+  .shot .ph-unit.is-filled {
     background: var(--lc-rule-strong);
   }
 
-  .ph-unit.is-tall {
+  .shot .ph-unit.is-tall {
     flex: 2.2;
     background: var(--lc-ink-faint);
   }
 
-  .ph-graph {
+  .shot .ph-graph {
     flex: 1;
     inline-size: 100%;
   }
 
-  .ph-graph path {
+  .shot .ph-graph path {
     fill: none;
     stroke: var(--lc-ink-faint);
     stroke-width: 1.4;
   }
 
-  .ph-graph .ph-graph-obs {
+  .shot .ph-graph .ph-graph-obs {
     stroke: var(--lc-observed);
     stroke-dasharray: 3 4;
   }
 
-  .ph-graph rect {
+  .shot .ph-graph rect {
     fill: var(--lc-paper);
     stroke: var(--lc-ink-faint);
   }
 
-  .ph-caption {
+  .shot .ph-caption {
     position: absolute;
     inset-block-end: 4%;
     inset-inline-end: 3%;
@@ -472,7 +503,7 @@ const plainName = name.replace(/<[^>]+>/g, "");
     font-size: 0.72rem;
   }
 
-  :lang(he) .ph-caption {
+  :lang(he) .shot .ph-caption {
     font-family: var(--lc-font-sans);
   }
 </style>

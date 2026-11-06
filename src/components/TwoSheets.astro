@@ -159,16 +159,16 @@ const reg = (x: number, y: number) => `M${x - 9} ${y}H${x + 9}M${x} ${y - 9}V${y
   import "../scripts/two-sheets.ts";
 </script>
 
-<style>
+<style is:global>
   .two-sheets {
     margin: 0;
   }
 
-  .drift-stage {
+  .two-sheets .drift-stage {
     position: relative;
   }
 
-  .sheets-svg {
+  .two-sheets .sheets-svg {
     inline-size: 100%;
     block-size: auto;
     aspect-ratio: 560 / 400;
@@ -176,12 +176,12 @@ const reg = (x: number, y: number) => `M${x - 9} ${y}H${x + 9}M${x} ${y - 9}V${y
   }
 
   /* Observed sheet. */
-  .sheet-paper {
+  .two-sheets .sheet-paper {
     fill: var(--lc-paper-sunk);
     stroke: var(--lc-rule);
   }
 
-  .observed-edges path {
+  .two-sheets .observed-edges path {
     fill: none;
     stroke: var(--lc-observed);
     stroke-opacity: 0.55;
@@ -189,63 +189,63 @@ const reg = (x: number, y: number) => `M${x - 9} ${y}H${x + 9}M${x} ${y - 9}V${y
     stroke-dasharray: 2 3;
   }
 
-  .observed-node {
+  .two-sheets .observed-node {
     fill: var(--lc-observed);
   }
 
-  .reg-observed :is(circle, path) {
+  .two-sheets .reg-observed :is(circle, path) {
     fill: none;
     stroke: var(--lc-observed);
     stroke-width: 0.9;
   }
 
   /* Vellum. Static state: in register. */
-  .sheet-vellum {
+  .two-sheets .sheet-vellum {
     transform-box: view-box;
     transform-origin: 280px 200px;
   }
 
-  .vellum-shadow {
+  .two-sheets .vellum-shadow {
     fill: var(--lc-shadow);
     opacity: 0.5;
   }
 
-  .vellum-paper {
+  .two-sheets .vellum-paper {
     fill: var(--lc-paper-raised);
     fill-opacity: 0.8;
     stroke: var(--lc-rule-strong);
   }
 
-  .documented-edges path {
+  .two-sheets .documented-edges path {
     fill: none;
     stroke: var(--lc-ink);
     stroke-opacity: 0.7;
     stroke-width: 1.4;
   }
 
-  .node-box {
+  .two-sheets .node-box {
     fill: var(--lc-paper-raised);
     stroke: var(--lc-ink-faint);
     stroke-width: 1;
   }
 
-  .node-dot {
+  .two-sheets .node-dot {
     fill: var(--lc-documented-line);
   }
 
-  .node text {
+  .two-sheets .node text {
     fill: var(--lc-ink);
     font-family: var(--lc-font-mono);
     font-size: 12px;
   }
 
-  .reg-vellum :is(circle, path) {
+  .two-sheets .reg-vellum :is(circle, path) {
     fill: none;
     stroke: var(--lc-ink);
     stroke-width: 0.9;
   }
 
-  .edge-resolved {
+  .two-sheets .edge-resolved {
     fill: none;
     stroke: var(--lc-documented-line);
     stroke-width: 2.2;
@@ -253,7 +253,7 @@ const reg = (x: number, y: number) => `M${x - 9} ${y}H${x + 9}M${x} ${y - 9}V${y
   }
 
   /* The drift mark. Static state: gone. */
-  .edge-ghost {
+  .two-sheets .edge-ghost {
     fill: none;
     stroke: var(--lc-drift);
     stroke-width: 2.2;
@@ -261,7 +261,7 @@ const reg = (x: number, y: number) => `M${x - 9} ${y}H${x + 9}M${x} ${y - 9}V${y
     opacity: 0;
   }
 
-  .node-halo {
+  .two-sheets .node-halo {
     fill: none;
     stroke: var(--lc-drift);
     stroke-width: 1.4;
@@ -269,21 +269,21 @@ const reg = (x: number, y: number) => `M${x - 9} ${y}H${x + 9}M${x} ${y - 9}V${y
     opacity: 0;
   }
 
-  .probe {
+  .two-sheets .probe {
     fill: var(--lc-observed);
     opacity: 0;
   }
 
   /* The chips sit beside the link, in the stage's own left-to-right picture
      space; each chip keeps the page's direction. */
-  .leader {
+  .two-sheets .leader {
     fill: none;
     stroke: var(--lc-ink-faint);
     stroke-width: 1;
     stroke-dasharray: 2 2;
   }
 
-  .chips {
+  .two-sheets .chips {
     position: absolute;
     inset-block-start: 75.5%;
     inset-inline-end: 4%;
@@ -291,7 +291,7 @@ const reg = (x: number, y: number) => `M${x - 9} ${y}H${x + 9}M${x} ${y - 9}V${y
     justify-items: end;
   }
 
-  .chip {
+  .two-sheets .chip {
     grid-area: 1 / 1;
     display: inline-flex;
     align-items: center;
@@ -307,69 +307,69 @@ const reg = (x: number, y: number) => `M${x - 9} ${y}H${x + 9}M${x} ${y - 9}V${y
     box-shadow: 0 8px 22px -12px var(--lc-shadow);
   }
 
-  .chip-id {
+  .two-sheets .chip-id {
     color: var(--lc-ink);
     font-family: var(--lc-font-mono);
     font-size: 0.72rem;
     font-weight: 400;
   }
 
-  .chip-sep {
+  .two-sheets .chip-sep {
     color: var(--lc-ink-faint);
   }
 
-  .chip-mark {
+  .two-sheets .chip-mark {
     inline-size: 0.5rem;
     block-size: 0.5rem;
   }
 
-  .chip-finding {
+  .two-sheets .chip-finding {
     border-color: var(--lc-drift);
     background: var(--lc-drift-wash);
     color: var(--lc-drift);
     opacity: 0;
   }
 
-  .chip-finding .chip-mark {
+  .two-sheets .chip-finding .chip-mark {
     background: var(--lc-drift);
     rotate: 45deg;
   }
 
-  .chip-resolved {
+  .two-sheets .chip-resolved {
     border-color: var(--lc-documented-line);
     background: var(--lc-documented-wash);
     color: var(--lc-documented);
     opacity: 1;
   }
 
-  .chip-resolved .chip-mark {
+  .two-sheets .chip-resolved .chip-mark {
     background: var(--lc-documented-line);
     border-radius: 50%;
   }
 
   @media (max-width: 520px) {
-    .leader {
+    .two-sheets .leader {
       display: none;
     }
 
-    .chips {
+    .two-sheets .chips {
       inset-block-start: auto;
       inset-block-end: 0.5rem;
       inset-inline-end: 0.5rem;
       max-inline-size: calc(100% - 1rem);
     }
 
-    .chip {
+    .two-sheets .chip {
       max-inline-size: 100%;
     }
 
-    .chip-id {
+    .two-sheets .chip-id {
       overflow: hidden;
       text-overflow: ellipsis;
     }
   }
 
-  .sheets-legend {
+  .two-sheets .sheets-legend {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -379,27 +379,27 @@ const reg = (x: number, y: number) => `M${x - 9} ${y}H${x + 9}M${x} ${y - 9}V${y
     font-size: var(--lc-text-xs);
   }
 
-  .legend-item {
+  .two-sheets .legend-item {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
   }
 
-  .legend-line {
+  .two-sheets .legend-line {
     inline-size: 1.5rem;
     block-size: 0;
     border-block-start: 1.5px solid var(--lc-ink);
   }
 
-  .legend-observed {
+  .two-sheets .legend-observed {
     border-block-start: 2px dotted var(--lc-observed);
   }
 
-  .legend-drift {
+  .two-sheets .legend-drift {
     border-block-start: 2px dashed var(--lc-drift);
   }
 
-  .drift-pause {
+  .two-sheets .drift-pause {
     display: none;
     align-items: center;
     gap: 0.4rem;
@@ -407,7 +407,7 @@ const reg = (x: number, y: number) => `M${x - 9} ${y}H${x + 9}M${x} ${y - 9}V${y
     cursor: pointer;
   }
 
-  .drift-pause input {
+  .two-sheets .drift-pause input {
     inline-size: 1rem;
     block-size: 1rem;
     margin: 0;
@@ -415,41 +415,41 @@ const reg = (x: number, y: number) => `M${x - 9} ${y}H${x + 9}M${x} ${y - 9}V${y
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .drift-pause {
+    .two-sheets .drift-pause {
       display: inline-flex;
     }
 
-    .sheet-vellum {
+    .two-sheets .sheet-vellum {
       animation: sheets-register 12s linear infinite both;
     }
 
-    .reg-observed {
+    .two-sheets .reg-observed {
       animation: registration 12s linear infinite both;
     }
 
-    .probe {
+    .two-sheets .probe {
       animation: probe 12s linear infinite both;
     }
 
-    .edge-ghost {
+    .two-sheets .edge-ghost {
       animation:
         ghost 12s linear infinite both,
         march 1.4s linear infinite;
     }
 
-    .node-halo {
+    .two-sheets .node-halo {
       animation: ghost 12s linear infinite both;
     }
 
-    .edge-resolved {
+    .two-sheets .edge-resolved {
       animation: resolved 12s linear infinite both;
     }
 
-    .chip-finding {
+    .two-sheets .chip-finding {
       animation: chip-finding 12s linear infinite both;
     }
 
-    .chip-resolved {
+    .two-sheets .chip-resolved {
       animation: chip-resolved 12s linear infinite both;
     }
 

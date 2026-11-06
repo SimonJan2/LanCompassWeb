@@ -2,7 +2,7 @@
 /** Builds the sites the Playwright suite serves (see playwright.config.ts). */
 import { execFileSync } from "node:child_process";
 
-const empty = { PUBLIC_DOCS_URL: "", PUBLIC_GITHUB_URL: "", PUBLIC_FORM_ENDPOINT: "" };
+const empty = { PUBLIC_DOCS_URL: "", PUBLIC_FORM_ENDPOINT: "" };
 /** A site in one theme, on one port: every flag empty except the contact email, plus
  *  (for the dark and auto builds) the form endpoint, so their forms are tested too. */
 const themed = (outDir, port, theme, extra = {}) => ({
@@ -25,6 +25,8 @@ export const builds = [
       PUBLIC_SITE_URL: "http://127.0.0.1:4322",
       PUBLIC_CONTACT_EMAIL: "hello@example.com",
       PUBLIC_DOCS_URL: "https://docs.example.com/",
+      // The "Source code" link and its PUBLIC_GITHUB_URL flag are gone (DECISIONS.md D-GITHUB):
+      // set here, it must change nothing (tests/flags.spec.ts).
       PUBLIC_GITHUB_URL: "https://github.com/example/lancompass",
       PUBLIC_FORM_ENDPOINT: "https://forms.example.com/submit",
       PUBLIC_SITE_THEME: "light",

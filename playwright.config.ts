@@ -3,7 +3,8 @@ import { defineConfig, devices } from "@playwright/test";
 /**
  * Four static builds are served (all made by `npm run pretest`, scripts/build-test.mjs):
  *   - dist-test       on :4321 — light; every PUBLIC_* flag empty except the contact email
- *   - dist-test-flags on :4322 — light; docs, GitHub and form endpoint all set
+ *   - dist-test-flags on :4322 — light; docs and form endpoint set (and PUBLIC_GITHUB_URL, which
+ *                               must render nothing: DECISIONS.md D-GITHUB)
  *   - dist-test-dark  on :4323 — PUBLIC_SITE_THEME=dark (form endpoint set)
  *   - dist-test-auto  on :4324 — PUBLIC_SITE_THEME=auto (form endpoint set)
  *

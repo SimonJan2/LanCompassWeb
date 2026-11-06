@@ -46,18 +46,18 @@ const Tag = level === 1 ? "h1" : "h2";
   {lead && <p class="text-lead section-lead" set:html={lead} />}
 </div>
 
-<style>
+<style is:global>
   .section-heading {
     position: relative;
     max-inline-size: 48rem;
   }
 
-  .align-center {
+  .section-heading.align-center {
     margin-inline: auto;
     text-align: center;
   }
 
-  .bearing {
+  .section-heading .bearing {
     margin-block-end: 1.5rem;
     padding-block-start: 0.75rem;
     border-block-start: 1px solid var(--lc-ink);
@@ -70,15 +70,15 @@ const Tag = level === 1 ? "h1" : "h2";
     unicode-bidi: isolate;
   }
 
-  .heading-1 {
+  .section-heading .heading-1 {
     font-size: var(--lc-text-h1);
   }
 
-  .heading-2 {
+  .section-heading .heading-2 {
     font-size: var(--lc-text-h2);
   }
 
-  .section-lead {
+  .section-heading .section-lead {
     max-inline-size: 40rem;
     margin-block-start: 1.25rem;
   }

@@ -30,7 +30,6 @@
     "contact": "Contact",
     "privacy": "Privacy",
     "accessibility": "Accessibility",
-    "source": "Source code",
     "docs": "Docs",
     "madeIn": "Made in Israel",
     "rights": "LanCompass",
@@ -53,9 +52,16 @@
       "rack": "rack elevation",
       "topology-observed": "topology, observed layer",
       "review": "drift review",
-      "deep-discovery": "Deep Discovery services",
       "nac": "NAC overview",
-      "compliance": "compliance findings"
+      "compliance": "compliance findings",
+      "discovery-queue": "Discovery queue",
+      "map-ages": "map, with the age of every line",
+      "ask-the-map": "map, answering a question",
+      "design-studio": "Design Studio",
+      "rack-studio": "Rack Studio, power lens",
+      "ip-plan": "subnet IP plan",
+      "licence": "licence settings",
+      "gallery": "Dashboard Gallery"
     },
     "alt": "The LanCompass {screen} screen, showing the fictional demo network."
   },

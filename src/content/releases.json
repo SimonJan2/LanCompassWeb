@@ -1,0 +1,37 @@
+{
+  "$comment": "Product releases, newest first: the one source for every current-release mention on the site. Read from the product's CHANGELOG.md at each tag (docs/claims.md C-REL-1..4). title is the first line of the release's CHANGELOG section (0.6.1 has only a Fixed list). 0.5.0 was never tagged (CHANGELOG: \"never tagged or published\"), so its tag is null. W6 adds the bundle facts, W8 reads the notes.",
+  "releases": [
+    {
+      "version": "0.7.0",
+      "date": "2026-11-06",
+      "tag": "v0.7.0",
+      "commit": "6d248a18",
+      "title": "The topology arc 2, \"A map that tells the truth\", and its expansion, the design studio",
+      "claim": "C-REL-1"
+    },
+    {
+      "version": "0.6.1",
+      "date": "2026-11-03",
+      "tag": "v0.6.1",
+      "commit": "e01081d7",
+      "title": "Fixed",
+      "claim": "C-REL-2"
+    },
+    {
+      "version": "0.6.0",
+      "date": "2026-11-02",
+      "tag": "v0.6.0",
+      "commit": "9abfcf9a",
+      "title": "The pilot release",
+      "claim": "C-REL-3"
+    },
+    {
+      "version": "0.5.0",
+      "date": "2026-10-14",
+      "tag": null,
+      "commit": "5571813",
+      "title": "The bundle built from 5571813, the 2026-10-14 tree",
+      "claim": "C-REL-4"
+    }
+  ]
+}

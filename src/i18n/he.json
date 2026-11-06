@@ -30,7 +30,6 @@
     "contact": "יצירת קשר",
     "privacy": "פרטיות",
     "accessibility": "נגישות",
-    "source": "קוד מקור",
     "docs": "תיעוד",
     "madeIn": "פותח בישראל",
     "rights": "LanCompass",
@@ -53,9 +52,16 @@
       "rack": "שרטוט הארון",
       "topology-observed": "הטופולוגיה, השכבה הנצפית",
       "review": "תור הסקירה",
-      "deep-discovery": "השירותים בגילוי המעמיק",
       "nac": "סקירת <bdi>NAC</bdi>",
-      "compliance": "ממצאי התאימות"
+      "compliance": "ממצאי התאימות",
+      "discovery-queue": "תור ההחלטות של הגילוי",
+      "map-ages": "המפה, עם הגיל של כל קו",
+      "ask-the-map": "המפה, עונה על שאלה",
+      "design-studio": "סטודיו התכנון",
+      "rack-studio": "סטודיו הארונות, עדשת החשמל",
+      "ip-plan": "תוכנית הכתובות של רשת",
+      "licence": "הגדרות הרישיון",
+      "gallery": "גלריית לוחות הבקרה"
     },
     "alt": "מסך {screen} ב־LanCompass, עם רשת ההדגמה הבדיונית."
   },

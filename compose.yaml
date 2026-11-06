@@ -17,7 +17,6 @@ services:
         PUBLIC_SITE_URL: ${PUBLIC_SITE_URL:-http://localhost:${LANCOMPASS_WEB_PORT:-8088}}
         PUBLIC_CONTACT_EMAIL: ${PUBLIC_CONTACT_EMAIL:-}
         PUBLIC_FORM_ENDPOINT: ${PUBLIC_FORM_ENDPOINT:-}
-        PUBLIC_GITHUB_URL: ${PUBLIC_GITHUB_URL:-}
         PUBLIC_DOCS_URL: ${PUBLIC_DOCS_URL:-}
         # light (default) | dark | auto. Change it in .env, then: docker compose up -d --build
         PUBLIC_SITE_THEME: ${PUBLIC_SITE_THEME:-light}

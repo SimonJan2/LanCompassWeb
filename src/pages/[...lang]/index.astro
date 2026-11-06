@@ -9,6 +9,7 @@ import Eyebrow from "../../components/Eyebrow.astro";
 import FeatureCard from "../../components/FeatureCard.astro";
 import Icon, { type IconName } from "../../components/Icon.astro";
 import MapLegend from "../../components/MapLegend.astro";
+import ScreenshotFrame from "../../components/ScreenshotFrame.astro";
 import SectionHeading from "../../components/SectionHeading.astro";
 import StepTimeline from "../../components/StepTimeline.astro";
 import TwoSheets from "../../components/TwoSheets.astro";
@@ -17,7 +18,8 @@ import BearingScale from "../../components/motifs/BearingScale.astro";
 import Contours from "../../components/motifs/Contours.astro";
 import Marginalia from "../../components/motifs/Marginalia.astro";
 import { getCopy } from "../../content/copy";
-import { absoluteUrl, localeStaticPaths, pagePath, type Locale } from "../../i18n";
+import { absoluteUrl, fill, localeStaticPaths, pagePath, type Locale } from "../../i18n";
+import { latestRelease, releaseDate } from "../../lib/releases";
 import { isScreenKey } from "../../lib/screens";
 
 export const getStaticPaths = (() => localeStaticPaths()) satisfies GetStaticPaths;
@@ -27,16 +29,35 @@ interface Props {
 }
 
 const { locale } = Astro.props;
+/* The English home draws every icon inline. A <use> of /icons.svg is fetched while the HTML
+   parses, ahead of the English hero's paint, and Lighthouse's simulation then holds the LCP
+   past its 1.8 s budget (measured: 1,806 ms with the sprite, 1,732 ms inline). The Hebrew home
+   keeps the sprite: its LCP is unaffected (1,654 ms) and its HTML has no bytes to spare. */
+Astro.locals.inlineIcons = locale === "en";
 const copy = getCopy(locale);
 const h = copy.home;
 const partnersHref = `${pagePath(locale, "design-partners")}#apply`;
 const productHref = pagePath(locale, "product");
 const offlineIcons: IconName[] = ["offline", "eye", "lock", "key", "users", "log"];
+/** The newest release (src/content/releases.json), for the datasheet and What's new. */
+const release = {
+  version: latestRelease.version,
+  date: `<time datetime="${latestRelease.date}">${releaseDate(latestRelease, locale)}</time>`,
+};
+const datasheetRows = [
+  ...h.datasheet.rows,
+  {
+    label: h.datasheet.release.label,
+    value: `<a href="#whats-new" data-release="${latestRelease.version}">${fill(h.datasheet.release.value, release)}</a>`,
+  },
+];
 const softwareApplication = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   name: "LanCompass",
-  applicationCategory: "NetworkingApplication",
+  // Google supports BusinessApplication, not NetworkingApplication (W2 research §7.9).
+  applicationCategory: "BusinessApplication",
+  softwareVersion: latestRelease.version,
   operatingSystem: "Linux (Docker)",
   description: copy.meta.home.description,
   url: absoluteUrl(pagePath(locale, "home")),
@@ -95,8 +116,38 @@ const atlasRows = h.atlas.rows.map((row) => ({
         id="datasheet-title"
         title={h.datasheet.title}
         note={h.datasheet.note}
-        rows={h.datasheet.rows}
+        rows={datasheetRows}
       />
+    </div>
+  </section>
+
+  <!-- What's new in the newest release (src/content/releases.json). -->
+  <section class="section defer-render whats-new" id="whats-new" aria-labelledby="whats-new-title">
+    <div class="container-site">
+      <SectionHeading
+        eyebrow={fill(h.whatsNew.eyebrow, release)}
+        title={h.whatsNew.title}
+        id="whats-new-title"
+      />
+      <ul class="news" role="list">
+        {h.whatsNew.items.map((item) => (
+          <li class="news-item reveal" data-news={item.screen}>
+            {isScreenKey(item.screen) && (
+              <ScreenshotFrame
+                screen={item.screen}
+                locale={locale}
+                variant="focus"
+                single={640}
+                singleDark
+              />
+            )}
+            <h3 class="news-title">
+              <a href={`${productHref}#${item.section}`} set:html={item.title} />
+            </h3>
+            <p class="news-text" set:html={item.text} />
+          </li>
+        ))}
+      </ul>
     </div>
   </section>
 
@@ -415,6 +466,51 @@ const atlasRows = h.atlas.rows.map((row) => ({
 
   .datasheet-section {
     padding-block: clamp(2.5rem, 2rem + 2vw, 4rem) 0;
+  }
+
+  /* What's new: three items, each a screen, a title, a line or two and a link. */
+  .news {
+    display: grid;
+    gap: 2.5rem;
+    margin: clamp(2.5rem, 2rem + 2vw, 3.5rem) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 720px) {
+    .news {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .news {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+  }
+
+  .news-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-block-start: 1.25rem;
+    border-block-start: 1px solid var(--lc-ink);
+  }
+
+  .news-title {
+    margin-block-start: 0.75rem;
+    font-size: var(--lc-text-h3);
+  }
+
+  .news-title a {
+    color: inherit;
+    text-underline-offset: 0.2em;
+  }
+
+  .news-text {
+    color: var(--lc-ink-muted);
+    font-size: var(--lc-text-small);
   }
 
   .section-more {

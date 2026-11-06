@@ -8,7 +8,18 @@ const formsBase = () => (siteProject().theme === "light" ? FLAGS : siteBase());
 
 const widths = [390, 1440];
 
+/**
+ * Contrast is measured at rest. axe scrolls each element into view while it checks, and the
+ * scroll-driven section reveal (global.css, motion.spec.ts) then leaves an element below it
+ * part-way through its fade-in, which axe reads as low contrast (W2 met it: a longer offline
+ * band put one title at opacity 0.42 on / at 390 px, 3.48:1). Reduced motion turns the reveal
+ * off, so axe sees the page as a reader does once it has scrolled there.
+ */
 test.describe("axe: zero violations", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+  });
+
   for (const width of widths) {
     for (const p of pages) {
       test(`${p.path} at ${width}px`, async ({ page }) => {
@@ -160,6 +171,11 @@ test.describe("atlas index", () => {
     test(`(${locale}) every preview opens on keyboard focus, reachable by Tab alone`, async ({
       page,
     }) => {
+      const site = siteProject();
+      test.skip(
+        site.theme === "auto" && site.scheme === "dark",
+        "auto under a dark scheme hides the (Survey) previews; tested below",
+      );
       await page.setViewportSize({ width: 1440, height: 900 });
       await page.goto(pathFor(locale, "home"));
       const rows = page.locator("[data-atlas-row]");
@@ -184,10 +200,28 @@ test.describe("atlas index", () => {
   }
 
   test("previews also follow hover", async ({ page }) => {
+    const site = siteProject();
+    test.skip(
+      site.theme === "auto" && site.scheme === "dark",
+      "auto under a dark scheme hides the (Survey) previews; tested below",
+    );
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/");
     await page.locator('[data-atlas-row="nac"]').hover();
     await expect(page.locator('[data-atlas-preview="nac"]')).toBeVisible();
     await expect(page.locator('[data-atlas-preview="ipam"]')).toBeHidden();
+  });
+
+  test("auto under a dark scheme: no light preview on the night page; the rows still work", async ({
+    page,
+  }) => {
+    const site = siteProject();
+    test.skip(!(site.theme === "auto" && site.scheme === "dark"), "auto-dark only");
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/");
+    await page.locator('[data-atlas-row="nac"]').hover();
+    await expect(page.locator("[data-atlas] .atlas-previews")).toBeHidden();
+    await page.locator('[data-atlas-row="nac"]').focus();
+    await expect(page.locator('[data-atlas-row="nac"]')).toBeFocused();
   });
 });

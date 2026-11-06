@@ -37,8 +37,6 @@ export const site = {
   contactEmail: read(env.PUBLIC_CONTACT_EMAIL),
   /** Empty → forms are replaced by a mailto: button. */
   formEndpoint: readUrl(env.PUBLIC_FORM_ENDPOINT),
-  /** Empty → no GitHub link anywhere. */
-  githubUrl: readUrl(env.PUBLIC_GITHUB_URL),
   /** Empty → "Docs" is not rendered in the navigation. */
   docsUrl: readUrl(env.PUBLIC_DOCS_URL),
   /** light (default): survey paper · dark: Night chart · auto: follows the visitor's OS. */

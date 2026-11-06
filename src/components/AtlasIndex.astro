@@ -40,7 +40,13 @@ const { locale, rows, previewLabel } = Astro.props;
     {rows.map((row) => (
       <div class="atlas-preview" data-atlas-preview={row.key}>
         {isScreenKey(row.screen) && (
-          <ScreenshotFrame screen={row.screen} locale={locale} single={960} />
+          <ScreenshotFrame
+            screen={row.screen}
+            locale={locale}
+            single={960}
+            variant="focus"
+            decorative
+          />
         )}
         <p class="atlas-preview-caption" set:html={row.title} />
       </div>
@@ -48,7 +54,7 @@ const { locale, rows, previewLabel } = Astro.props;
   </div>
 </div>
 
-<style>
+<style is:global>
   .atlas {
     display: grid;
     gap: 3rem;
@@ -62,14 +68,14 @@ const { locale, rows, previewLabel } = Astro.props;
     }
   }
 
-  .atlas-list {
+  .atlas .atlas-list {
     margin: 0;
     padding: 0;
     list-style: none;
     border-block-start: 1px solid var(--lc-ink);
   }
 
-  .atlas-row {
+  .atlas .atlas-row {
     display: grid;
     grid-template-columns: 2.25rem 1fr auto;
     grid-template-areas:
@@ -85,75 +91,88 @@ const { locale, rows, previewLabel } = Astro.props;
   }
 
   @media (min-width: 720px) {
-    .atlas-row {
+    .atlas .atlas-row {
       grid-template-columns: 2.25rem minmax(11rem, 2fr) 3fr auto;
       grid-template-areas: "num title claim arrow";
     }
   }
 
-  .atlas-num {
+  .atlas .atlas-num {
     grid-area: num;
     color: var(--lc-ink-faint);
     font-family: var(--lc-font-mono);
     font-size: 0.75rem;
   }
 
-  .atlas-title {
+  .atlas .atlas-title {
     grid-area: title;
     font-size: var(--lc-text-h3);
     font-weight: 550;
     line-height: 1.3;
   }
 
-  :lang(he) .atlas-title {
+  :lang(he) .atlas .atlas-title {
     font-weight: 600;
   }
 
-  .atlas-claim {
+  .atlas .atlas-claim {
     grid-area: claim;
     color: var(--lc-ink-muted);
     font-size: var(--lc-text-small);
     line-height: 1.5;
   }
 
-  .atlas-row :global(.atlas-arrow) {
+  .atlas .atlas-row .atlas-arrow {
     grid-area: arrow;
     align-self: center;
     color: var(--lc-ink-faint);
   }
 
-  .atlas-row:is(:hover, :focus) {
+  .atlas .atlas-row:is(:hover, :focus) {
     background: var(--lc-paper-raised);
   }
 
-  .atlas-row:is(:hover, :focus) :global(.atlas-arrow) {
+  .atlas .atlas-row:is(:hover, :focus) .atlas-arrow {
     color: var(--lc-ink);
   }
 
-  .atlas-row:focus-visible {
+  .atlas .atlas-row:focus-visible {
     outline-offset: -2px;
   }
 
   /* Previews: wide screens only; one visible at a time, the first by default. */
-  .atlas-previews {
+  .atlas .atlas-previews {
     display: none;
   }
 
   @media (min-width: 960px) {
-    .atlas-previews {
+    .atlas .atlas-previews {
       position: sticky;
       inset-block-start: 6rem;
       display: grid;
     }
   }
 
-  .atlas-preview {
+  /* An auto build under a dark scheme: the previews are Survey frames (their nine Night chart
+     twins would not fit the home page's first round trip), so they step aside rather than show
+     a light window on the night page; the list takes the width, as on narrow screens. */
+  @media (min-width: 960px) and (prefers-color-scheme: dark) {
+    :root[data-theme="auto"] .atlas {
+      grid-template-columns: 1fr;
+    }
+
+    :root[data-theme="auto"] .atlas .atlas-previews {
+      display: none;
+    }
+  }
+
+  .atlas .atlas-preview {
     grid-area: 1 / 1;
     visibility: hidden;
     opacity: 0;
   }
 
-  .atlas-preview-caption {
+  .atlas .atlas-preview-caption {
     margin-block-start: 0.75rem;
     color: var(--lc-ink-muted);
     font-size: var(--lc-text-xs);
@@ -175,11 +194,11 @@ const { locale, rows, previewLabel } = Astro.props;
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .atlas-row {
+    .atlas .atlas-row {
       transition: background-color var(--lc-dur-micro) ease;
     }
 
-    .atlas-preview {
+    .atlas .atlas-preview {
       transition:
         opacity var(--lc-dur-ui) ease,
         visibility 0s linear var(--lc-dur-ui);
@@ -192,15 +211,15 @@ const { locale, rows, previewLabel } = Astro.props;
         visibility 0s;
     }
 
-    .atlas-row :global(.atlas-arrow) {
+    .atlas .atlas-row .atlas-arrow {
       transition: translate var(--lc-dur-ui) var(--lc-spring);
     }
 
-    .atlas-row:is(:hover, :focus) :global(.atlas-arrow) {
+    .atlas .atlas-row:is(:hover, :focus) .atlas-arrow {
       translate: 3px 0;
     }
 
-    [dir="rtl"] .atlas-row:is(:hover, :focus) :global(.atlas-arrow) {
+    [dir="rtl"] .atlas .atlas-row:is(:hover, :focus) .atlas-arrow {
       translate: -3px 0;
     }
   }

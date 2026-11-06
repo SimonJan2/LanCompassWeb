@@ -37,12 +37,12 @@ const { title, note, rows, id, class: className } = Astro.props;
   </dl>
 </div>
 
-<style>
+<style is:global>
   .datasheet {
     border-block: 1px solid var(--lc-ink);
   }
 
-  .ds-head {
+  .datasheet .ds-head {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
@@ -52,7 +52,7 @@ const { title, note, rows, id, class: className } = Astro.props;
     border-block-end: 1px solid var(--lc-ink);
   }
 
-  .ds-title {
+  .datasheet .ds-title {
     font-family: var(--lc-font-mono);
     font-size: var(--lc-text-mono);
     font-weight: 500;
@@ -61,30 +61,30 @@ const { title, note, rows, id, class: className } = Astro.props;
     text-transform: uppercase;
   }
 
-  :lang(he) .ds-title {
+  :lang(he) .datasheet .ds-title {
     font-family: var(--lc-font-sans);
     font-size: var(--lc-text-small);
     letter-spacing: 0;
   }
 
-  .ds-note {
+  .datasheet .ds-note {
     color: var(--lc-ink-faint);
     font-size: var(--lc-text-xs);
   }
 
-  .ds-rows {
+  .datasheet .ds-rows {
     display: grid;
     margin: 0;
   }
 
   @media (min-width: 900px) {
-    .ds-rows {
+    .datasheet .ds-rows {
       grid-template-columns: 1fr 1fr;
       column-gap: 3rem;
     }
   }
 
-  .ds-row {
+  .datasheet .ds-row {
     display: grid;
     grid-template-columns: minmax(9rem, 2fr) 3fr;
     gap: 1rem;
@@ -94,20 +94,20 @@ const { title, note, rows, id, class: className } = Astro.props;
   }
 
   @media (max-width: 520px) {
-    .ds-row {
+    .datasheet .ds-row {
       grid-template-columns: 1fr;
       gap: 0.25rem;
     }
   }
 
-  .ds-row dt {
+  .datasheet .ds-row dt {
     display: flex;
     gap: 0.75rem;
     color: var(--lc-ink-muted);
     font-size: var(--lc-text-small);
   }
 
-  .ds-num {
+  .datasheet .ds-num {
     color: var(--lc-ink-faint);
     font-family: var(--lc-font-mono);
     font-size: 0.75rem;
@@ -115,7 +115,7 @@ const { title, note, rows, id, class: className } = Astro.props;
     unicode-bidi: isolate;
   }
 
-  .ds-row dd {
+  .datasheet .ds-row dd {
     margin: 0;
     color: var(--lc-ink);
     font-family: var(--lc-font-mono);
@@ -125,17 +125,17 @@ const { title, note, rows, id, class: className } = Astro.props;
   }
 
   /* Plex Mono has no Hebrew; Hebrew values set in Plex Sans Hebrew, identifiers stay mono. */
-  :lang(he) .ds-row dd {
+  :lang(he) .datasheet .ds-row dd {
     font-family: var(--lc-font-sans);
     font-size: var(--lc-text-small);
   }
 
-  :lang(he) .ds-row dd :global(:is(code, bdi)) {
+  :lang(he) .datasheet .ds-row dd :is(code, bdi) {
     font-family: var(--lc-font-mono);
     font-size: 0.85rem;
   }
 
-  .ds-row dd :global(code) {
+  .datasheet .ds-row dd code {
     font-size: 1em;
   }
 </style>

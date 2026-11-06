@@ -47,7 +47,6 @@ value switches the feature off. They are read at build time by `src/config/site.
 | `PUBLIC_SITE_URL`      | Origin for canonical URLs, hreflang, sitemap, Open Graph. Default `http://localhost:4321`.                                            |
 | `PUBLIC_CONTACT_EMAIL` | mailto fallback for the forms, disclosure and accessibility contact. Empty → visible `TODO(operator)` marker.                         |
 | `PUBLIC_FORM_ENDPOINT` | Forms POST here. Empty → each form is replaced by a mailto: button. Its origin is added to CSP `form-action`.                         |
-| `PUBLIC_GITHUB_URL`    | Footer "Source code" link. Empty → not rendered.                                                                                      |
 | `PUBLIC_DOCS_URL`      | "Docs" in the navigation and footer. Empty → not rendered.                                                                            |
 | `PUBLIC_SITE_THEME`    | `light` (default): survey paper. `dark`: the Night chart. `auto`: both ship, the visitor's OS picks. Any other value fails the build. |
 
@@ -60,7 +59,7 @@ The colour theme is a build-time choice, like every `PUBLIC_*` value: set
 - `light` builds W1.1 exactly: survey paper, paper OG images and icons, light screenshots
   and videos.
 - `dark` builds the **Night chart**: deep indigo ground, paper-ink type, lamp-lit bands, the
-  product's Nightwire screenshots and videos, night OG images, a night manifest and
+  product's Night chart screenshots and its Nightwire videos (until W5), night OG images, a night manifest and
   `theme-color`.
 - `auto` ships both palettes. CSS switches with `prefers-color-scheme`, screenshots switch
   with `<picture><source media>` (only the matching image is fetched), each video slot
@@ -83,13 +82,22 @@ Videos: drop files into `public/media/<light|nightwire>/` as described in
 
 ## Screenshots
 
-`scripts/capture-screenshots.mjs` signs in to a locally running LanCompass, sets the theme
-and language (`en`, `he`) in the capture browser's `localStorage` only, and saves 2× PNGs to
-`src/assets/screens/<set>/{en,he}/<screen>.png`. It never changes data or settings.
-`LANCOMPASS_CAPTURE_THEME` picks the product theme: `light` (default, the `light/` set the
-light site shows) or `nightwire` (the product's default dark theme, the `nightwire/` set the
-dark site shows); `dark` is also accepted. `LANCOMPASS_CAPTURE_DIR` writes to another folder
-instead, for example `media-library/screens/nightwire`.
+Product screens come from the **signed release bundle**, run on a throwaway stack of their own
+(`scripts/capture-stack/README.md`: the bundle checked, `lcweb-cap` up, the admin, the demo
+estate, the staged writes, the teardown). `scripts/capture-screenshots.mjs` signs in to that
+stack, sets the theme and language (`en`, `he`) in the capture browser's `localStorage` only,
+and saves, for each of the fifteen keys (`src/lib/screens.ts`), a 2× PNG of the full window
+(`src/assets/screens/<set>/<locale>/<key>.png`, 2880 × 1800) and a focus crop around the key's
+main element (`<key>.focus.png`), with a copy in `media-library/screens/`. It records each
+crop's clip and up to four named anchors per frame in `src/content/screen-anchors.json`, and
+the capture (bundle checksum, release key, demo load time, routes, staged writes) in
+`media-library/screens/CAPTURED.json`. `LANCOMPASS_CAPTURE_THEME` picks the product theme:
+`survey` (Survey, the product's default light theme: the light site's set) or `night-chart`
+(Night chart, its default dark theme: the dark site's set; `auto` ships both). `--check` walks
+every key without writing a file and fails on a missing route or element; `--keys a,b` and
+`--locales en` narrow a run; `--probe <key>` prints the page's `data-*` attributes and saves a
+screenshot to `.tmp/probe/`. Narrow slots (What's new, the atlas previews) show the crop, wide
+ones (the product sections) the full window.
 
 `scripts/record-video.mjs <key>` records one product video the same read-only way
 (navigation, hover and scrolling; a click only follows a link; never a layer toggle, approve,
@@ -107,14 +115,15 @@ timed to the same steps. Keys: `drift-review-queue`, `documented-vs-observed`, `
 - `--cards <dir>` renders the title and end card to PNG; it needs neither the product nor a
   login.
 
-Both scripts fill `media-library/` (light and Nightwire, en and he); see
+Both scripts fill `media-library/` (screens: Survey and Night chart; videos: light and
+Nightwire until W5; en and he); see
 `media-library/README.md`, then copy the site's set into `public/media/` (or use `--publish`).
 
 ```bash
-docker run --rm --network host --user "$(id -u):$(id -g)" -e HOME=/tmp \
-  -e LANCOMPASS_DEMO_URL=http://localhost:3010 \
-  -e LANCOMPASS_DEMO_USER -e LANCOMPASS_DEMO_PASS -e LANCOMPASS_CAPTURE_THEME=light \
-  -v "$PWD":/app -w /app mcr.microsoft.com/playwright:v1.64.0-noble npm run capture
+docker run --rm --network host --ipc=host --user "$(id -u):$(id -g)" -e HOME=/tmp \
+  -e LANCOMPASS_DEMO_URL=http://127.0.0.1:4186 \
+  -e LANCOMPASS_DEMO_USER -e LANCOMPASS_DEMO_PASS -e LANCOMPASS_CAPTURE_THEME=survey \
+  -v "$PWD":/app -w /app mcr.microsoft.com/playwright:v1.64.0-noble npm run capture -- --check
 ```
 
 ```bash
@@ -150,20 +159,33 @@ src/
                    SectionHeading, FeatureCard, AtlasIndex, Datasheet, MapLegend, TwoSheets,
                    ScreenshotFrame, StepTimeline, ComparisonRow, VideoSlot, CTABand, Prose,
                    form/, motifs/ (Contours, BearingScale, RegistrationMarks, Marginalia)
-  content/         copy/{en,he}.ts (structured pages), pages/{en,he}/*.mdx, fingerprints.json
+  content/         copy/{en,he}.ts (structured pages), pages/{en,he}/*.mdx, fingerprints.json,
+                   releases.json (product releases, newest first: the one "current release")
   i18n/            locales.ts (the locale list), en.json, he.json (UI strings)
   config/site.ts   PUBLIC_* configuration
   styles/          tokens.css (design tokens), global.css (Tailwind + base), fonts.css
   scripts/         the small client scripts (site, two sheets, forms, scroll-spy)
   lib/             build-time helpers: screenshots, OG images, WOFF2 decoding, media
-  assets/          brand/ (compass mark), screens/{light,nightwire}/{en,he}/ (captures)
-scripts/           capture-screenshots.mjs, record-video.mjs, build-test.mjs, lhci.mjs
-media-library/     captured screens and videos (light + Nightwire, en + he), not built
+  assets/          brand/ (compass mark), screens/{survey,night-chart}/{en,he}/ (captures)
+scripts/           capture-screenshots.mjs, record-video.mjs, build-test.mjs, lhci.mjs,
+                   capture-stack/ (the throwaway stack from the signed bundle)
+media-library/     captured screens (Survey + Night chart) and videos, en + he, not built
 tests/             Playwright specs
 docs/headers.md    security headers and nginx equivalents
 docs/design/       originality.md: the identity, measured against NetBox Labs (ΔE, fonts)
 docs/copy/         he-voice.md (how Hebrew is written), he-review.md (every Hebrew string, glossed)
+docs/claims.md     the claims register: every product fact the site states, with its source at
+                   the product's release tag; the copy cites its rows (tests/claims.spec.ts)
 ```
+
+### Product claims
+
+Every sentence about the product cites a row of [`docs/claims.md`](docs/claims.md) in a comment
+beside it (`// C-MAP-1` in `src/content/copy/*.ts`, `{/* C-SEC-3 */}` in `.mdx`), and every figure
+in the copy appears in the row it cites. `tests/claims.spec.ts` checks both, and that every row is
+cited or marked `unused —` with a reason. At a product release: re-read each row's source at the
+new tag, change what changed, add the release to `src/content/releases.json` (the datasheet's
+Release row, What's new and the JSON-LD read it), and run the tests.
 
 ## Identity and motion
 
