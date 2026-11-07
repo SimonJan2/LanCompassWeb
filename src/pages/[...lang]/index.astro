@@ -19,6 +19,7 @@ import Contours from "../../components/motifs/Contours.astro";
 import Marginalia from "../../components/motifs/Marginalia.astro";
 import { getCopy } from "../../content/copy";
 import { absoluteUrl, fill, localeStaticPaths, pagePath, type Locale } from "../../i18n";
+import { releasePath } from "../../lib/changelog";
 import { latestRelease, releaseDate } from "../../lib/releases";
 import { isScreenKey } from "../../lib/screens";
 
@@ -40,6 +41,7 @@ const pilotHref = `${pagePath(locale, "pilot")}#apply`;
 const productHref = pagePath(locale, "product");
 const offlineIcons: IconName[] = ["offline", "eye", "lock", "key", "users", "log"];
 /** The newest release (src/content/releases.json), for the datasheet and What's new. */
+const notesHref = releasePath(locale, latestRelease.version);
 const release = {
   version: latestRelease.version,
   date: `<time datetime="${latestRelease.date}">${releaseDate(latestRelease, locale)}</time>`,
@@ -48,7 +50,8 @@ const datasheetRows = [
   ...h.datasheet.rows,
   {
     label: h.datasheet.release.label,
-    value: `<a href="#whats-new" data-release="${latestRelease.version}">${fill(h.datasheet.release.value, release)}</a>`,
+    // W8: the Release row links the release's notes.
+    value: `<a href="${notesHref}" data-release="${latestRelease.version}">${fill(h.datasheet.release.value, release)}</a>`,
   },
 ];
 const softwareApplication = {
@@ -148,6 +151,11 @@ const atlasRows = h.atlas.rows.map((row) => ({
           </li>
         ))}
       </ul>
+      <div class="section-more">
+        <Button href={notesHref} variant="tertiary">
+          {h.whatsNew.notes}
+        </Button>
+      </div>
     </div>
   </section>
 

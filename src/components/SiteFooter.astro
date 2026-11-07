@@ -3,14 +3,23 @@ import LanguageSwitcher from "./LanguageSwitcher.astro";
 import BearingScale from "./motifs/BearingScale.astro";
 import Logo from "./Logo.astro";
 import { site } from "../config/site";
-import { pagePath, useUi, type Locale, type PageKey } from "../i18n";
+import {
+  pagePath,
+  sectionPath,
+  useUi,
+  type Locale,
+  type LocalePaths,
+  type PageKey,
+  type SectionKey,
+} from "../i18n";
 
 interface Props {
   locale: Locale;
-  page: PageKey;
+  page: PageKey | SectionKey;
+  paths?: LocalePaths | undefined;
 }
 
-const { locale, page } = Astro.props;
+const { locale, page, paths } = Astro.props;
 const ui = useUi(locale);
 const f = ui.footer;
 const home = pagePath(locale, "home");
@@ -23,7 +32,12 @@ const columns = [
       { href: `${home}#integrations`, label: f.integrations },
       { href: pagePath(locale, "security"), label: f.security },
       { href: pagePath(locale, "verify"), label: f.verify },
-      ...(site.docsUrl ? [{ href: site.docsUrl, label: f.docs, flag: "docs" }] : []),
+      // W8: the release notes.
+      { href: sectionPath(locale, "changelog"), label: f.releaseNotes },
+      // W9: the docs on the site; PUBLIC_DOCS_URL, when set, still wins.
+      site.docsUrl
+        ? { href: site.docsUrl, label: f.docs, flag: "docs" }
+        : { href: sectionPath(locale, "docs"), label: f.docs },
     ],
   },
   {
@@ -71,7 +85,7 @@ const year = new Date().getFullYear();
       </nav>
     </div>
     <div class="footer-bottom">
-      <LanguageSwitcher locale={locale} page={page} variant="list" />
+      <LanguageSwitcher locale={locale} page={page} paths={paths} variant="list" />
       <p class="footer-legal">
         <span class="tabular">© {year}</span>
         <bdi translate="no">{f.rights}</bdi>

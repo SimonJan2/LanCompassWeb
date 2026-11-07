@@ -1,5 +1,13 @@
 import { expect, test } from "@playwright/test";
-import { defaultLocale, localeCodes, locales, pages, pathFor, siteBase } from "./helpers";
+import {
+  defaultLocale,
+  localeCodes,
+  locales,
+  pages,
+  pathFor,
+  sectionPages,
+  siteBase,
+} from "./helpers";
 
 test.describe("routes and locales", () => {
   for (const p of pages) {
@@ -103,6 +111,91 @@ test.describe("routes and locales", () => {
       expect(await ctas.count(), path).toBeGreaterThanOrEqual(1);
       await expect(ctas.first()).toHaveText(label[locale][1]!);
     }
+  });
+
+  for (const s of sectionPages) {
+    test(`W8: ${s.path} has lang, dir, canonical, hreflang to its twin and a switcher to it`, async ({
+      page,
+    }) => {
+      const response = await page.goto(s.path);
+      expect(response?.status()).toBe(200);
+      await expect(page.locator("html")).toHaveAttribute("lang", s.lang);
+      await expect(page.locator("html")).toHaveAttribute("dir", s.dir);
+      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+        "href",
+        `${siteBase()}${s.path}`,
+      );
+      for (const code of localeCodes) {
+        await expect(
+          page.locator(`link[rel="alternate"][hreflang="${locales[code].htmlLang}"]`),
+        ).toHaveAttribute("href", `${siteBase()}${s.twins[code]}`);
+        await expect(page.locator(`footer [data-locale-link="${code}"]`)).toHaveAttribute(
+          "href",
+          s.twins[code],
+        );
+      }
+      await expect(page.locator('link[rel="alternate"][hreflang="x-default"]')).toHaveAttribute(
+        "href",
+        `${siteBase()}${s.twins[defaultLocale]}`,
+      );
+      await expect(page.locator("h1")).toHaveCount(1);
+      await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", /.{40,}/);
+      await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+        "content",
+        `${siteBase()}/og/${s.locale}/changelog.png`,
+      );
+    });
+  }
+
+  test("W8: every page's footer links the release notes; the sitemap lists them", async ({
+    page,
+    request,
+  }) => {
+    const label = { en: "Release notes", he: "הערות גרסה" };
+    for (const p of [...pages, ...sectionPages]) {
+      await page.goto(p.path);
+      const link = page.locator("footer nav a", { hasText: label[p.locale] });
+      await expect(link, p.path).toHaveCount(1);
+      await expect(link).toHaveAttribute(
+        "href",
+        p.locale === "en" ? "/changelog/" : "/he/changelog/",
+      );
+    }
+    const sitemap = await (await request.get("/sitemap-0.xml")).text();
+    for (const s of sectionPages) expect(sitemap, s.path).toContain(`${siteBase()}${s.path}<`);
+    expect((await request.get("/og/en/changelog.png")).status()).toBe(200);
+    expect((await request.get("/og/he/changelog.png")).status()).toBe(200);
+  });
+
+  test("W9: Docs in every page's header and footer, both locales; the docs in the sitemap", async ({
+    page,
+    request,
+  }) => {
+    const label = { en: "Docs", he: "תיעוד" };
+    for (const p of [...pages, ...sectionPages]) {
+      await page.goto(p.path);
+      const docs = p.locale === "en" ? "/docs/" : "/he/docs/";
+      const nav = page.locator(".header-nav a").nth(3);
+      await expect(nav, p.path).toHaveText(label[p.locale]);
+      await expect(nav).toHaveAttribute("href", docs);
+      await expect(page.locator(`footer nav a[href="${docs}"]`), p.path).toHaveText(
+        label[p.locale],
+      );
+    }
+    const sitemap = await (await request.get("/sitemap-0.xml")).text();
+    for (const path of ["/docs/", "/he/docs/", "/docs/topology/", "/he/docs/first-run/"]) {
+      expect(sitemap, path).toContain(`${siteBase()}${path}<`);
+    }
+    expect((sitemap.match(/\/docs\/[a-z0-9-]+\/</g) ?? []).length).toBe(130);
+    for (const path of ["/docs/", "/he/docs/topology/"]) {
+      const res = await page.goto(path);
+      expect(res?.status(), path).toBe(200);
+      await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+        "content",
+        `${siteBase()}/og/${path.startsWith("/he/") ? "he" : "en"}/docs.png`,
+      );
+    }
+    expect((await request.get("/og/he/docs.png")).status()).toBe(200);
   });
 
   test("W7: /design-partners/ is a redirect page to /pilot/, and not in the sitemap", async ({

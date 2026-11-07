@@ -1,0 +1,314 @@
+---
+/**
+ * W8: one release's notes, /changelog/<version>/ (the product's English notes, verbatim) and
+ * /he/changelog/<version>/ (the Hebrew summary, DECISIONS.md D-NOTES-HE), in the long-form
+ * layout. "At a glance" comes first and is derived only from the English notes (the sync's
+ * front matter): the version it upgrades from, the migrations the notes count, the number of
+ * known issues, and links to the Upgrading and Known issues headings (the same anchors in both
+ * languages). Then the notes, the newer and older releases, and for the newest release a line
+ * to /verify/.
+ */
+import type { GetStaticPaths } from "astro";
+import { render } from "astro:content";
+import LongformLayout from "../../../layouts/LongformLayout.astro";
+import Prose from "../../../components/Prose.astro";
+import { getCopy } from "../../../content/copy";
+import {
+  defaultLocale,
+  fill,
+  localeCodes,
+  pagePath,
+  sectionPath,
+  type Locale,
+} from "../../../i18n";
+import {
+  feedPath,
+  longDate,
+  releaseEntries,
+  releasePath,
+  releasePaths,
+} from "../../../lib/changelog";
+import { latestRelease } from "../../../lib/releases";
+import { slugifyHeading } from "../../../lib/product-markdown.mjs";
+
+export const getStaticPaths = (async () => {
+  const out = [];
+  for (const locale of localeCodes) {
+    for (const { release } of await releaseEntries(locale)) {
+      out.push({
+        params: { lang: locale === defaultLocale ? undefined : locale, version: release.version },
+        props: { locale, version: release.version },
+      });
+    }
+  }
+  return out;
+}) satisfies GetStaticPaths;
+
+interface Props {
+  locale: Locale;
+  version: string;
+}
+
+const { locale, version } = Astro.props;
+const copy = getCopy(locale);
+const c = copy.changelog;
+const g = c.glance;
+const entries = await releaseEntries(locale);
+const index = entries.findIndex((e) => e.release.version === version);
+const entry = entries[index]!;
+const { release, notes, english } = entry;
+const newer = entries[index - 1]?.release;
+const older = entries[index + 1]?.release;
+const { Content } = await render(notes);
+const facts = english.data;
+const latest = release.version === latestRelease.version;
+const code = (s: string) => `<code dir="ltr">${s}</code>`;
+const upgradeAnchor = facts.upgradesFrom
+  ? slugifyHeading(`Upgrading from ${facts.upgradesFrom}`)
+  : null;
+const knownAnchor = facts.knownIssues ? "known-issues" : null;
+const title = fill(c.releaseTitle, { version });
+const plainTitle = title.replace(/<[^>]+>/g, "");
+const description = `${plainTitle}: ${notes.data.summary.replace(/<[^>]+>/g, "")}`;
+const dateText = longDate(release.date, locale);
+const writtenText = notes.data.written ? longDate(notes.data.written, locale) : "";
+---
+
+<LongformLayout
+  locale={locale}
+  page="changelog"
+  paths={releasePaths(version)}
+  title={`${plainTitle} — ${c.eyebrow}`}
+  description={description}
+  hero={{
+    eyebrow: c.eyebrow,
+    title,
+    lead: notes.data.title,
+    dateLabel: c.dateLabel,
+    date: release.date,
+    dateText,
+    after: latest ? ` <span class="cl-latest">${c.latest}</span>` : undefined,
+  }}
+>
+  <link
+    slot="head"
+    rel="alternate"
+    type="application/atom+xml"
+    title={c.feedTitle}
+    href={feedPath(locale)}
+  />
+  <section class="cl-glance" aria-labelledby="cl-glance-title">
+    <h2 id="cl-glance-title">{g.title}</h2>
+    <dl>
+      <div>
+        <dt>{g.from}</dt>
+        <dd>
+          {facts.upgradesFrom ? (
+            <>
+              <bdi>{facts.upgradesFrom}</bdi>
+              {upgradeAnchor && (
+                <>
+                  {" · "}
+                  <a href={`#${upgradeAnchor}`}>{g.upgradeLink}</a>
+                </>
+              )}
+            </>
+          ) : (
+            g.fromNone
+          )}
+        </dd>
+      </div>
+      <div>
+        <dt>{g.migrations}</dt>
+        <dd
+          set:html={
+            facts.migrations
+              ? fill(g.migrationsValue, {
+                  count: String(facts.migrations.count),
+                  first: code(facts.migrations.first),
+                  last: code(facts.migrations.last),
+                })
+              : g.migrationsNone
+          }
+        />
+      </div>
+      <div>
+        <dt>{g.known}</dt>
+        <dd>
+          {facts.knownIssues ? (
+            <>
+              <bdi>{facts.knownIssues}</bdi>
+              {knownAnchor && (
+                <>
+                  {" · "}
+                  <a href={`#${knownAnchor}`}>{g.knownLink}</a>
+                </>
+              )}
+            </>
+          ) : (
+            g.knownNone
+          )}
+        </dd>
+      </div>
+    </dl>
+    {latest && (
+      <p
+        class="cl-verify"
+        set:html={fill(c.verify, { version, href: pagePath(locale, "verify") })}
+      />
+    )}
+  </section>
+  {notes.data.written && (
+    <p class="cl-authority">
+      {fill(c.authority, { date: writtenText })}{" "}
+      <a href={releasePath(defaultLocale, version)} hreflang="en">
+        {c.english}
+      </a>
+    </p>
+  )}
+  <section class="cl-notes" aria-labelledby="cl-notes-title">
+    <h2 id="cl-notes-title" class="cl-notes-title">
+      {c.notes}
+    </h2>
+    {/* The page's own div carries its scope, so the list markers below reach the notes. */}
+    <div class="cl-prose">
+      <Prose>
+        <Content />
+      </Prose>
+    </div>
+  </section>
+  <nav class="cl-others" aria-label={c.others}>
+    <ul role="list">
+      {newer && (
+        <li>
+          <a
+            href={releasePath(locale, newer.version)}
+            rel="next"
+            set:html={fill(c.newer, { version: newer.version })}
+          />
+        </li>
+      )}
+      {older && (
+        <li>
+          <a
+            href={releasePath(locale, older.version)}
+            rel="prev"
+            set:html={fill(c.older, { version: older.version })}
+          />
+        </li>
+      )}
+      <li>
+        <a href={sectionPath(locale, "changelog")}>{c.all}</a>
+      </li>
+    </ul>
+  </nav>
+</LongformLayout>
+
+<style>
+  .cl-glance {
+    max-inline-size: 44rem;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--lc-rule-strong);
+    border-radius: var(--lc-radius);
+    background: var(--lc-paper-raised);
+  }
+
+  .cl-glance h2 {
+    margin-block-end: 0.75rem;
+    color: var(--lc-ink);
+    font-size: var(--lc-text-h3);
+  }
+
+  .cl-glance dl {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+  }
+
+  .cl-glance dl > div {
+    display: grid;
+    grid-template-columns: minmax(9rem, 14rem) 1fr;
+    gap: 0.25rem 1rem;
+  }
+
+  @media (max-width: 559px) {
+    .cl-glance dl > div {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .cl-glance dt {
+    color: var(--lc-ink-faint);
+    font-size: var(--lc-text-small);
+  }
+
+  .cl-glance dd {
+    margin: 0;
+    color: var(--lc-ink);
+    overflow-wrap: anywhere;
+  }
+
+  .cl-glance a,
+  .cl-authority a,
+  .cl-others a,
+  .cl-verify :global(a) {
+    color: var(--lc-ink);
+    text-decoration: underline;
+    text-decoration-color: var(--lc-ink-faint);
+    text-underline-offset: 3px;
+  }
+
+  .cl-verify {
+    margin-block-start: 1rem;
+    color: var(--lc-ink-muted);
+    font-size: var(--lc-text-small);
+  }
+
+  .cl-authority {
+    max-inline-size: 44rem;
+    color: var(--lc-ink-muted);
+    font-size: var(--lc-text-small);
+  }
+
+  .cl-notes-title {
+    margin-block-end: 1.5rem;
+    padding-block-start: 0.75rem;
+    border-block-start: 1px solid var(--lc-rule-strong);
+    color: var(--lc-ink);
+    font-size: clamp(1.375rem, 1.2rem + 0.7vw, 1.75rem);
+  }
+
+  .cl-prose :global(h2),
+  .cl-prose :global(h3) {
+    scroll-margin-block-start: 5.5rem;
+  }
+
+  .cl-prose :global(ul) {
+    list-style: disc;
+  }
+
+  .cl-prose :global(ol) {
+    list-style: decimal;
+  }
+
+  .cl-prose :global(code) {
+    overflow-wrap: anywhere;
+  }
+
+  .cl-others ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 2rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  :global(.cl-latest) {
+    margin-inline-start: 0.5rem;
+    padding: 0.0625rem 0.4rem;
+    border: 1px solid var(--lc-ink-faint);
+    border-radius: var(--lc-radius-sm);
+    color: var(--lc-ink);
+  }
+</style>

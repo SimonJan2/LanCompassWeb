@@ -11,3 +11,9 @@
 
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
+
+# W8: the release notes' Atom feeds.
+/changelog/feed.xml
+  Content-Type: application/atom+xml; charset=utf-8
+/he/changelog/feed.xml
+  Content-Type: application/atom+xml; charset=utf-8

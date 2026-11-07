@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { pages } from "./helpers";
+import { pages, sectionPages } from "./helpers";
 
 /**
  * The Hebrew guard (docs/copy/he-voice.md). On every /he/ page: no banned
@@ -47,7 +47,8 @@ const masculineImperatives = [
 const HEB = "א-ת";
 const words = (text: string) => text.split(new RegExp(`[^${HEB}]+`)).filter(Boolean);
 
-const hebrew = pages.filter((p) => p.locale === "he");
+// W8: the release-note pages too (their Hebrew is the site's own summary).
+const hebrew = [...pages, ...sectionPages].filter((p) => p.locale === "he");
 
 test.describe("Hebrew voice", () => {
   for (const p of hebrew) {

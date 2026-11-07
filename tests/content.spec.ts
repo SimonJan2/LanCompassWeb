@@ -122,8 +122,16 @@ test.describe("the site at the newest release (W2)", () => {
       await expect(release).toHaveAttribute("data-release", latest.version);
       await expect(release).toContainText(latest.version);
       await expect(release.locator("time")).toHaveAttribute("datetime", latest.date);
-      await expect(release).toHaveAttribute("href", "#whats-new");
+      // W8: the Release row and What's new link the newest release's notes.
+      await expect(release).toHaveAttribute("href", `${prefix}/changelog/${latest.version}/`);
       const news = page.locator("#whats-new");
+      await expect(news.locator(".section-more a")).toHaveAttribute(
+        "href",
+        `${prefix}/changelog/${latest.version}/`,
+      );
+      await expect(news.locator(".section-more a")).toHaveText(
+        locale === "en" ? "Read the release notes" : "להערות הגרסה",
+      );
       await expect(news.locator(".eyebrow")).toContainText(latest.version);
       await expect(news.locator(".eyebrow time")).toHaveAttribute("datetime", latest.date);
       await expect(news.locator(".news-item")).toHaveCount(3);

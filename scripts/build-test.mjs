@@ -32,6 +32,10 @@ export const builds = [
       PUBLIC_GITHUB_URL: "https://github.com/example/lancompass",
       PUBLIC_FORM_ENDPOINT: "https://forms.example.com/submit",
       PUBLIC_SITE_THEME: "light",
+      // W9: one fixture docs page the product marks as an outdated translation
+      // (tests/fixtures/docs/he/stale-fixture.md), so the notice is rendered and tested
+      // (tests/docs.spec.ts). No 0.7.0 page needs it, and no other build reads the fixture.
+      LANCOMPASS_DOCS_FIXTURES: "1",
     },
   },
   themed("dist-test-dark", 4323, "dark", form),

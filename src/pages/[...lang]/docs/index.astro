@@ -1,0 +1,137 @@
+---
+/**
+ * W9: /docs/ and /he/docs/ — what these docs are (the product's help, as shipped in the newest
+ * release), then every category in the product's order with its articles' titles and one-line
+ * descriptions (each article's front matter). No search (DECISIONS.md D-DOCS-SEARCH): the index,
+ * each page's "On this page" and the browser's find.
+ */
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import SectionHeading from "../../../components/SectionHeading.astro";
+import Contours from "../../../components/motifs/Contours.astro";
+import { getCopy } from "../../../content/copy";
+import { fill, localeStaticPaths, type Locale } from "../../../i18n";
+import { byCategory, chromeHtml, docPages, docPath } from "../../../lib/docs";
+import { latestRelease } from "../../../lib/releases";
+
+export const getStaticPaths = (() => localeStaticPaths()) satisfies GetStaticPaths;
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+const c = copy.docs;
+const groups = byCategory(await docPages(locale));
+const version = groups[0]?.pages[0]?.data.version ?? latestRelease.version;
+const isolate = (s: string) => chromeHtml(s, locale);
+---
+
+<BaseLayout
+  locale={locale}
+  page="docs"
+  title={copy.meta.docs.title}
+  description={copy.meta.docs.description}
+>
+  <section class="docs-hero">
+    <Contours map="quiet" eager />
+    <div class="container-site">
+      <SectionHeading
+        eyebrow={c.eyebrow}
+        title={c.title}
+        lead={fill(c.lead, { version })}
+        level={1}
+      />
+      <p class="docs-version" set:html={fill(c.versionLine, { version })} />
+    </div>
+  </section>
+  <section class="section-tight">
+    <div class="container-site docs-index">
+      {groups.map((g) => (
+        <section class="docs-cat" aria-labelledby={`cat-${g.category}`} data-category={g.category}>
+          <h2 id={`cat-${g.category}`} set:html={c.categories[g.category]} />
+          <ul role="list">
+            {g.pages.map((p) => (
+              <li data-slug={p.slug}>
+                <a href={docPath(locale, p.slug)} set:html={isolate(p.data.title)} />
+                <p set:html={isolate(p.data.description)} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .docs-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding-block: clamp(3rem, 2rem + 4vw, 5.5rem) clamp(2rem, 1.5rem + 2vw, 3rem);
+    border-block-end: 1px solid var(--lc-rule);
+  }
+
+  .docs-version {
+    margin-block-start: 1.25rem;
+    color: var(--lc-ink-faint);
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-text-xs);
+  }
+
+  :lang(he) .docs-version {
+    font-family: var(--lc-font-sans);
+  }
+
+  .docs-index {
+    display: grid;
+    gap: 3rem;
+  }
+
+  .docs-cat h2 {
+    margin-block-end: 1rem;
+    padding-block-start: 0.75rem;
+    border-block-start: 1px solid var(--lc-rule-strong);
+    color: var(--lc-ink);
+    font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.625rem);
+  }
+
+  .docs-cat ul {
+    display: grid;
+    gap: 1rem 2.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 760px) {
+    .docs-cat ul {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .docs-cat ul {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .docs-cat a {
+    color: var(--lc-ink);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .docs-cat a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .docs-cat p {
+    margin-block-start: 0.25rem;
+    color: var(--lc-ink-muted);
+    font-size: var(--lc-text-small);
+  }
+</style>

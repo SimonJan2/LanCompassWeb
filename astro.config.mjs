@@ -10,6 +10,7 @@ import { loadEnv } from "vite";
 import { defaultLocale, localeCodes } from "./src/i18n/locales.ts";
 import { SECURITY_TXT_PATH, securityTxt } from "./src/lib/security-txt.ts";
 import { markRules } from "./src/lib/annotations.ts";
+import { productMarkdown } from "./src/lib/product-markdown.mjs";
 import { getCopy } from "./src/content/copy/index.ts";
 
 const env = loadEnv(process.env.NODE_ENV ?? "production", process.cwd(), "PUBLIC_");
@@ -128,6 +129,30 @@ function figureMarksCss() {
 }
 
 /**
+ * W8/W9: the product's own Markdown (release notes, docs) renders as the product renders it —
+ * src/lib/product-markdown.mjs, a hast plugin for Astro 7's Markdown processor (Sätteri) that
+ * acts only on files under src/content/changelog/ and src/content/docs/. Smart punctuation is
+ * off, so the product's quotes and dashes stay as it wrote them (the MDX long-form pages type
+ * their typographic quotes themselves: the light build's pages are byte-identical either way).
+ * @returns {import("astro").AstroIntegration}
+ */
+function productText() {
+  return {
+    name: "lancompass:product-text",
+    hooks: {
+      "astro:config:setup": ({ config }) => {
+        const processor = /** @type {any} */ (config.markdown.processor);
+        if (processor?.name !== "satteri" || !processor.options) {
+          throw new Error("productText: expected Astro's Sätteri Markdown processor");
+        }
+        processor.options.hastPlugins.push(productMarkdown());
+        processor.options.features.smartPunctuation = false;
+      },
+    },
+  };
+}
+
+/**
  * Moves /<locale>/404/index.html to /<locale>/404.html, where static hosts that
  * serve the nearest 404.html (Cloudflare Pages) look for it.
  * @returns {import("astro").AstroIntegration}
@@ -211,6 +236,7 @@ export default defineConfig({
     routing: { prefixDefaultLocale: false },
   },
   integrations: [
+    productText(),
     mdx(),
     sitemap({
       i18n: { defaultLocale, locales: Object.fromEntries(localeCodes.map((code) => [code, code])) },
@@ -223,6 +249,10 @@ export default defineConfig({
   ],
   devToolbar: { enabled: false },
   prefetch: false,
+  // W9: no syntax highlighting. Shiki colours each token with an inline style attribute, which
+  // the CSP (`style-src 'self'`) blocks; the docs' code blocks are plain, LTR and wrapped, as on
+  // the product's printed page. (The MDX pages have no code blocks: their output is unchanged.)
+  markdown: { syntaxHighlight: false },
   vite: {
     plugins: [themeCss(), figureMarksCss(), tailwindcss()],
     // Never inline scripts into HTML: the CSP has no 'unsafe-inline' for scripts.

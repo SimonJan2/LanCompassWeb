@@ -1,41 +1,101 @@
 ---
-/** A long-form page rendered from src/content/pages/<locale>/<page>.mdx. */
+/**
+ * A long-form page: rendered from src/content/pages/<locale>/<page>.mdx (security, privacy,
+ * accessibility), or (W8) a section page that brings its own hero and body — a release's notes —
+ * with its locale twins' paths for canonical, hreflang and the switcher.
+ */
 import { getEntry, render } from "astro:content";
 import BaseLayout from "./BaseLayout.astro";
 import Eyebrow from "../components/Eyebrow.astro";
 import Prose from "../components/Prose.astro";
 import Contours from "../components/motifs/Contours.astro";
 import { getCopy } from "../content/copy";
-import { locales, useUi, type Locale, type PageKey } from "../i18n";
+import { locales, useUi, type Locale, type LocalePaths, type PageKey } from "../i18n";
 
-interface Props {
+interface MdxPage {
   locale: Locale;
   page: Extract<PageKey, "security" | "privacy" | "accessibility">;
 }
 
-const { locale, page } = Astro.props;
-const entry = await getEntry("pages", `${locale}/${page}`);
-if (!entry) throw new Error(`Missing src/content/pages/${locale}/${page}.mdx`);
-const { Content } = await render(entry);
-const meta = getCopy(locale).meta[page];
-const updatedLabel = useUi(locale).longform.updated;
-const updated = new Intl.DateTimeFormat(locales[locale].htmlLang, {
-  dateStyle: "long",
-  timeZone: "UTC",
-}).format(new Date(`${entry.data.updated}T00:00:00Z`));
+interface SectionPage {
+  locale: Locale;
+  page: "changelog";
+  paths: LocalePaths;
+  /** The document title and description. */
+  title: string;
+  description: string;
+  hero: {
+    eyebrow: string;
+    /** HTML: the page's h1. */
+    title: string;
+    /** HTML: the lead under it. */
+    lead: string;
+    /** The date line: its label and an ISO date. */
+    dateLabel: string;
+    date: string;
+    /** The date as the page writes it ("6 November 2026"); the locale's long date otherwise. */
+    dateText?: string | undefined;
+    /** HTML after the date, on the same line (the "Latest" mark). */
+    after?: string | undefined;
+  };
+}
+
+type Props = MdxPage | SectionPage;
+
+const props = Astro.props;
+const { locale } = props;
+const section = "hero" in props ? props : null;
+const formatDate = (iso: string) =>
+  new Intl.DateTimeFormat(locales[locale].htmlLang, { dateStyle: "long", timeZone: "UTC" }).format(
+    new Date(`${iso}T00:00:00Z`),
+  );
+
+let Content: Awaited<ReturnType<typeof render>>["Content"] | null = null;
+let hero: SectionPage["hero"];
+let legalReview = false;
+let meta: { title: string; description: string };
+let mdxPage: MdxPage["page"] | null = null;
+if (section) {
+  hero = section.hero;
+  meta = { title: section.title, description: section.description };
+} else {
+  const page = (props as MdxPage).page;
+  mdxPage = page;
+  const entry = await getEntry("pages", `${locale}/${page}`);
+  if (!entry) throw new Error(`Missing src/content/pages/${locale}/${page}.mdx`);
+  ({ Content } = await render(entry));
+  meta = getCopy(locale).meta[page];
+  legalReview = entry.data.legalReview;
+  hero = {
+    eyebrow: entry.data.eyebrow,
+    title: entry.data.title,
+    lead: entry.data.lead,
+    dateLabel: useUi(locale).longform.updated,
+    date: entry.data.updated,
+  };
+}
+const updated = hero.dateText ?? formatDate(hero.date);
 ---
 
-<BaseLayout locale={locale} page={page} title={meta.title} description={meta.description}>
+<BaseLayout
+  locale={locale}
+  page={section ? section.page : (mdxPage as MdxPage["page"])}
+  paths={section ? section.paths : undefined}
+  title={meta.title}
+  description={meta.description}
+>
+  <slot name="head" slot="head" />
   <section class="longform-hero">
     <Contours map="quiet" eager />
     <div class="container-site">
-      <Eyebrow>{entry.data.eyebrow}</Eyebrow>
-      <h1 class="longform-title" set:html={entry.data.title} />
-      <p class="text-lead longform-lead" set:html={entry.data.lead} />
+      <Eyebrow>{hero.eyebrow}</Eyebrow>
+      <h1 class="longform-title" set:html={hero.title} />
+      <p class="text-lead longform-lead" set:html={hero.lead} />
       <p class="longform-updated">
-        {updatedLabel}: <time datetime={entry.data.updated}>{updated}</time>
+        {hero.dateLabel}: <time datetime={hero.date}>{updated}</time>
+        {hero.after && <Fragment set:html={hero.after} />}
       </p>
-      {entry.data.legalReview && (
+      {legalReview && (
         <p class="longform-review">
           <span class="todo-operator">
             TODO(operator): legal review of this page before going public.
@@ -46,9 +106,11 @@ const updated = new Intl.DateTimeFormat(locales[locale].htmlLang, {
   </section>
   <section class="section-tight">
     <div class="container-site longform-body">
-      <Prose>
-        <Content />
-      </Prose>
+      {Content && (
+        <Prose>
+          <Content />
+        </Prose>
+      )}
       <slot />
     </div>
   </section>

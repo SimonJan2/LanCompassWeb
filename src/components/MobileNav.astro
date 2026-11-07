@@ -3,7 +3,15 @@ import Button from "./Button.astro";
 import Icon from "./Icon.astro";
 import LanguageSwitcher from "./LanguageSwitcher.astro";
 import { site } from "../config/site";
-import { pagePath, useUi, type Locale, type PageKey } from "../i18n";
+import {
+  pagePath,
+  sectionPath,
+  useUi,
+  type Locale,
+  type LocalePaths,
+  type PageKey,
+  type SectionKey,
+} from "../i18n";
 
 /**
  * Below 960px: a full-height sheet in a modal <dialog> (focus stays inside,
@@ -12,11 +20,12 @@ import { pagePath, useUi, type Locale, type PageKey } from "../i18n";
  */
 interface Props {
   locale: Locale;
-  page: PageKey;
+  page: PageKey | SectionKey;
+  paths?: LocalePaths | undefined;
   links: { page: PageKey; label: string }[];
 }
 
-const { locale, page, links } = Astro.props;
+const { locale, page, paths, links } = Astro.props;
 const ui = useUi(locale);
 ---
 
@@ -45,13 +54,20 @@ const ui = useUi(locale);
             </a>
           </li>
         ))}
-        {site.docsUrl && (
-          <li>
+        <li>
+          {site.docsUrl ? (
             <a href={site.docsUrl} data-flag="docs">
               {ui.nav.docs}
             </a>
-          </li>
-        )}
+          ) : (
+            <a
+              href={sectionPath(locale, "docs")}
+              aria-current={page === "docs" ? "page" : undefined}
+            >
+              {ui.nav.docs}
+            </a>
+          )}
+        </li>
       </ul>
     </nav>
     <div class="sheet-foot">
@@ -60,7 +76,7 @@ const ui = useUi(locale);
       </Button>
       <div class="sheet-lang">
         <span class="sheet-lang-label">{ui.language.label}</span>
-        <LanguageSwitcher locale={locale} page={page} variant="list" />
+        <LanguageSwitcher locale={locale} page={page} paths={paths} variant="list" />
       </div>
     </div>
   </dialog>

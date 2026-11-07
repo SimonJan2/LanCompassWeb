@@ -70,6 +70,18 @@ export const en = {
       title: "Page not found — LanCompass",
       description: "This page does not exist. The compass is still pointing home.",
     },
+    docs: {
+      title: "Docs — LanCompass",
+      // C-DOCS-1, C-DOCS-2
+      description:
+        "The help built into LanCompass 0.7.0, in English and Hebrew: getting started, how-to guides, IPAM, inventory, integrations, operations and the system.",
+    },
+    changelog: {
+      title: "Release notes — LanCompass",
+      // C-NOTES-2
+      description:
+        "The notes of every LanCompass release, newest first, as the product writes them: what changed, how to upgrade and the known issues.",
+    },
   },
 
   home: {
@@ -146,6 +158,8 @@ export const en = {
           section: "studio",
         },
       ],
+      /** W8: the link to the newest release's notes. */
+      notes: "Read the release notes",
     },
     loop: {
       eyebrow: "How it works",
@@ -1351,6 +1365,82 @@ export const en = {
     title: "This page is off the map.",
     lead: "The address may have moved, or it never existed. The compass still points home.",
     home: "Back to the home page",
+  },
+
+  /**
+   * W8: /changelog/ and each release's page. The notes themselves are the product's
+   * (src/content/changelog/en); these are the site's words around them. `{version}`, `{date}`,
+   * `{count}`, `{first}`, `{last}` and `{href}` are filled in by the pages.
+   */
+  changelog: {
+    eyebrow: "Release notes",
+    title: "What changed in each release",
+    // C-NOTES-2
+    lead: "Every LanCompass release, newest first, in the product’s own notes: what changed and, from 0.6.0 on, how to upgrade and what a pilot can still meet.",
+    latest: "Latest",
+    // C-NOTES-1 (each release's line shows its summary: releases.json summary_en / summary_he)
+    read: "The {version} notes",
+    feed: "Follow the release notes (Atom feed)",
+    feedTitle: "LanCompass release notes",
+    feedSubtitle: "The notes of every LanCompass release, as the product writes them.",
+    releaseTitle: "LanCompass {version}",
+    dateLabel: "Date",
+    glance: {
+      title: "At a glance",
+      from: "Upgrades from",
+      fromNone: "No upgrade section in these notes",
+      migrations: "Database migrations",
+      migrationsValue: "{count}: {first} → {last}",
+      migrationsNone: "None counted in these notes",
+      known: "Known issues",
+      knownNone: "None listed in these notes",
+      upgradeLink: "How to upgrade",
+      knownLink: "The known issues",
+    },
+    notes: "The notes",
+    others: "Other releases",
+    older: "Older: {version}",
+    newer: "Newer: {version}",
+    all: "All releases",
+    // C-VER-1, C-VER-2
+    verify:
+      'Before you install {version}, check its bundle: <a href="{href}">verify a download</a>.',
+    /** The Hebrew pages only: what the summary is, and the link to the full English notes. */
+    authority: "",
+    english: "",
+  },
+
+  /**
+   * W9: /docs/ and each article. The articles are the product's (src/content/docs/<locale>);
+   * these are the site's words around them. The category names, "On this page", "All guides",
+   * "Previous" / "Next" and the stale notice are the product's own UI strings at v0.7.0
+   * (frontend/src/i18n/messages/en.json: docs.category.*, docs.onThisPage, docs.allGuides,
+   * common.previous, common.next, docs.i18n.stale).
+   */
+  docs: {
+    eyebrow: "Docs",
+    // C-DOCS-1
+    title: "The help built into LanCompass",
+    // C-DOCS-1, C-DOCS-2
+    lead: "These are the product’s own help pages, as they ship inside LanCompass {version}: 65 articles in seven categories, in English and in Hebrew, the two languages the product reviews in full.",
+    // C-DOCS-1
+    versionLine: "Docs for LanCompass {version} — the help built into the product",
+    categories: {
+      "getting-started": "Getting Started",
+      "how-to": "How-to guides",
+      ipam: "IPAM",
+      inventory: "Inventory",
+      integrations: "Integrations",
+      operations: "Operations",
+      system: "System",
+    },
+    nav: "Guides",
+    allGuides: "All guides",
+    onThisPage: "On this page",
+    previous: "Previous",
+    next: "Next",
+    stale: "This translation may be outdated — the English article changed since",
+    index: "All the docs",
   },
 };
 

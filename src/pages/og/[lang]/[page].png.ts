@@ -1,15 +1,24 @@
 import type { APIRoute, GetStaticPaths } from "astro";
 import { getEntry } from "astro:content";
 import { getCopy } from "../../../content/copy";
-import { localeCodes, locales, pageKeys, type Locale, type PageKey } from "../../../i18n";
+import {
+  localeCodes,
+  locales,
+  pageKeys,
+  sectionKeys,
+  type Locale,
+  type PageKey,
+  type SectionKey,
+} from "../../../i18n";
 import { site } from "../../../config/site";
 import { renderOgImage } from "../../../lib/og";
 
-type OgPage = PageKey | "404";
+/** A section's pages (W8: every release's notes) share the section's card. */
+type OgPage = PageKey | SectionKey | "404";
 
 export const getStaticPaths = (() =>
   localeCodes.flatMap((locale) =>
-    [...pageKeys, "404" as const].map((page) => ({
+    [...pageKeys, ...sectionKeys, "404" as const].map((page) => ({
       params: { lang: locale, page },
       props: { locale, page },
     })),
@@ -46,6 +55,12 @@ export const GET: APIRoute = async ({ props }) => {
   } else if (page === "verify") {
     eyebrow = copy.verify.eyebrow;
     title = copy.verify.title;
+  } else if (page === "changelog") {
+    eyebrow = copy.changelog.eyebrow;
+    title = copy.changelog.title;
+  } else if (page === "docs") {
+    eyebrow = copy.docs.eyebrow;
+    title = copy.docs.title;
   } else {
     const entry = await getEntry("pages", `${locale}/${page}`);
     eyebrow = entry?.data.eyebrow ?? copy.meta[page].title;

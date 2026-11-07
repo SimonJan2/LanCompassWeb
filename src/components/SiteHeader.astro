@@ -4,15 +4,27 @@ import LanguageSwitcher from "./LanguageSwitcher.astro";
 import Logo from "./Logo.astro";
 import MobileNav from "./MobileNav.astro";
 import { site } from "../config/site";
-import { pagePath, useUi, type Locale, type PageKey } from "../i18n";
+import {
+  pagePath,
+  sectionPath,
+  useUi,
+  type Locale,
+  type LocalePaths,
+  type PageKey,
+  type SectionKey,
+} from "../i18n";
 
 interface Props {
   locale: Locale;
-  page: PageKey;
+  page: PageKey | SectionKey;
+  /** A section page's twins (BaseLayout), for the language switcher. */
+  paths?: LocalePaths | undefined;
 }
 
-const { locale, page } = Astro.props;
+const { locale, page, paths } = Astro.props;
 const ui = useUi(locale);
+/** W9: the docs live on the site (/docs/); PUBLIC_DOCS_URL, when set, still wins. */
+const docsHref = sectionPath(locale, "docs");
 const links: { page: PageKey; label: string }[] = [
   { page: "product", label: ui.nav.product },
   { page: "security", label: ui.nav.security },
@@ -35,21 +47,25 @@ const links: { page: PageKey; label: string }[] = [
             </a>
           </li>
         ))}
-        {site.docsUrl && (
-          <li>
+        <li>
+          {site.docsUrl ? (
             <a href={site.docsUrl} data-flag="docs">
               {ui.nav.docs}
             </a>
-          </li>
-        )}
+          ) : (
+            <a href={docsHref} aria-current={page === "docs" ? "page" : undefined}>
+              {ui.nav.docs}
+            </a>
+          )}
+        </li>
       </ul>
     </nav>
     <div class="header-actions">
-      <LanguageSwitcher locale={locale} page={page} />
+      <LanguageSwitcher locale={locale} page={page} paths={paths} />
       <Button href={`${pagePath(locale, "pilot")}#apply`} class="header-cta">
         {ui.nav.cta}
       </Button>
-      <MobileNav locale={locale} page={page} links={links} />
+      <MobileNav locale={locale} page={page} paths={paths} links={links} />
     </div>
   </div>
 </header>

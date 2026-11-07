@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { pages } from "./helpers";
+import { docsSample, pages, sectionPages } from "./helpers";
 
 /**
  * Runs only against the Docker image (nginx), where the security headers are
@@ -13,7 +13,8 @@ const base = process.env["DOCKER_BASE_URL"];
 test.describe("container: enforced CSP", () => {
   test.skip(!base, "set DOCKER_BASE_URL to run against the container");
 
-  for (const p of pages) {
+  // W8: the release-note pages too; W9: a sample of the docs.
+  for (const p of [...pages, ...sectionPages, ...docsSample]) {
     test(`${p.path}: no CSP violation or console error`, async ({ page }) => {
       const problems: string[] = [];
       page.on("console", (m) => {
@@ -52,6 +53,18 @@ test.describe("container: enforced CSP", () => {
     }
     const pilot = await request.get(`${base}/pilot/`);
     expect(pilot.status()).toBe(200);
+  });
+
+  test("W8: both release-note feeds are served as Atom, under the security headers", async ({
+    request,
+  }) => {
+    for (const path of ["/changelog/feed.xml", "/he/changelog/feed.xml"]) {
+      const res = await request.get(`${base}${path}`);
+      expect(res.status(), path).toBe(200);
+      expect(res.headers()["content-type"], path).toBe("application/atom+xml; charset=utf-8");
+      expect(res.headers()["x-content-type-options"], path).toBe("nosniff");
+      expect(await res.text(), path).toContain('<feed xmlns="http://www.w3.org/2005/Atom"');
+    }
   });
 
   test("W6: the SBOM is JSON and security.txt is UTF-8 text, both under the CSP", async ({

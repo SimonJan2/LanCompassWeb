@@ -1,5 +1,5 @@
 {
-  "$comment": "Product releases, newest first: the one source for every current-release mention on the site. Read from the product's CHANGELOG.md at each tag (docs/claims.md C-REL-1..4). title is the first line of the release's CHANGELOG section (0.6.1 has only a Fixed list). 0.5.0 was never tagged (CHANGELOG: \"never tagged or published\"), so its tag is null. W6: bundle and sbom are the signed release's facts, each value copied from a command's output on the bundle itself (sha256sum, stat, the .sha256 file, the SBOM's specVersion and components; night C's report quotes them): /verify/ shows them. Releases without them (no bundle on the build host) show none. W8 reads the notes.",
+  "$comment": "Product releases, newest first: the one source for every current-release mention on the site. Read from the product's CHANGELOG.md at each tag (docs/claims.md C-REL-1..4). title is the first line of the release's CHANGELOG section (0.6.1 has only a Fixed list). 0.5.0 was never tagged (CHANGELOG: \"never tagged or published\"), so its tag is null. W6: bundle and sbom are the signed release's facts, each value copied from a command's output on the bundle itself (sha256sum, stat, the .sha256 file, the SBOM's specVersion and components; night C's report quotes them): /verify/ shows them. Releases without them (no bundle on the build host) show none. W8: summary_en is the first sentence of the release's CHANGELOG section as scripts/sync-changelog.mjs derives it (the summary in src/content/changelog/en/<version>.md; tests/changelog.spec.ts compares them), wave numbers and backticks dropped; summary_he says the same in Hebrew (docs/copy/he-review.md). Both cite summaryClaim (C-NOTES-1).",
   "releases": [
     {
       "version": "0.7.0",
@@ -8,6 +8,9 @@
       "commit": "6d248a18",
       "title": "The topology arc 2, \"A map that tells the truth\", and its expansion, the design studio",
       "claim": "C-REL-1",
+      "summary_en": "The topology arc 2, \"A map that tells the truth\", and its expansion, the design studio: everything since 0.6.1 (e01081d7).",
+      "summary_he": "הסבב השני של עבודת הטופולוגיה, „מפה שאומרת את האמת”, וההרחבה שלו, סטודיו התכנון: כל מה שהשתנה מאז <bdi>0.6.1</bdi> (<code dir=\"ltr\">e01081d7</code>).",
+      "summaryClaim": "C-NOTES-1",
       "bundle": {
         "file": "lancompass-0.7.0-offline.tar.gz",
         "bytes": 369470438,
@@ -37,7 +40,10 @@
       "tag": "v0.6.1",
       "commit": "e01081d7",
       "title": "Fixed",
-      "claim": "C-REL-2"
+      "claim": "C-REL-2",
+      "summary_en": "Fixed: Active Directory sync names and links the addresses its DNS zones describe; Subnets, VLANs and Inventory scroll in one region again; the workbook import says which VRF it uses; a sheet that lists one kind of device across sites is split by address.",
+      "summary_he": "תוקנו: סנכרון <bdi>Active Directory</bdi> נותן שמות לכתובות שאזורי ה־<bdi>DNS</bdi> שלו מתארים ומקשר אותן; רשתות משנה, רשתות <bdi>VLAN</bdi> והמלאי נגללים שוב באזור אחד; הייבוא מקובץ <bdi>Excel</bdi> אומר באיזה <bdi>VRF</bdi> הוא משתמש; גיליון שמפרט סוג אחד של מכשיר בכמה אתרים מתפצל לפי כתובת.",
+      "summaryClaim": "C-NOTES-1"
     },
     {
       "version": "0.6.0",
@@ -45,7 +51,10 @@
       "tag": "v0.6.0",
       "commit": "9abfcf9a",
       "title": "The pilot release",
-      "claim": "C-REL-3"
+      "claim": "C-REL-3",
+      "summary_en": "The pilot release: everything since 0.5.0 (the bundle built from the 2026-10-14 tree, 5571813), one paragraph per roadmap arc.",
+      "summary_he": "גרסת הפיילוט: כל מה שהשתנה מאז <bdi>0.5.0</bdi> (החבילה שנבנתה מהעץ של <bdi>2026-10-14</bdi>, <code dir=\"ltr\">5571813</code>), פסקה אחת לכל סבב פיתוח.",
+      "summaryClaim": "C-NOTES-1"
     },
     {
       "version": "0.5.0",
@@ -53,7 +62,10 @@
       "tag": null,
       "commit": "5571813",
       "title": "The bundle built from 5571813, the 2026-10-14 tree",
-      "claim": "C-REL-4"
+      "claim": "C-REL-4",
+      "summary_en": "The bundle built from 5571813, the 2026-10-14 tree — never tagged or published.",
+      "summary_he": "החבילה שנבנתה מ־<code dir=\"ltr\">5571813</code>, העץ של <bdi>2026-10-14</bdi> — לא תויגה ולא פורסמה מעולם.",
+      "summaryClaim": "C-NOTES-1"
     }
   ]
 }

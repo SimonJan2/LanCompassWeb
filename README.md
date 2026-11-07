@@ -94,6 +94,41 @@ Every call to action goes to `/pilot/#apply`. The old `/design-partners/` answer
 `docker/nginx/site.conf`; for any other host the build leaves a meta-refresh page there (not in
 the sitemap). Both pages carry a visible legal-review marker until the wording is reviewed.
 
+Release notes (W8): `/changelog/` lists every release, newest first, and `/changelog/<version>/`
+shows its notes — the product's own `CHANGELOG.md` section, verbatim (the wave numbers dropped,
+`Docs → …` references linked to `/docs/` pages the site has) — after an "At a glance" box. The
+English files in `src/content/changelog/en/` are written by the sync script, never by hand; the
+Hebrew pages in `src/content/changelog/he/` are summaries written natively (headline changes, the
+upgrade steps in full, every known issue), each with its `written` date and its `he-review.md`
+rows. Atom feeds: `/changelog/feed.xml`, `/he/changelog/feed.xml`. **At each release:**
+
+```sh
+git -C ../LanCompass show v0.8.0:CHANGELOG.md > /tmp/CHANGELOG.md   # the tag, never the tree
+node scripts/sync-changelog.mjs /tmp/CHANGELOG.md                   # writes src/content/changelog/en
+```
+
+then add the release to `src/content/releases.json` (with `summary_en` — the sync prints it —
+and `summary_he`), write `src/content/changelog/he/<version>.md`, and rebuild. A second run of the
+sync on the same file changes nothing.
+
+Docs (W9): `/docs/` and `/he/docs/` are the product's own help, as it ships in the release: the
+65 articles of its registry in English and Hebrew, in the product's seven categories and order,
+each at `/docs/<slug>/` with the category navigation (a `<details>` on a phone), "On this page"
+and a version line. The files in `src/content/docs/` and the images in `src/assets/docs/` are
+written by the sync script, never by hand (they are left out of Prettier and of Tailwind's
+sources). A Hebrew article the product marks as translated from an older English file shows the
+product's own notice. There is no search (DECISIONS.md D-DOCS-SEARCH). `PUBLIC_DOCS_URL`, when
+set, still wins in the header and footer. **At each release:**
+
+```sh
+git -C ../LanCompass archive -o /tmp/docs.tar v0.8.0 frontend/src/content/docs frontend/public/docs-img
+mkdir /tmp/docs && tar -xf /tmp/docs.tar -C /tmp/docs
+node scripts/sync-docs.mjs /tmp/docs --version 0.8.0 --locales en,he
+```
+
+then rebuild; a second run on the same archive changes nothing. Re-run the changelog sync after
+it, so the notes' `Docs → …` references link the new pages.
+
 Videos: drop files into `public/media/<survey|night-chart>/` as described in
 `public/media/README.md`.
 
@@ -174,13 +209,16 @@ locale list. Layout uses logical properties only, so right-to-left needs no extr
 ```
 src/
   pages/           routes: [...lang]/*.astro (en has no prefix), [lang]/404.astro, og/, icons
-  layouts/         BaseLayout (head, SEO, header, footer), LongformLayout (MDX pages)
+  layouts/         BaseLayout (head, SEO, header, footer), LongformLayout (MDX pages, the
+                   release notes), DocsLayout (W9: the docs articles)
   components/      SiteHeader, MobileNav, LanguageSwitcher, SiteFooter, Button, Eyebrow,
                    SectionHeading, FeatureCard, AtlasIndex, Datasheet, MapLegend, TwoSheets,
                    ScreenshotFrame, StepTimeline, ComparisonRow, VideoSlot, CTABand, Prose,
                    form/, motifs/ (Contours, BearingScale, RegistrationMarks, Marginalia)
   content/         copy/{en,he}.ts (structured pages), pages/{en,he}/*.mdx, fingerprints.json,
-                   releases.json (product releases, newest first: the one "current release")
+                   releases.json (product releases, newest first: the one "current release"),
+                   changelog/{en,he}/<version>.md (W8: the product's notes; the Hebrew summaries),
+                   docs/{en,he}/<slug>.md (W9: the product's help at the release tag)
   i18n/            locales.ts (the locale list), en.json, he.json (UI strings)
   config/site.ts   PUBLIC_* configuration
   styles/          tokens.css (design tokens), global.css (Tailwind + base), fonts.css
@@ -188,7 +226,9 @@ src/
   lib/             build-time helpers: screenshots, OG images, WOFF2 decoding, media
   assets/          brand/ (compass mark), screens/{survey,night-chart}/{en,he}/ (captures)
 scripts/           capture-screenshots.mjs, record-video.mjs, build-test.mjs, lhci.mjs,
-                   capture-stack/ (the throwaway stack from the signed bundle)
+                   capture-stack/ (the throwaway stack from the signed bundle),
+                   sync-changelog.mjs (W8: the release notes from CHANGELOG.md at a tag),
+                   sync-docs.mjs (W9: the docs from an archive of the tag)
 media-library/     captured screens (Survey + Night chart) and videos, en + he, not built
 tests/             Playwright specs
 docs/headers.md    security headers and nginx equivalents

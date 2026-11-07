@@ -43,6 +43,52 @@ export const pages: PageCase[] = localeCodes.flatMap((locale) =>
 
 export { localeCodes, locales, pageKeys, defaultLocale };
 
+/** W8: every release in src/content/releases.json, newest first. */
+export const releaseVersions: string[] = (
+  JSON.parse(readFileSync(join(process.cwd(), "src", "content", "releases.json"), "utf8")) as {
+    releases: { version: string }[];
+  }
+).releases.map((r) => r.version);
+
+/** A page outside pageKeys (W8: the changelog index and each release's notes). */
+export interface SectionPageCase {
+  locale: Locale;
+  path: string;
+  dir: "ltr" | "rtl";
+  lang: string;
+  /** The same page in each locale. */
+  twins: Record<Locale, string>;
+}
+
+const sectionPrefix = (locale: Locale) => (locale === defaultLocale ? "" : `/${locale}`);
+const twinsOf = (rest: string) =>
+  Object.fromEntries(localeCodes.map((c) => [c, `${sectionPrefix(c)}${rest}`])) as Record<
+    Locale,
+    string
+  >;
+
+/** W9: a sample of the docs (the index and the longest article, both locales), for the specs
+ *  that visit every page (origins, the container's CSP). tests/docs.spec.ts checks all 130. */
+export const docsSample: { path: string }[] = [
+  "/docs/",
+  "/he/docs/",
+  "/docs/topology/",
+  "/he/docs/topology/",
+  "/docs/racks/",
+  "/he/docs/subnets/",
+].map((path) => ({ path }));
+
+/** The changelog index and every release's page, in every locale. */
+export const sectionPages: SectionPageCase[] = localeCodes.flatMap((locale) =>
+  ["/changelog/", ...releaseVersions.map((v) => `/changelog/${v}/`)].map((rest) => ({
+    locale,
+    path: `${sectionPrefix(locale)}${rest}`,
+    dir: locales[locale].dir,
+    lang: locales[locale].htmlLang,
+    twins: twinsOf(rest),
+  })),
+);
+
 /** Every built HTML file under a dist directory. */
 export function builtHtml(dir: string): { file: string; html: string }[] {
   const out: { file: string; html: string }[] = [];

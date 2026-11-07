@@ -21,8 +21,11 @@ is the JSON-LD data block, which browsers never execute and CSP does not govern.
 
 `/_astro/*` files are content-hashed, so they get `Cache-Control: public, max-age=31536000, immutable`.
 
-Two same-origin files need their content types, and nothing else (the CSP is unchanged: no new
-origin):
+Three kinds of same-origin file need their content types, and nothing else (the CSP is
+unchanged: no new origin). W8's release-note feeds, `/changelog/feed.xml` and
+`/he/changelog/feed.xml`, are Atom 1.0: `application/atom+xml; charset=utf-8` (nginx: a location in
+`site.conf` and `application/atom+xml` in `charset_types` and `gzip_types`; Netlify and Cloudflare:
+their own block in `public/_headers`).
 
 | File                                                 | Content type                      | Written                                                                                                                                    |
 | ---------------------------------------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |

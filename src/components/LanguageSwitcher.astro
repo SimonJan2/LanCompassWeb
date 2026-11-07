@@ -1,6 +1,16 @@
 ---
 import Icon from "./Icon.astro";
-import { fill, localeCodes, locales, pagePath, useUi, type Locale, type PageKey } from "../i18n";
+import {
+  fill,
+  localeCodes,
+  locales,
+  pagePath,
+  useUi,
+  type Locale,
+  type LocalePaths,
+  type PageKey,
+  type SectionKey,
+} from "../i18n";
 
 /**
  * A disclosure menu of locales; every entry links to the same page in that
@@ -9,13 +19,16 @@ import { fill, localeCodes, locales, pagePath, useUi, type Locale, type PageKey 
  */
 interface Props {
   locale: Locale;
-  page: PageKey;
+  page: PageKey | SectionKey;
+  /** A section page's twins (W8): the same release's notes in each locale. */
+  paths?: LocalePaths | undefined;
   variant?: "menu" | "list";
 }
 
-const { locale, page, variant = "menu" } = Astro.props;
+const { locale, page, paths, variant = "menu" } = Astro.props;
 const ui = useUi(locale);
 const current = locales[locale];
+const hrefIn = (code: Locale) => paths?.[code] ?? pagePath(code, page as PageKey);
 ---
 
 {variant === "menu" ? (
@@ -29,7 +42,7 @@ const current = locales[locale];
       {localeCodes.map((code) => (
         <li>
           <a
-            href={pagePath(code, page)}
+            href={hrefIn(code)}
             hreflang={locales[code].htmlLang}
             lang={locales[code].htmlLang}
             aria-current={code === locale ? "true" : undefined}
@@ -47,7 +60,7 @@ const current = locales[locale];
     {localeCodes.map((code) => (
       <li>
         <a
-          href={pagePath(code, page)}
+          href={hrefIn(code)}
           hreflang={locales[code].htmlLang}
           lang={locales[code].htmlLang}
           aria-current={code === locale ? "true" : undefined}

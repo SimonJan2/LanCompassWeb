@@ -1,6 +1,11 @@
 @import "tailwindcss";
 /* W6: the release's SBOM is data (package names), not markup: Tailwind must not read it. */
 @source not "../../public/verify";
+/* W8: the release notes are the product's prose ("shadow", "table" …), not markup either. */
+@source not "../content/changelog";
+/* W9: so are the product's 130 docs pages ("blur", "shadow", "hidden" in their prose). */
+@source not "../content/docs";
+@source not "../../tests/fixtures";
 @import "./tokens.css";
 @import "./fonts.css";
 

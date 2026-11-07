@@ -1,0 +1,168 @@
+---
+/**
+ * W8: /changelog/ and /he/changelog/ — every release, newest first (src/content/releases.json):
+ * its version, date, one-sentence summary and a link; the newest marked "Latest". The Atom feed
+ * is linked in the head and at the end of the list.
+ */
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import SectionHeading from "../../../components/SectionHeading.astro";
+import Contours from "../../../components/motifs/Contours.astro";
+import { getCopy } from "../../../content/copy";
+import { fill, localeStaticPaths, type Locale } from "../../../i18n";
+import {
+  feedPath,
+  longDate,
+  releaseEntries,
+  releasePath,
+  releaseSummary,
+} from "../../../lib/changelog";
+import { latestRelease } from "../../../lib/releases";
+
+export const getStaticPaths = (() => localeStaticPaths()) satisfies GetStaticPaths;
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+const c = copy.changelog;
+const entries = await releaseEntries(locale);
+const rows = entries.map(({ release }) => ({
+  version: release.version,
+  date: release.date,
+  dateText: longDate(release.date, locale),
+  summary: releaseSummary(release, locale),
+  href: releasePath(locale, release.version),
+  latest: release.version === latestRelease.version,
+}));
+---
+
+<BaseLayout
+  locale={locale}
+  page="changelog"
+  title={copy.meta.changelog.title}
+  description={copy.meta.changelog.description}
+>
+  <link
+    slot="head"
+    rel="alternate"
+    type="application/atom+xml"
+    title={c.feedTitle}
+    href={feedPath(locale)}
+  />
+  <section class="cl-hero">
+    <Contours map="quiet" eager />
+    <div class="container-site">
+      <SectionHeading eyebrow={c.eyebrow} title={c.title} lead={c.lead} level={1} />
+    </div>
+  </section>
+  <section class="section-tight">
+    <div class="container-site">
+      <ol class="cl-list" role="list">
+        {rows.map((r) => (
+          <li class="cl-item" data-release={r.version}>
+            <h2 class="cl-version">
+              <a href={r.href}>
+                <bdi>{r.version}</bdi>
+              </a>
+              {r.latest && <span class="cl-latest">{c.latest}</span>}
+            </h2>
+            <p class="cl-date">
+              <time datetime={r.date}>{r.dateText}</time>
+            </p>
+            <p class="cl-summary" set:html={r.summary} />
+            <p class="cl-read">
+              <a href={r.href} set:html={fill(c.read, { version: r.version })} />
+            </p>
+          </li>
+        ))}
+      </ol>
+      <p class="cl-feed">
+        <a href={feedPath(locale)} type="application/atom+xml" set:html={c.feed} />
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .cl-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding-block: clamp(3rem, 2rem + 4vw, 5.5rem) clamp(2rem, 1.5rem + 2vw, 3rem);
+    border-block-end: 1px solid var(--lc-rule);
+  }
+
+  .cl-list {
+    display: grid;
+    gap: 0;
+    max-inline-size: 48rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .cl-item {
+    display: grid;
+    gap: 0.375rem;
+    padding-block: 1.75rem;
+    border-block-end: 1px solid var(--lc-rule);
+  }
+
+  .cl-version {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.75rem;
+    font-size: var(--lc-text-h3);
+  }
+
+  .cl-version a {
+    color: var(--lc-ink);
+    text-decoration: none;
+  }
+
+  .cl-version a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .cl-latest {
+    padding: 0.125rem 0.5rem;
+    border: 1px solid var(--lc-ink);
+    border-radius: var(--lc-radius-sm);
+    color: var(--lc-ink);
+    font-size: var(--lc-text-xs);
+    font-weight: 500;
+  }
+
+  .cl-date {
+    color: var(--lc-ink-faint);
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-text-xs);
+  }
+
+  :lang(he) .cl-date {
+    font-family: var(--lc-font-sans);
+  }
+
+  .cl-summary {
+    max-inline-size: 44rem;
+    color: var(--lc-ink-muted);
+  }
+
+  .cl-read a,
+  .cl-feed a {
+    color: var(--lc-ink);
+    font-size: var(--lc-text-small);
+    text-decoration: underline;
+    text-decoration-color: var(--lc-ink-faint);
+    text-underline-offset: 3px;
+  }
+
+  .cl-feed {
+    margin-block-start: 2rem;
+  }
+</style>

@@ -40,6 +40,12 @@ export interface Release {
   title: string;
   /** Its row in docs/claims.md. */
   claim: string;
+  /** W8: the notes' first sentence (scripts/sync-changelog.mjs derives it; tests compare). */
+  summary_en: string;
+  /** W8: the same sentence, written in Hebrew (docs/copy/he-review.md). */
+  summary_he: string;
+  /** W8: the summaries' row in docs/claims.md. */
+  summaryClaim: string;
   bundle?: ReleaseBundle;
   sbom?: ReleaseSbom;
 }

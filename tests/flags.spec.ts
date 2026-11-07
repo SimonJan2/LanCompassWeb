@@ -7,12 +7,17 @@ import { DEFAULT, FLAGS, FLAG_VALUES, pathFor } from "./helpers";
  * repository private): the flags build still sets PUBLIC_GITHUB_URL, and it renders nothing.
  */
 test.describe("feature flags", () => {
-  test("with docs and form endpoint empty: no Docs, forms fall back to mailto:", async ({
+  test("with docs and form endpoint empty: Docs is the site's own, forms fall back to mailto:", async ({
     page,
   }) => {
     for (const locale of ["en", "he"] as const) {
       await page.goto(`${DEFAULT}${pathFor(locale, "home")}`);
       await expect(page.locator('[data-flag="docs"]')).toHaveCount(0);
+      // W9: without PUBLIC_DOCS_URL the header, the mobile menu and the footer link /docs/.
+      const docs = locale === "en" ? "/docs/" : "/he/docs/";
+      await expect(page.locator("header .header-nav a").nth(3)).toHaveAttribute("href", docs);
+      await expect(page.locator(`dialog[data-menu-sheet] a[href="${docs}"]`)).toHaveCount(1);
+      await expect(page.locator(`footer nav a[href="${docs}"]`)).toHaveCount(1);
       for (const which of ["pilot", "contact"] as const) {
         await page.goto(`${DEFAULT}${pathFor(locale, which)}`);
         await expect(page.locator("form[data-lc-form]")).toHaveCount(0);
@@ -32,6 +37,12 @@ test.describe("feature flags", () => {
         "href",
         FLAG_VALUES.docs,
       );
+      // W9: an external docs host, when set, still wins over the site's /docs/.
+      await expect(page.locator(`footer nav [data-flag="docs"]`)).toHaveAttribute(
+        "href",
+        FLAG_VALUES.docs,
+      );
+      await expect(page.locator('header a[href$="/docs/"]')).toHaveCount(0);
       for (const which of ["pilot", "contact"] as const) {
         await page.goto(`${FLAGS}${pathFor(locale, which)}`);
         const form = page.locator("form[data-lc-form]");

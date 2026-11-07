@@ -10,7 +10,10 @@
         "http://localhost:4321/he/",
         "http://localhost:4321/he/product/",
         "http://localhost:4321/verify/",
-        "http://localhost:4321/he/verify/"
+        "http://localhost:4321/he/verify/",
+        "http://localhost:4321/changelog/0.7.0/",
+        "http://localhost:4321/docs/",
+        "http://localhost:4321/docs/topology/"
       ],
       "numberOfRuns": 3,
       "settings": {

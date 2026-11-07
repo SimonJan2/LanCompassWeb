@@ -33,6 +33,14 @@ esac
 for path in /sitemap-index.xml /robots.txt /site.webmanifest /favicon.svg /og/he/home.png /healthz; do
   check "GET $path" 200 "$(status "$BASE$path")"
 done
+# W8: the release notes and their Atom feeds; W9: the docs.
+for path in /changelog/ /changelog/0.7.0/ /he/changelog/ /he/changelog/0.7.0/ \
+            /docs/ /docs/topology/ /he/docs/ /he/docs/topology/; do
+  check "GET $path" 200 "$(status "$BASE$path")"
+done
+for path in /changelog/feed.xml /he/changelog/feed.xml; do
+  check "$path is Atom" "application/atom+xml; charset=utf-8" "$(header content-type "$BASE$path")"
+done
 
 check "<html data-theme> is $THEME" 1 "$(curl -s "$BASE/" | grep -c "<html [^>]*data-theme=\"$THEME\"")"
 check "he page is rtl" 1 "$(curl -s "$BASE/he/" | grep -c '<html lang="he" dir="rtl"')"

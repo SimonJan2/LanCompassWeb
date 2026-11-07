@@ -10,4 +10,10 @@ src/assets/screens/
 public/media/
 # W6: the release's SBOM, byte-identical to the bundle's (its SHA-256 is on /verify/).
 public/verify/
+# W8: the product's release notes, verbatim from its CHANGELOG.md (scripts/sync-changelog.mjs),
+# and the sync's test fixtures, which must stay exactly as written.
+src/content/changelog/en/
+tests/fixtures/
+# W9: the product's docs, verbatim from the tag (scripts/sync-docs.mjs).
+src/content/docs/
 *.mdx

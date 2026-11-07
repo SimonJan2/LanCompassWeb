@@ -17,13 +17,17 @@ import {
   pagePath,
   useUi,
   type Locale,
+  type LocalePaths,
   type PageKey,
+  type SectionKey,
 } from "../i18n";
 
 interface Props {
   locale: Locale;
-  /** The page, for the switcher, hreflang and canonical. */
-  page: PageKey;
+  /** The page, for the switcher, hreflang and canonical; or a section (W8 changelog). */
+  page: PageKey | SectionKey;
+  /** A section's page: its path in each locale (canonical, hreflang, the language switcher). */
+  paths?: LocalePaths | undefined;
   title: string;
   description: string;
   /** Set on the 404 page: no canonical or hreflang, and noindex. */
@@ -32,10 +36,12 @@ interface Props {
   jsonLd?: Record<string, unknown>[];
 }
 
-const { locale, page, title, description, notFound = false, jsonLd = [] } = Astro.props;
+const { locale, page, paths, title, description, notFound = false, jsonLd = [] } = Astro.props;
 const ui = useUi(locale);
 const meta = locales[locale];
-const canonical = absoluteUrl(pagePath(locale, page));
+/** The page in a locale: a section page's own path, or a page key's. */
+const pathIn = (code: Locale) => paths?.[code] ?? pagePath(code, page as PageKey);
+const canonical = absoluteUrl(pathIn(locale));
 const ogImage = absoluteUrl(`/og/${locale}/${notFound ? "404" : page}.png`);
 const organization = {
   "@context": "https://schema.org",
@@ -73,19 +79,12 @@ const darkColour = palettes.dark.page.toUpperCase();
     {!notFound && <link rel="canonical" href={canonical} />}
     {!notFound &&
       localeCodes.map((code) => (
-        <link
-          rel="alternate"
-          hreflang={locales[code].htmlLang}
-          href={absoluteUrl(pagePath(code, page))}
-        />
+        <link rel="alternate" hreflang={locales[code].htmlLang} href={absoluteUrl(pathIn(code))} />
       ))}
     {!notFound && (
-      <link
-        rel="alternate"
-        hreflang="x-default"
-        href={absoluteUrl(pagePath(defaultLocale, page))}
-      />
+      <link rel="alternate" hreflang="x-default" href={absoluteUrl(pathIn(defaultLocale))} />
     )}
+    <slot name="head" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -142,11 +141,11 @@ const darkColour = palettes.dark.page.toUpperCase();
     <a class="skip-link" href="#main">
       {ui.skipLink}
     </a>
-    <SiteHeader locale={locale} page={page} />
+    <SiteHeader locale={locale} page={page} paths={paths} />
     <main id="main" tabindex="-1">
       <slot />
     </main>
-    <SiteFooter locale={locale} page={page} />
+    <SiteFooter locale={locale} page={page} paths={paths} />
     <script>
       import "../scripts/site.ts";
     </script>

@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "comment": "A fixture for tests/docs.spec.ts: alpha's Hebrew was made from the English file as it is; beta's from an older English file, so the sync marks it stale (the product's rule).",
+  "docs": {
+    "alpha": {
+      "en_sha256": "b907aeb14ad8656aeec066ee9df7c4c66deb966a0caab8ed8ff6efcaeb6084e3",
+      "locales": {
+        "he": {
+          "source_sha256": "b907aeb14ad8656aeec066ee9df7c4c66deb966a0caab8ed8ff6efcaeb6084e3"
+        }
+      }
+    },
+    "beta": {
+      "en_sha256": "f4e723a0606502d87b3e3b882dc23793f9422a6bef89c0607f4f6b598316bdb2",
+      "locales": {
+        "he": {
+          "source_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      }
+    }
+  }
+}

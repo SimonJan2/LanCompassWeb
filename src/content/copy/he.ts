@@ -67,6 +67,18 @@ export const he: Copy = {
       title: "הדף לא נמצא — LanCompass",
       description: "הכתובת הזו לא מגיעה לשום דף. המצפן עדיין מכוון הביתה.",
     },
+    docs: {
+      title: "תיעוד — LanCompass",
+      // C-DOCS-1, C-DOCS-2
+      description:
+        "העזרה שמובנית ב־⁦LanCompass 0.7.0⁩, בעברית ובאנגלית: תחילת עבודה, מדריכים מעשיים, ⁦IPAM⁩, מלאי, אינטגרציות, תפעול ומערכת.",
+    },
+    changelog: {
+      title: "הערות גרסה — LanCompass",
+      // C-NOTES-2
+      description:
+        "מה השתנה בכל גרסה של ⁦LanCompass⁩, מהחדשה לישנה: סיכום בעברית, דרך השדרוג והבעיות הידועות, וקישור להערות המלאות באנגלית.",
+    },
   },
 
   home: {
@@ -154,6 +166,8 @@ export const he: Copy = {
           section: "studio",
         },
       ],
+      /** W8: הקישור להערות של הגרסה החדשה. */
+      notes: "להערות הגרסה",
     },
     loop: {
       eyebrow: "איך זה עובד",
@@ -1339,5 +1353,79 @@ export const he: Copy = {
     title: "הדף הזה לא על המפה.",
     lead: "אולי הכתובת זזה, ואולי היא אף פעם לא הייתה קיימת. המצפן עדיין מכוון הביתה.",
     home: "חזרה לדף הבית",
+  },
+
+  /**
+   * W8: ‏/he/changelog/ ודף הסיכום של כל גרסה. ההערות המלאות של המוצר כתובות באנגלית
+   * (src/content/changelog/en); הסיכומים בעברית נכתבו כאן (src/content/changelog/he).
+   */
+  changelog: {
+    eyebrow: "הערות גרסה",
+    title: "מה השתנה בכל גרסה",
+    // C-NOTES-2
+    lead: "כל גרסה של <bdi>LanCompass</bdi>, מהחדשה לישנה: מה השתנה, ומגרסה <bdi>0.6.0</bdi> והלאה גם איך משדרגים ומה עוד עלולים לפגוש בפיילוט. כאן הם בסיכום בעברית; ההערות המלאות של המוצר כתובות באנגלית.",
+    latest: "האחרונה",
+    // C-NOTES-1 (השורה של כל גרסה מציגה את הסיכום שלה: releases.json summary_en / summary_he)
+    read: "הסיכום של <bdi>{version}</bdi>",
+    feed: "מעקב אחרי הערות הגרסה (פיד <bdi>Atom</bdi>)",
+    feedTitle: "הערות הגרסה של LanCompass",
+    feedSubtitle: "סיכום בעברית של כל גרסה של LanCompass, עם קישור להערות המלאות באנגלית.",
+    releaseTitle: "<bdi>LanCompass {version}</bdi>",
+    dateLabel: "תאריך",
+    glance: {
+      title: "במבט אחד",
+      from: "משדרגים מגרסה",
+      fromNone: "אין בהערות האלה פרק שדרוג",
+      migrations: "מיגרציות של מסד הנתונים",
+      migrationsValue: "{count}: {first} ← {last}",
+      migrationsNone: "ההערות האלה לא מונות מיגרציות",
+      known: "בעיות ידועות",
+      knownNone: "ההערות האלה לא מפרטות בעיות ידועות",
+      upgradeLink: "איך משדרגים",
+      knownLink: "הבעיות הידועות",
+    },
+    notes: "הסיכום",
+    others: "גרסאות אחרות",
+    older: "קודמת: <bdi>{version}</bdi>",
+    newer: "חדשה יותר: <bdi>{version}</bdi>",
+    all: "כל הגרסאות",
+    // C-VER-1, C-VER-2
+    verify:
+      'לפני שמתקינים את <bdi>{version}</bdi>, בודקים את החבילה שלה: <a href="{href}">אימות חבילה</a>.',
+    // C-NOTES-2
+    authority:
+      "זהו סיכום בעברית, שנכתב ב־{date}. הנוסח הקובע הוא הערות הגרסה המלאות באנגלית, כפי שהמוצר כותב אותן.",
+    english: "להערות המלאות באנגלית",
+  },
+
+  /**
+   * W9: ‏/he/docs/ וכל מאמר. המאמרים הם של המוצר (src/content/docs/he); כאן המילים של האתר
+   * סביבם. שמות הקטגוריות, „בדף זה”, „כל המדריכים”, „הקודם” / „הבא” והודעת התרגום הלא מעודכן
+   * הם המחרוזות של המוצר עצמו ב־v0.7.0 ‏(frontend/src/i18n/messages/he.json).
+   */
+  docs: {
+    eyebrow: "תיעוד",
+    // C-DOCS-1
+    title: "העזרה שמובנית ב־<bdi>LanCompass</bdi>",
+    // C-DOCS-1, C-DOCS-2
+    lead: "אלה דפי העזרה של המוצר עצמו, כפי שהם מגיעים בתוך <bdi>LanCompass {version}</bdi>: ‏65 מאמרים בשבע קטגוריות, בעברית ובאנגלית — שתי השפות שהמוצר בודק במלואן.",
+    // C-DOCS-1
+    versionLine: "התיעוד של <bdi>LanCompass {version}</bdi> — העזרה שמובנית במוצר",
+    categories: {
+      "getting-started": "תחילת עבודה",
+      "how-to": "מדריכים מעשיים",
+      ipam: "<bdi>IPAM</bdi>",
+      inventory: "מלאי",
+      integrations: "אינטגרציות",
+      operations: "תפעול",
+      system: "מערכת",
+    },
+    nav: "מדריכים",
+    allGuides: "כל המדריכים",
+    onThisPage: "בדף זה",
+    previous: "הקודם",
+    next: "הבא",
+    stale: "ייתכן שהתרגום אינו מעודכן — המאמר האנגלי השתנה מאז",
+    index: "כל התיעוד",
   },
 };

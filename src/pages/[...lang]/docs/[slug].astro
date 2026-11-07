@@ -1,0 +1,46 @@
+---
+/**
+ * W9: /docs/<slug>/ and /he/docs/<slug>/ — one of the product's 65 help articles per locale,
+ * as it ships in the release (src/content/docs, scripts/sync-docs.mjs), in DocsLayout.
+ */
+import type { GetStaticPaths } from "astro";
+import DocsLayout from "../../../layouts/DocsLayout.astro";
+import { defaultLocale, localeCodes, type Locale } from "../../../i18n";
+import { docPages, docPaths, neighbours } from "../../../lib/docs";
+
+export const getStaticPaths = (async () => {
+  const out = [];
+  for (const locale of localeCodes) {
+    for (const page of await docPages(locale)) {
+      out.push({
+        params: { lang: locale === defaultLocale ? undefined : locale, slug: page.slug },
+        props: { locale, slug: page.slug },
+      });
+    }
+  }
+  return out;
+}) satisfies GetStaticPaths;
+
+interface Props {
+  locale: Locale;
+  slug: string;
+}
+
+const { locale, slug } = Astro.props;
+const pages = await docPages(locale);
+const page = pages.find((p) => p.slug === slug)!;
+const { Content, headings } = await page.load();
+const { previous, next } = neighbours(pages, page);
+---
+
+<DocsLayout
+  locale={locale}
+  page={page}
+  pages={pages}
+  headings={headings}
+  paths={docPaths(slug)}
+  previous={previous}
+  next={next}
+>
+  <Content />
+</DocsLayout>

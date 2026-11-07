@@ -1,0 +1,8 @@
+{
+  "comment": "A two-page fixture for tests/docs.spec.ts, in the shape of the product's registry.json.",
+  "categories": ["getting-started", "how-to"],
+  "articles": [
+    { "slug": "alpha", "icon": "Compass", "category": "getting-started", "keywords": [] },
+    { "slug": "beta", "icon": "Server", "category": "how-to", "keywords": [] }
+  ]
+}

@@ -29,6 +29,8 @@ const themed = [
   "annotations",
   "verify",
   "pilot",
+  "changelog",
+  "docs",
 ].map((name) => `${name}.spec.ts`);
 
 export default defineConfig({

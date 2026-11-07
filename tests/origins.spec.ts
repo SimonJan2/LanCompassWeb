@@ -1,8 +1,25 @@
 import { expect, test } from "@playwright/test";
-import { builtHtml, DEFAULT, FLAGS, FLAG_VALUES, pages, siteBase, siteProject } from "./helpers";
+import {
+  builtHtml,
+  docsSample,
+  DEFAULT,
+  FLAGS,
+  FLAG_VALUES,
+  pages,
+  sectionPages,
+  siteBase,
+  siteProject,
+} from "./helpers";
+
+/** The external links in the product's docs at v0.7.0 (frontend/src/content/docs/{en,he}/racks.md). */
+const DOCS_LINKS = [
+  "https://github.com/RackulaLives/Rackula",
+  "https://github.com/netbox-community/devicetype-library",
+];
 
 test.describe("no third parties", () => {
-  for (const p of pages) {
+  // W8: the release-note pages too; W9: a sample of the docs (their images are the site's own).
+  for (const p of [...pages, ...sectionPages, ...docsSample]) {
     test(`${p.path}: every request stays on the site's origin`, async ({ page }) => {
       const origins = new Set<string>();
       page.on("request", (r) => {
@@ -62,6 +79,9 @@ test.describe("no third parties", () => {
             const url = value.trim().split(/\s+/)[0]!;
             if (!/^(https?:)?\/\//.test(url)) continue;
             if (url.startsWith(`${site}/`) || allowed.includes(url)) continue;
+            // W9: the product's docs keep their own https:// links (a reader's navigation, not
+            // a request the page makes): exactly these two, on the racks article only.
+            if (/\/docs\/racks\/index\.html$/.test(file) && DOCS_LINKS.includes(url)) continue;
             offenders.push(`${file}: ${url}`);
           }
         }
