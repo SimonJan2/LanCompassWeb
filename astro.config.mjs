@@ -74,10 +74,11 @@ function themeCss() {
 /**
  * The figure marks' positions (AnnotatedScreen.astro) as a stylesheet: `virtual:lancompass/
  * figure-marks.css`, one rule per mark the build can draw (markRules in src/lib/annotations.ts),
- * from W3's anchors, the copy's notes and each capture's size. AnnotatedScreen imports it, so
- * Vite bundles it into the page's own CSS file: no extra request, and no inline style attribute,
- * which the CSP (`style-src 'self'`) would block. The sets follow screenSets() in
- * src/lib/screens.ts (that module globs images, which a config cannot load).
+ * from the capture's anchors and clips and the copy's notes, the desktop crop's marks inside a
+ * min-width media query and the phone crop's inside a max-width one (W11). AnnotatedScreen
+ * imports it, so Vite bundles it into the page's own CSS file: no extra request, and no inline
+ * style attribute, which the CSP (`style-src 'self'`) would block. The sets follow screenSets()
+ * in src/lib/screens.ts.
  * @returns {import("vite").Plugin}
  */
 function figureMarksCss() {
@@ -99,29 +100,10 @@ function figureMarksCss() {
       this.addWatchFile(anchorsFile);
       const anchors = JSON.parse(await readFile(anchorsFile, "utf8"));
       const sets = /** @type {("survey" | "night-chart")[]} */ (setsFor[siteTheme]);
-      /** @type {Map<string, { width: number; height: number } | null>} */
-      const sizes = new Map();
-      for (const locale of localeCodes) {
-        for (const screen of Object.keys(getCopy(locale).figures)) {
-          for (const variant of /** @type {const} */ (["full", "focus"])) {
-            const name = variant === "focus" ? `${screen}.focus.png` : `${screen}.png`;
-            const file = join(root, "assets/screens", sets[0] ?? "survey", locale, name);
-            let size = null;
-            try {
-              const png = await readFile(file);
-              size = { width: png.readUInt32BE(16), height: png.readUInt32BE(20) };
-            } catch {
-              size = null;
-            }
-            sizes.set(`${locale}/${screen}/${variant}`, size);
-          }
-        }
-      }
       const css = markRules(anchors, {
         sets,
         locales: localeCodes,
         notes: (locale) => getCopy(locale).figures,
-        size: (locale, screen, variant) => sizes.get(`${locale}/${screen}/${variant}`) ?? null,
       });
       return `/* The figure marks' positions (astro.config.mjs → figureMarksCss). */\n${css}\n`;
     },
@@ -220,6 +202,31 @@ function securityTxtFile() {
   };
 }
 
+/**
+ * W11: public/screens/<set>/ holds both capture sets (Survey, Night chart). A light build serves
+ * only Survey and a dark build only Night chart, so the other set's folder is left out of the
+ * build; an auto build keeps both (src/lib/screens.ts → screenSets).
+ * @returns {import("astro").AstroIntegration}
+ */
+function screensForTheme() {
+  /** @type {Record<string, string[]>} */
+  const keep = { light: ["survey"], dark: ["night-chart"], auto: ["survey", "night-chart"] };
+  return {
+    name: "lancompass:screens-for-theme",
+    hooks: {
+      "astro:build:done": async ({ dir }) => {
+        for (const set of ["survey", "night-chart"]) {
+          if (keep[siteTheme]?.includes(set)) continue;
+          await rm(fileURLToPath(new URL(`screens/${set}/`, dir)), {
+            recursive: true,
+            force: true,
+          });
+        }
+      },
+    },
+  };
+}
+
 export default defineConfig({
   site: siteUrl,
   output: "static",
@@ -246,6 +253,7 @@ export default defineConfig({
     headersFormAction(),
     localized404(),
     securityTxtFile(),
+    screensForTheme(),
   ],
   devToolbar: { enabled: false },
   prefetch: false,

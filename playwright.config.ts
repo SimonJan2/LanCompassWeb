@@ -27,6 +27,7 @@ const themed = [
   "theme",
   "media",
   "annotations",
+  "legibility",
   "verify",
   "pilot",
   "changelog",

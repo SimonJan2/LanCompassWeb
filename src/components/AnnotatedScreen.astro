@@ -1,25 +1,29 @@
 ---
 /**
- * W4: a product screen as a numbered figure. The picture is ScreenshotFrame's (the focus crop in a
- * narrow slot, the full window in a wide one); up to four numbered marks sit on it, placed only
- * from W3's capture anchors (src/content/screen-anchors.json) for the build's set and the screen's
- * locale, as percentages of the picture, so they scale; a numbered legend (ol) carries the same
- * notes as text. Each mark is an in-page link to its legend item (#fig-<n>-<m>), which :target
+ * W4: a product screen as a numbered figure; since W11 a crop of the figure's slot around the
+ * thing its caption names (ScreenshotFrame, slot "figure": the desktop crop, and a phone crop
+ * below the breakpoint). Up to four numbered marks sit on it, placed only from the capture's
+ * anchors (src/content/screen-anchors.json) for the build's set, the screen's locale and the
+ * picture the window shows — the desktop crop's positions inside a min-width media query, the
+ * phone crop's inside a max-width one (the generated stylesheet) — as percentages of the
+ * picture, so they scale. A numbered legend (ol) carries every note as text at every width; a
+ * note whose thing lies outside a crop has no mark at that width (W11: the mark goes, never the
+ * note). Each mark is an in-page link to its legend item (#fig-<n>-<m>), which :target
  * highlights. No JavaScript.
  *
- * A key, set or locale without anchors renders no marks and keeps its caption (lib/annotations).
- * A cropped figure links to its full window, a same-origin image (no lightbox script).
+ * A key, set or locale without anchors renders no marks and keeps its caption and legend
+ * (lib/annotations). Every cropped figure links to its full window, a same-origin image (no
+ * lightbox script).
  */
-import { getImage } from "astro:assets";
 import ScreenshotFrame from "./ScreenshotFrame.astro";
 import anchorData from "../content/screen-anchors.json";
 import { fill, useUi, type Locale } from "../i18n";
 import { site } from "../config/site";
-import { figureMarks, markClass, MARKED_PICTURES, type AnchorFile } from "../lib/annotations";
+import { figureNotes, markClass, MARKED_PICTURES, type AnchorFile } from "../lib/annotations";
 // Each mark's position, as rules in this page's stylesheet (astro.config.mjs → figureMarksCss):
 // the CSP blocks style attributes.
 import "virtual:lancompass/figure-marks.css";
-import { findScreen, screenSets, type ScreenKey, type ScreenVariant } from "../lib/screens";
+import { fullWindow, screenSets, slotPictures, type ScreenKey } from "../lib/screens";
 
 interface Props {
   screen: ScreenKey;
@@ -29,95 +33,61 @@ interface Props {
   n: number;
   /** The caption after "Fig. n —" (inline HTML from the copy files). */
   caption: string;
-  /** The notes, keyed by the anchor names W3 recorded; an anchor without a note gets no mark. */
+  /** The notes, keyed by the anchor names the capture records; every note is in the legend. */
   notes: Record<string, string>;
-  variant?: ScreenVariant;
-  crop?: "full" | "wide";
-  sizes?: string;
-  widths?: number[];
-  single?: number;
-  singleDark?: boolean;
   eager?: boolean;
   class?: string;
 }
 
-const {
-  screen,
-  locale,
-  n,
-  caption,
-  notes,
-  variant = "full",
-  crop = "full",
-  sizes,
-  widths,
-  single,
-  singleDark,
-  eager,
-  class: className,
-} = Astro.props;
+const { screen, locale, n, caption, notes, eager = false, class: className } = Astro.props;
 const ui = useUi(locale);
 const sets = screenSets(site.theme);
-const picture = findScreen(sets[0]!, locale, screen, variant);
-const full = findScreen(sets[0]!, locale, screen, "full");
-/** The anchors that belong to the picture shown: the focus crop's own, or the full window's. */
-const shown: ScreenVariant = variant === "focus" && picture && picture !== full ? "focus" : "full";
-const marks = picture
-  ? figureMarks(anchorData as AnchorFile, {
-      sets,
-      locale,
-      screen,
-      variant: shown,
-      notes,
-      width: picture.width,
-      height: crop === "wide" ? picture.width / 2 : picture.height,
-    })
+const picture = slotPictures("figure", sets[0]!, locale, screen).desktop;
+/** No legend on a placeholder frame (no capture yet), as before W11. */
+const items = picture ? figureNotes(anchorData as AnchorFile, { sets, locale, screen, notes }) : [];
+const marked = items.filter((it) => Object.keys(it.marks).length > 0);
+/** A mark's classes: its position in each picture, or `<prefix>-0` (no mark at that width). */
+const classes = (it: (typeof items)[number]) =>
+  MARKED_PICTURES.map(({ picture: p, prefix }) => {
+    const m = it.marks[p as keyof typeof it.marks];
+    return m ? markClass(m, prefix) : `${prefix}-0`;
+  }).join(" ");
+/** Every figure is a crop: it links to the whole window, one link per set (auto shows the
+ *  scheme's own). */
+const fullLinks = picture
+  ? sets
+      .map((set) => ({ set, href: fullWindow(set, locale, screen)?.src }))
+      .filter((l): l is { set: typeof l.set; href: string } => !!l.href)
   : [];
-if (marks.length > 0 && !MARKED_PICTURES.some((p) => p.variant === shown && p.crop === crop)) {
-  throw new Error(
-    `AnnotatedScreen ${screen}: marks on a ${shown} / ${crop} picture have no position rules; add it to MARKED_PICTURES (src/lib/annotations.ts)`,
-  );
-}
-/** A cropped figure (a focus crop, or the wide band of the loop) links to the whole window. */
-const cropped = shown === "focus" || crop === "wide";
-const fullLinks =
-  cropped && full
-    ? await Promise.all(
-        sets.map(async (set) => {
-          const src = findScreen(set, locale, screen, "full")!;
-          return { set, href: (await getImage({ src, width: src.width, format: "webp" })).src };
-        }),
-      )
-    : [];
+const cropped = fullLinks.length > 0;
 const label = fill(ui.figure.label, { n: String(n) });
-/** The frame's own options, passed on only when given (exactOptionalPropertyTypes). */
-const frame = Object.fromEntries(
-  Object.entries({ sizes, widths, single, singleDark, eager }).filter(([, v]) => v !== undefined),
-);
 ---
 
 <figure class:list={["fig", className]} id={`fig-${n}`} data-cropped={cropped ? "true" : undefined}>
-  <ScreenshotFrame screen={screen} locale={locale} variant={variant} crop={crop} {...frame}>
-    {marks.length > 0 && (
+  <ScreenshotFrame screen={screen} locale={locale} slot="figure" eager={eager}>
+    {marked.length > 0 && (
       <div class="fig-layer">
-        {marks.map((m, i) => (
-          <span class={`fig-a ${markClass(m)}`}>
-            <a
-              href={`#fig-${n}-${i + 1}`}
-              aria-label={`${fill(ui.figure.note, { m: String(i + 1) })}: ${m.text.replace(/<[^>]+>/g, "")}`}
-            >
-              {i + 1}
-            </a>
-          </span>
-        ))}
+        {items.map(
+          (it, i) =>
+            Object.keys(it.marks).length > 0 && (
+              <span class={`fig-a ${classes(it)}`}>
+                <a
+                  href={`#fig-${n}-${i + 1}`}
+                  aria-label={`${fill(ui.figure.note, { m: String(i + 1) })}: ${it.text.replace(/<[^>]+>/g, "")}`}
+                >
+                  {i + 1}
+                </a>
+              </span>
+            ),
+        )}
       </div>
     )}
   </ScreenshotFrame>
-  {marks.length > 0 && (
+  {items.length > 0 && (
     <ol class="fig-notes" role="list">
-      {marks.map((m, i) => (
+      {items.map((it, i) => (
         <li id={`fig-${n}-${i + 1}`}>
-          <span set:html={m.text} />
+          <span set:html={it.text} />
         </li>
       ))}
     </ol>

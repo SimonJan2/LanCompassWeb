@@ -68,7 +68,8 @@ test.describe("site theme", () => {
   }) => {
     const requested: string[] = [];
     page.on("request", (r) => {
-      if (/\/_astro\/[\w-]+\.[\w-]+\.(avif|webp|png)$/.test(new URL(r.url()).pathname))
+      // W11: the screens' served files, /screens/<set>/<locale>/<key>.<picture>.webp.
+      if (/^\/screens\/[\w-]+\/[\w-]+\/[\w.-]+\.webp$/.test(new URL(r.url()).pathname))
         requested.push(new URL(r.url()).pathname);
     });
     await page.setViewportSize({ width: 1440, height: 900 });

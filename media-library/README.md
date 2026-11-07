@@ -1,7 +1,8 @@
 # Media library
 
-Product imagery captured from the LanCompass demo estate, kept for later use. The site only
-reads `src/assets/screens/` and `public/media/`; nothing in this folder is built or served.
+Product imagery captured from the LanCompass demo estate, kept as the record. The site only
+reads `public/screens/` (derived from the screens here) and `public/media/`; nothing in this
+folder is built or served.
 
 Every file shows the fictional demo estate only. Screens come from the signed release bundle on
 a throwaway stack (`scripts/capture-stack/`), where the capture only navigates, scrolls,
@@ -10,12 +11,15 @@ version on each demo design) are staged on that stack beforehand and listed in
 `screens/CAPTURED.json`. Videos were recorded read-only on a development stack (W1.3; W5
 re-records them).
 
-## Screens — `screens/<set>/<locale>/<key>.png` and `<key>.focus.png`
+## Screens — `screens/<set>/<locale>/<key>.png` and `<key>.<slot>[-phone].png`
 
-2× PNGs at 1440 × 900 (2880 × 1800 px) of the full window, and a focus crop around each key's
-main element (its box plus 24 px, at least 760 × 475 CSS px), in both interface languages and
-the product's two official themes. `scripts/capture-screenshots.mjs` writes them into
-`src/assets/screens/<set>/` (what the site builds) and copies them here.
+PNGs of the full window at 1440 × 900 (2880 × 1800 px), and, for every slot that shows the key
+(W11, `src/content/screen-slots.json`), a crop of the slot's own size around the one thing its
+caption names, scaled from a render at device scale 3 to twice the width the slot draws it (never
+enlarged), in both interface languages and the product's two official themes.
+`scripts/capture-screenshots.mjs` writes them here and derives the served WebP files in
+`public/screens/<set>/<locale>/` from them (`--derive` does that alone). W3's 760 × 475 focus
+crops (`<key>.focus.png`) are gone: no slot drew them at a readable size.
 
 | Theme       | Folder                 | Use                                   |
 | ----------- | ---------------------- | ------------------------------------- |

@@ -136,13 +136,7 @@ const atlasRows = h.atlas.rows.map((row) => ({
         {h.whatsNew.items.map((item) => (
           <li class="news-item reveal" data-news={item.screen}>
             {isScreenKey(item.screen) && (
-              <ScreenshotFrame
-                screen={item.screen}
-                locale={locale}
-                variant="focus"
-                single={640}
-                singleDark
-              />
+              <ScreenshotFrame screen={item.screen} locale={locale} slot="news" />
             )}
             <h3 class="news-title">
               <a href={`${productHref}#${item.section}`} set:html={item.title} />

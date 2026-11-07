@@ -20,6 +20,9 @@ is the JSON-LD data block, which browsers never execute and CSP does not govern.
 | `Cross-Origin-Opener-Policy` | `same-origin`                                                                                                                                                                                                                                                                                 |                                                                                                      |
 
 `/_astro/*` files are content-hashed, so they get `Cache-Control: public, max-age=31536000, immutable`.
+The product screens (`/screens/<set>/<locale>/*.webp`, W11) and videos (`/media/*`) keep stable
+paths: the production image's nginx (`docker/nginx/site.conf`, its rule for media files) gives
+them `Cache-Control: public, max-age=3600`, so a re-capture reaches visitors within the hour.
 
 Three kinds of same-origin file need their content types, and nothing else (the CSP is
 unchanged: no new origin). W8's release-note feeds, `/changelog/feed.xml` and

@@ -771,9 +771,9 @@ export const en = {
     "map-ages": {
       // C-MAP-1, C-MAP-2
       caption: "Demo HQ’s map: one line per cable, and each line says how old it is.",
+      // W11: the figure is a crop around the open card; the Changes lens's note went with the
+      // window's top bar it pointed at (C-MAP-4 stays cited in the map section above).
       notes: {
-        // C-MAP-4
-        lens: "The Changes lens: what moved or went quiet since the date you pick.",
         // C-MAP-2
         canvas: "A cable’s card: when it was last verified on the wire.",
       },

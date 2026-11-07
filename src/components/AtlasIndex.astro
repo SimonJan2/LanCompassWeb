@@ -40,13 +40,7 @@ const { locale, rows, previewLabel } = Astro.props;
     {rows.map((row) => (
       <div class="atlas-preview" data-atlas-preview={row.key}>
         {isScreenKey(row.screen) && (
-          <ScreenshotFrame
-            screen={row.screen}
-            locale={locale}
-            single={960}
-            variant="focus"
-            decorative
-          />
+          <ScreenshotFrame screen={row.screen} locale={locale} slot="atlas" decorative />
         )}
         <p class="atlas-preview-caption" set:html={row.title} />
       </div>

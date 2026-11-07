@@ -39,12 +39,7 @@ const { locale, steps, figure } = Astro.props;
 </ol>
 {figure && isScreenKey(figure.screen) && (
   <figure class="step-figure reveal">
-    <ScreenshotFrame
-      screen={figure.screen}
-      locale={locale}
-      crop="wide"
-      sizes="(min-width: 1264px) 1200px, 100vw"
-    />
+    <ScreenshotFrame screen={figure.screen} locale={locale} slot="loop" crop="wide" />
     <figcaption class="step-caption" set:html={figure.caption} />
   </figure>
 )}

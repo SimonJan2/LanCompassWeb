@@ -1,13 +1,39 @@
 {
-  "$comment": "W3 capture anchors: { name, x, y, w, h } in image pixels per set, locale and key, for the full window and the focus crop (with its clip in CSS px). Written by scripts/capture-screenshots.mjs.",
+  "$comment": "Capture anchors: { name, x, y, w, h } in units of 2 per CSS px per set, locale and key, for the full window and for each slot's crop (its clip in CSS px under clips). Written by scripts/capture-screenshots.mjs.",
   "survey": {
     "en": {
       "dashboard": {
-        "clip": {
-          "x": 240,
-          "y": 28,
-          "width": 1200,
-          "height": 872
+        "clips": {
+          "atlas": {
+            "x": 248,
+            "y": 310,
+            "width": 456,
+            "height": 285
+          },
+          "band": {
+            "x": 248,
+            "y": 310,
+            "width": 560,
+            "height": 350
+          },
+          "band-phone": {
+            "x": 248,
+            "y": 310,
+            "width": 330,
+            "height": 206
+          },
+          "figure": {
+            "x": 248,
+            "y": 310,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 248,
+            "y": 310,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -18,22 +44,66 @@
             "h": 1148
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "grid",
-            "x": 48,
-            "y": 596,
-            "w": 2304,
-            "h": 1148
+            "x": 32,
+            "y": 32,
+            "w": 880,
+            "h": 538
+          }
+        ],
+        "band": [
+          {
+            "name": "grid",
+            "x": 32,
+            "y": 32,
+            "w": 1088,
+            "h": 668
+          }
+        ],
+        "band-phone": [
+          {
+            "name": "grid",
+            "x": 32,
+            "y": 32,
+            "w": 628,
+            "h": 380
+          }
+        ],
+        "figure": [
+          {
+            "name": "grid",
+            "x": 32,
+            "y": 32,
+            "w": 1434,
+            "h": 884
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "grid",
+            "x": 32,
+            "y": 32,
+            "w": 628,
+            "h": 380
           }
         ]
       },
       "ipam-tree": {
-        "clip": {
-          "x": 240,
-          "y": 174,
-          "width": 1200,
-          "height": 702
+        "clips": {
+          "figure": {
+            "x": 248,
+            "y": 182,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 248,
+            "y": 182,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -44,22 +114,39 @@
             "h": 1308
           }
         ],
-        "focus": [
+        "figure": [
           {
             "name": "tree",
-            "x": 48,
-            "y": 48,
-            "w": 2304,
-            "h": 1308
+            "x": 32,
+            "y": 32,
+            "w": 1434,
+            "h": 884
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "tree",
+            "x": 32,
+            "y": 32,
+            "w": 628,
+            "h": 380
           }
         ]
       },
       "rack": {
-        "clip": {
-          "x": 334,
-          "y": 0,
-          "width": 760,
-          "height": 900
+        "clips": {
+          "figure": {
+            "x": 248,
+            "y": 104,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 548,
+            "y": 546,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -70,49 +157,55 @@
             "h": 676
           }
         ],
-        "focus": [
+        "figure": [
           {
             "name": "elevation",
-            "x": 460,
-            "y": 1124,
+            "x": 632,
+            "y": 32,
             "w": 600,
-            "h": 676
+            "h": 884
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "elevation",
+            "x": 32,
+            "y": 32,
+            "w": 600,
+            "h": 380
           }
         ]
       },
       "topology-observed": {
-        "clip": {
-          "x": 541,
-          "y": 335,
-          "width": 760,
-          "height": 475
+        "clips": {
+          "atlas": {
+            "x": 693,
+            "y": 430,
+            "width": 456,
+            "height": 285
+          }
         },
         "full": [
           {
             "name": "edge",
-            "x": 1796,
-            "y": 1135,
-            "w": 92,
-            "h": 19
+            "x": 1799,
+            "y": 1138,
+            "w": 86,
+            "h": 12
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "edge",
-            "x": 714,
-            "y": 465,
-            "w": 92,
-            "h": 19
+            "x": 413,
+            "y": 278,
+            "w": 86,
+            "h": 12
           }
         ]
       },
       "review": {
-        "clip": {
-          "x": 240,
-          "y": 56,
-          "width": 1200,
-          "height": 510
-        },
+        "clips": {},
         "full": [
           {
             "name": "ghost-links",
@@ -121,23 +214,28 @@
             "w": 2304,
             "h": 923
           }
-        ],
-        "focus": [
-          {
-            "name": "ghost-links",
-            "x": 48,
-            "y": 48,
-            "w": 2304,
-            "h": 923
-          }
         ]
       },
       "nac": {
-        "clip": {
-          "x": 240,
-          "y": 47,
-          "width": 1200,
-          "height": 475
+        "clips": {
+          "atlas": {
+            "x": 248,
+            "y": 44,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 248,
+            "y": 0,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 248,
+            "y": 83,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -148,22 +246,54 @@
             "h": 80
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "mode",
-            "x": 48,
-            "y": 238,
-            "w": 2304,
+            "x": 32,
+            "y": 244,
+            "w": 880,
+            "h": 80
+          }
+        ],
+        "figure": [
+          {
+            "name": "mode",
+            "x": 32,
+            "y": 332,
+            "w": 1434,
+            "h": 80
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "mode",
+            "x": 32,
+            "y": 166,
+            "w": 628,
             "h": 80
           }
         ]
       },
       "compliance": {
-        "clip": {
-          "x": 240,
-          "y": 0,
-          "width": 1200,
-          "height": 900
+        "clips": {
+          "atlas": {
+            "x": 248,
+            "y": 56,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 248,
+            "y": 104,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 248,
+            "y": 104,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -174,22 +304,60 @@
             "h": 1656
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "section",
-            "x": 48,
-            "y": 144,
-            "w": 2304,
-            "h": 1656
+            "x": 32,
+            "y": 32,
+            "w": 880,
+            "h": 538
+          }
+        ],
+        "figure": [
+          {
+            "name": "section",
+            "x": 32,
+            "y": 32,
+            "w": 1434,
+            "h": 884
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "section",
+            "x": 32,
+            "y": 32,
+            "w": 628,
+            "h": 380
           }
         ]
       },
       "discovery-queue": {
-        "clip": {
-          "x": 240,
-          "y": 158,
-          "width": 1200,
-          "height": 520
+        "clips": {
+          "atlas": {
+            "x": 248,
+            "y": 166,
+            "width": 456,
+            "height": 285
+          },
+          "loop-phone": {
+            "x": 248,
+            "y": 166,
+            "width": 330,
+            "height": 165
+          },
+          "figure": {
+            "x": 248,
+            "y": 166,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 248,
+            "y": 166,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -207,29 +375,91 @@
             "h": 96
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "queue",
-            "x": 48,
-            "y": 48,
-            "w": 2304,
-            "h": 944
+            "x": 32,
+            "y": 32,
+            "w": 880,
+            "h": 538
           },
           {
             "name": "first-group",
-            "x": 98,
-            "y": 258,
-            "w": 2204,
+            "x": 82,
+            "y": 242,
+            "w": 830,
+            "h": 96
+          }
+        ],
+        "loop-phone": [
+          {
+            "name": "queue",
+            "x": 32,
+            "y": 32,
+            "w": 628,
+            "h": 298
+          },
+          {
+            "name": "first-group",
+            "x": 82,
+            "y": 242,
+            "w": 578,
+            "h": 88
+          }
+        ],
+        "figure": [
+          {
+            "name": "queue",
+            "x": 32,
+            "y": 32,
+            "w": 1434,
+            "h": 884
+          },
+          {
+            "name": "first-group",
+            "x": 82,
+            "y": 242,
+            "w": 1384,
+            "h": 96
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "queue",
+            "x": 32,
+            "y": 32,
+            "w": 628,
+            "h": 380
+          },
+          {
+            "name": "first-group",
+            "x": 82,
+            "y": 242,
+            "w": 578,
             "h": 96
           }
         ]
       },
       "map-ages": {
-        "clip": {
-          "x": 430,
-          "y": 106,
-          "width": 760,
-          "height": 581
+        "clips": {
+          "news": {
+            "x": 666,
+            "y": 514,
+            "width": 330,
+            "height": 206
+          },
+          "figure": {
+            "x": 465,
+            "y": 388,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 666,
+            "y": 514,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -241,35 +471,48 @@
           },
           {
             "name": "canvas",
-            "x": 530,
-            "y": 454,
-            "w": 2300,
-            "h": 1248
+            "x": 1368,
+            "y": 1168,
+            "w": 588,
+            "h": 132
           }
         ],
-        "focus": [
-          {
-            "name": "lens",
-            "x": 396,
-            "y": 48,
-            "w": 198,
-            "h": 64
-          },
+        "news": [
           {
             "name": "canvas",
-            "x": 0,
-            "y": 242,
-            "w": 1520,
-            "h": 920
+            "x": 36,
+            "y": 140,
+            "w": 588,
+            "h": 132
+          }
+        ],
+        "figure": [
+          {
+            "name": "canvas",
+            "x": 438,
+            "y": 392,
+            "w": 588,
+            "h": 132
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "canvas",
+            "x": 36,
+            "y": 140,
+            "w": 588,
+            "h": 132
           }
         ]
       },
       "ask-the-map": {
-        "clip": {
-          "x": 240,
-          "y": 0,
-          "width": 1200,
-          "height": 475
+        "clips": {
+          "news": {
+            "x": 248,
+            "y": 119,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -280,62 +523,132 @@
             "h": 32
           }
         ],
-        "focus": [
+        "news": [
           {
             "name": "answer",
-            "x": 48,
-            "y": 428,
-            "w": 2304,
+            "x": 32,
+            "y": 190,
+            "w": 628,
             "h": 32
           }
         ]
       },
       "design-studio": {
-        "clip": {
-          "x": 680,
-          "y": 230,
-          "width": 760,
-          "height": 520
+        "clips": {
+          "news": {
+            "x": 822,
+            "y": 307,
+            "width": 330,
+            "height": 206
+          },
+          "atlas": {
+            "x": 759,
+            "y": 268,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 621,
+            "y": 181,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 822,
+            "y": 307,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
             "name": "canvas",
-            "x": 1010,
+            "x": 602,
             "y": 508,
-            "w": 1340,
+            "w": 1748,
             "h": 1194
           },
           {
             "name": "selected",
-            "x": 2280,
+            "x": 1872,
             "y": 752,
             "w": 204,
             "h": 136
           }
         ],
-        "focus": [
+        "news": [
           {
             "name": "canvas",
             "x": 0,
-            "y": 48,
-            "w": 990,
-            "h": 992
+            "y": 0,
+            "w": 660,
+            "h": 412
           },
           {
             "name": "selected",
-            "x": 920,
-            "y": 292,
+            "x": 228,
+            "y": 138,
+            "w": 204,
+            "h": 136
+          }
+        ],
+        "atlas": [
+          {
+            "name": "canvas",
+            "x": 0,
+            "y": 0,
+            "w": 832,
+            "h": 570
+          },
+          {
+            "name": "selected",
+            "x": 354,
+            "y": 216,
+            "w": 204,
+            "h": 136
+          }
+        ],
+        "figure": [
+          {
+            "name": "canvas",
+            "x": 0,
+            "y": 146,
+            "w": 1108,
+            "h": 770
+          },
+          {
+            "name": "selected",
+            "x": 630,
+            "y": 390,
+            "w": 204,
+            "h": 136
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "canvas",
+            "x": 0,
+            "y": 0,
+            "w": 660,
+            "h": 412
+          },
+          {
+            "name": "selected",
+            "x": 228,
+            "y": 138,
             "w": 204,
             "h": 136
           }
         ]
       },
       "rack-studio": {
-        "clip": {
-          "x": 334,
-          "y": 0,
-          "width": 760,
-          "height": 900
+        "clips": {
+          "atlas": {
+            "x": 486,
+            "y": 546,
+            "width": 456,
+            "height": 285
+          }
         },
         "full": [
           {
@@ -353,29 +666,31 @@
             "h": 100
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "rack",
-            "x": 460,
-            "y": 1124,
+            "x": 156,
+            "y": 32,
             "w": 600,
-            "h": 676
+            "h": 538
           },
           {
             "name": "lens",
             "x": 0,
-            "y": 1340,
-            "w": 436,
+            "y": 248,
+            "w": 132,
             "h": 100
           }
         ]
       },
       "ip-plan": {
-        "clip": {
-          "x": 240,
-          "y": 89,
-          "width": 864,
-          "height": 811
+        "clips": {
+          "atlas": {
+            "x": 264,
+            "y": 120,
+            "width": 456,
+            "height": 285
+          }
         },
         "full": [
           {
@@ -386,22 +701,30 @@
             "h": 519
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "map",
-            "x": 48,
-            "y": 1103,
-            "w": 1632,
-            "h": 519
+            "x": 0,
+            "y": 0,
+            "w": 912,
+            "h": 570
           }
         ]
       },
       "licence": {
-        "clip": {
-          "x": 239,
-          "y": 0,
-          "width": 760,
-          "height": 475
+        "clips": {
+          "figure": {
+            "x": 252,
+            "y": 0,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 454,
+            "y": 107,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -412,22 +735,45 @@
             "h": 44
           }
         ],
-        "focus": [
+        "figure": [
           {
             "name": "state",
-            "x": 689,
+            "x": 663,
             "y": 398,
+            "w": 141,
+            "h": 44
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "state",
+            "x": 259,
+            "y": 184,
             "w": 141,
             "h": 44
           }
         ]
       },
       "gallery": {
-        "clip": {
-          "x": 240,
-          "y": 0,
-          "width": 1200,
-          "height": 900
+        "clips": {
+          "atlas": {
+            "x": 248,
+            "y": 575,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 699,
+            "y": 281,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 941,
+            "y": 671,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -438,24 +784,68 @@
             "h": 618
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "showcase",
-            "x": 48,
-            "y": 1182,
-            "w": 2304,
-            "h": 618
+            "x": 32,
+            "y": 32,
+            "w": 880,
+            "h": 538
+          }
+        ],
+        "figure": [
+          {
+            "name": "showcase",
+            "x": 0,
+            "y": 92,
+            "w": 1434,
+            "h": 824
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "showcase",
+            "x": 0,
+            "y": 0,
+            "w": 660,
+            "h": 412
           }
         ]
       }
     },
     "he": {
       "dashboard": {
-        "clip": {
-          "x": 0,
-          "y": 28,
-          "width": 1200,
-          "height": 872
+        "clips": {
+          "atlas": {
+            "x": 736,
+            "y": 310,
+            "width": 456,
+            "height": 285
+          },
+          "band": {
+            "x": 632,
+            "y": 310,
+            "width": 560,
+            "height": 350
+          },
+          "band-phone": {
+            "x": 862,
+            "y": 310,
+            "width": 330,
+            "height": 206
+          },
+          "figure": {
+            "x": 459,
+            "y": 310,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 862,
+            "y": 310,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -466,22 +856,66 @@
             "h": 1148
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "grid",
-            "x": 48,
-            "y": 596,
-            "w": 2304,
-            "h": 1148
+            "x": 0,
+            "y": 32,
+            "w": 880,
+            "h": 538
+          }
+        ],
+        "band": [
+          {
+            "name": "grid",
+            "x": 0,
+            "y": 32,
+            "w": 1088,
+            "h": 668
+          }
+        ],
+        "band-phone": [
+          {
+            "name": "grid",
+            "x": 0,
+            "y": 32,
+            "w": 628,
+            "h": 380
+          }
+        ],
+        "figure": [
+          {
+            "name": "grid",
+            "x": 0,
+            "y": 32,
+            "w": 1434,
+            "h": 884
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "grid",
+            "x": 0,
+            "y": 32,
+            "w": 628,
+            "h": 380
           }
         ]
       },
       "ipam-tree": {
-        "clip": {
-          "x": 0,
-          "y": 174,
-          "width": 1200,
-          "height": 702
+        "clips": {
+          "figure": {
+            "x": 459,
+            "y": 182,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 862,
+            "y": 182,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -492,22 +926,39 @@
             "h": 1308
           }
         ],
-        "focus": [
+        "figure": [
           {
             "name": "tree",
-            "x": 48,
-            "y": 48,
-            "w": 2304,
-            "h": 1308
+            "x": 0,
+            "y": 32,
+            "w": 1434,
+            "h": 884
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "tree",
+            "x": 0,
+            "y": 32,
+            "w": 628,
+            "h": 380
           }
         ]
       },
       "rack": {
-        "clip": {
-          "x": 346,
-          "y": 0,
-          "width": 760,
-          "height": 900
+        "clips": {
+          "figure": {
+            "x": 459,
+            "y": 104,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 562,
+            "y": 546,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -518,49 +969,55 @@
             "h": 676
           }
         ],
-        "focus": [
+        "figure": [
           {
             "name": "elevation",
-            "x": 460,
-            "y": 1124,
+            "x": 234,
+            "y": 32,
             "w": 600,
-            "h": 676
+            "h": 884
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "elevation",
+            "x": 28,
+            "y": 32,
+            "w": 600,
+            "h": 380
           }
         ]
       },
       "topology-observed": {
-        "clip": {
-          "x": 301,
-          "y": 335,
-          "width": 760,
-          "height": 475
+        "clips": {
+          "atlas": {
+            "x": 453,
+            "y": 430,
+            "width": 456,
+            "height": 285
+          }
         },
         "full": [
           {
             "name": "edge",
-            "x": 1316,
-            "y": 1135,
-            "w": 92,
-            "h": 19
+            "x": 1319,
+            "y": 1138,
+            "w": 86,
+            "h": 12
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "edge",
-            "x": 714,
-            "y": 465,
-            "w": 92,
-            "h": 19
+            "x": 413,
+            "y": 278,
+            "w": 86,
+            "h": 12
           }
         ]
       },
       "review": {
-        "clip": {
-          "x": 0,
-          "y": 56,
-          "width": 1200,
-          "height": 510
-        },
+        "clips": {},
         "full": [
           {
             "name": "ghost-links",
@@ -569,23 +1026,28 @@
             "w": 2304,
             "h": 923
           }
-        ],
-        "focus": [
-          {
-            "name": "ghost-links",
-            "x": 48,
-            "y": 48,
-            "w": 2304,
-            "h": 923
-          }
         ]
       },
       "nac": {
-        "clip": {
-          "x": 0,
-          "y": 47,
-          "width": 1200,
-          "height": 475
+        "clips": {
+          "atlas": {
+            "x": 736,
+            "y": 44,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 459,
+            "y": 0,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 862,
+            "y": 83,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -596,22 +1058,54 @@
             "h": 80
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "mode",
-            "x": 48,
-            "y": 238,
-            "w": 2304,
+            "x": 0,
+            "y": 244,
+            "w": 880,
+            "h": 80
+          }
+        ],
+        "figure": [
+          {
+            "name": "mode",
+            "x": 0,
+            "y": 332,
+            "w": 1434,
+            "h": 80
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "mode",
+            "x": 0,
+            "y": 166,
+            "w": 628,
             "h": 80
           }
         ]
       },
       "compliance": {
-        "clip": {
-          "x": 0,
-          "y": 48,
-          "width": 1200,
-          "height": 792
+        "clips": {
+          "atlas": {
+            "x": 736,
+            "y": 56,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 459,
+            "y": 104,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 862,
+            "y": 104,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -622,22 +1116,60 @@
             "h": 1488
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "section",
-            "x": 48,
-            "y": 48,
-            "w": 2304,
-            "h": 1488
+            "x": 0,
+            "y": 32,
+            "w": 880,
+            "h": 538
+          }
+        ],
+        "figure": [
+          {
+            "name": "section",
+            "x": 0,
+            "y": 32,
+            "w": 1434,
+            "h": 884
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "section",
+            "x": 0,
+            "y": 32,
+            "w": 628,
+            "h": 380
           }
         ]
       },
       "discovery-queue": {
-        "clip": {
-          "x": 0,
-          "y": 158,
-          "width": 1200,
-          "height": 520
+        "clips": {
+          "atlas": {
+            "x": 736,
+            "y": 166,
+            "width": 456,
+            "height": 285
+          },
+          "loop-phone": {
+            "x": 862,
+            "y": 166,
+            "width": 330,
+            "height": 165
+          },
+          "figure": {
+            "x": 459,
+            "y": 166,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 862,
+            "y": 166,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -655,29 +1187,91 @@
             "h": 96
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "queue",
-            "x": 48,
-            "y": 48,
-            "w": 2304,
-            "h": 944
+            "x": 0,
+            "y": 32,
+            "w": 880,
+            "h": 538
           },
           {
             "name": "first-group",
-            "x": 98,
-            "y": 258,
-            "w": 2204,
+            "x": 0,
+            "y": 242,
+            "w": 830,
+            "h": 96
+          }
+        ],
+        "loop-phone": [
+          {
+            "name": "queue",
+            "x": 0,
+            "y": 32,
+            "w": 628,
+            "h": 298
+          },
+          {
+            "name": "first-group",
+            "x": 0,
+            "y": 242,
+            "w": 578,
+            "h": 88
+          }
+        ],
+        "figure": [
+          {
+            "name": "queue",
+            "x": 0,
+            "y": 32,
+            "w": 1434,
+            "h": 884
+          },
+          {
+            "name": "first-group",
+            "x": 0,
+            "y": 242,
+            "w": 1384,
+            "h": 96
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "queue",
+            "x": 0,
+            "y": 32,
+            "w": 628,
+            "h": 380
+          },
+          {
+            "name": "first-group",
+            "x": 0,
+            "y": 242,
+            "w": 578,
             "h": 96
           }
         ]
       },
       "map-ages": {
-        "clip": {
-          "x": 363,
-          "y": 106,
-          "width": 760,
-          "height": 581
+        "clips": {
+          "news": {
+            "x": 578,
+            "y": 514,
+            "width": 330,
+            "height": 206
+          },
+          "figure": {
+            "x": 377,
+            "y": 388,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 578,
+            "y": 514,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -689,35 +1283,48 @@
           },
           {
             "name": "canvas",
-            "x": 50,
-            "y": 454,
-            "w": 2300,
-            "h": 1248
+            "x": 1192,
+            "y": 1168,
+            "w": 588,
+            "h": 132
           }
         ],
-        "focus": [
-          {
-            "name": "lens",
-            "x": 700,
-            "y": 48,
-            "w": 192,
-            "h": 64
-          },
+        "news": [
           {
             "name": "canvas",
-            "x": 0,
-            "y": 242,
-            "w": 1520,
-            "h": 920
+            "x": 36,
+            "y": 140,
+            "w": 588,
+            "h": 132
+          }
+        ],
+        "figure": [
+          {
+            "name": "canvas",
+            "x": 438,
+            "y": 392,
+            "w": 588,
+            "h": 132
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "canvas",
+            "x": 36,
+            "y": 140,
+            "w": 588,
+            "h": 132
           }
         ]
       },
       "ask-the-map": {
-        "clip": {
-          "x": 0,
-          "y": 0,
-          "width": 1200,
-          "height": 475
+        "clips": {
+          "news": {
+            "x": 862,
+            "y": 119,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -728,29 +1335,49 @@
             "h": 32
           }
         ],
-        "focus": [
+        "news": [
           {
             "name": "answer",
-            "x": 48,
-            "y": 428,
-            "w": 2304,
+            "x": 0,
+            "y": 190,
+            "w": 628,
             "h": 32
           }
         ]
       },
       "design-studio": {
-        "clip": {
-          "x": 0,
-          "y": 230,
-          "width": 760,
-          "height": 520
+        "clips": {
+          "news": {
+            "x": 572,
+            "y": 571,
+            "width": 330,
+            "height": 206
+          },
+          "atlas": {
+            "x": 509,
+            "y": 532,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 371,
+            "y": 442,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 572,
+            "y": 571,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
             "name": "canvas",
             "x": 530,
             "y": 508,
-            "w": 1340,
+            "w": 1748,
             "h": 1194
           },
           {
@@ -761,29 +1388,79 @@
             "h": 128
           }
         ],
-        "focus": [
+        "news": [
           {
             "name": "canvas",
-            "x": 530,
-            "y": 48,
-            "w": 990,
-            "h": 992
+            "x": 0,
+            "y": 0,
+            "w": 660,
+            "h": 412
           },
           {
             "name": "selected",
-            "x": 1378,
-            "y": 824,
-            "w": 142,
+            "x": 234,
+            "y": 142,
+            "w": 192,
+            "h": 128
+          }
+        ],
+        "atlas": [
+          {
+            "name": "canvas",
+            "x": 0,
+            "y": 0,
+            "w": 912,
+            "h": 570
+          },
+          {
+            "name": "selected",
+            "x": 360,
+            "y": 220,
+            "w": 192,
+            "h": 128
+          }
+        ],
+        "figure": [
+          {
+            "name": "canvas",
+            "x": 0,
+            "y": 0,
+            "w": 1466,
+            "h": 818
+          },
+          {
+            "name": "selected",
+            "x": 636,
+            "y": 400,
+            "w": 192,
+            "h": 128
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "canvas",
+            "x": 0,
+            "y": 0,
+            "w": 660,
+            "h": 412
+          },
+          {
+            "name": "selected",
+            "x": 234,
+            "y": 142,
+            "w": 192,
             "h": 128
           }
         ]
       },
       "rack-studio": {
-        "clip": {
-          "x": 346,
-          "y": 0,
-          "width": 760,
-          "height": 900
+        "clips": {
+          "atlas": {
+            "x": 498,
+            "y": 546,
+            "width": 456,
+            "height": 285
+          }
         },
         "full": [
           {
@@ -801,29 +1478,31 @@
             "h": 100
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "rack",
-            "x": 460,
-            "y": 1124,
+            "x": 156,
+            "y": 32,
             "w": 600,
-            "h": 676
+            "h": 538
           },
           {
             "name": "lens",
-            "x": 1084,
-            "y": 1340,
-            "w": 436,
+            "x": 780,
+            "y": 248,
+            "w": 132,
             "h": 100
           }
         ]
       },
       "ip-plan": {
-        "clip": {
-          "x": 336,
-          "y": 89,
-          "width": 864,
-          "height": 811
+        "clips": {
+          "atlas": {
+            "x": 720,
+            "y": 120,
+            "width": 456,
+            "height": 285
+          }
         },
         "full": [
           {
@@ -834,22 +1513,30 @@
             "h": 519
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "map",
-            "x": 48,
-            "y": 1103,
-            "w": 1632,
-            "h": 519
+            "x": 0,
+            "y": 0,
+            "w": 912,
+            "h": 570
           }
         ]
       },
       "licence": {
-        "clip": {
-          "x": 444,
-          "y": 0,
-          "width": 760,
-          "height": 475
+        "clips": {
+          "figure": {
+            "x": 457,
+            "y": 0,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 659,
+            "y": 107,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -860,22 +1547,45 @@
             "h": 44
           }
         ],
-        "focus": [
+        "figure": [
           {
             "name": "state",
-            "x": 670,
+            "x": 644,
             "y": 398,
+            "w": 178,
+            "h": 44
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "state",
+            "x": 240,
+            "y": 184,
             "w": 178,
             "h": 44
           }
         ]
       },
       "gallery": {
-        "clip": {
-          "x": 0,
-          "y": 0,
-          "width": 1200,
-          "height": 900
+        "clips": {
+          "atlas": {
+            "x": 736,
+            "y": 555,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 8,
+            "y": 442,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 169,
+            "y": 651,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -886,13 +1596,31 @@
             "h": 658
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "showcase",
-            "x": 48,
-            "y": 1142,
-            "w": 2304,
+            "x": 0,
+            "y": 32,
+            "w": 880,
+            "h": 538
+          }
+        ],
+        "figure": [
+          {
+            "name": "showcase",
+            "x": 32,
+            "y": 258,
+            "w": 1434,
             "h": 658
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "showcase",
+            "x": 0,
+            "y": 0,
+            "w": 660,
+            "h": 412
           }
         ]
       }
@@ -901,11 +1629,37 @@
   "night-chart": {
     "en": {
       "dashboard": {
-        "clip": {
-          "x": 240,
-          "y": 28,
-          "width": 1200,
-          "height": 872
+        "clips": {
+          "atlas": {
+            "x": 248,
+            "y": 310,
+            "width": 456,
+            "height": 285
+          },
+          "band": {
+            "x": 248,
+            "y": 310,
+            "width": 560,
+            "height": 350
+          },
+          "band-phone": {
+            "x": 248,
+            "y": 310,
+            "width": 330,
+            "height": 206
+          },
+          "figure": {
+            "x": 248,
+            "y": 310,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 248,
+            "y": 310,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -916,22 +1670,66 @@
             "h": 1148
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "grid",
-            "x": 48,
-            "y": 596,
-            "w": 2304,
-            "h": 1148
+            "x": 32,
+            "y": 32,
+            "w": 880,
+            "h": 538
+          }
+        ],
+        "band": [
+          {
+            "name": "grid",
+            "x": 32,
+            "y": 32,
+            "w": 1088,
+            "h": 668
+          }
+        ],
+        "band-phone": [
+          {
+            "name": "grid",
+            "x": 32,
+            "y": 32,
+            "w": 628,
+            "h": 380
+          }
+        ],
+        "figure": [
+          {
+            "name": "grid",
+            "x": 32,
+            "y": 32,
+            "w": 1434,
+            "h": 884
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "grid",
+            "x": 32,
+            "y": 32,
+            "w": 628,
+            "h": 380
           }
         ]
       },
       "ipam-tree": {
-        "clip": {
-          "x": 240,
-          "y": 174,
-          "width": 1200,
-          "height": 702
+        "clips": {
+          "figure": {
+            "x": 248,
+            "y": 182,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 248,
+            "y": 182,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -942,22 +1740,39 @@
             "h": 1308
           }
         ],
-        "focus": [
+        "figure": [
           {
             "name": "tree",
-            "x": 48,
-            "y": 48,
-            "w": 2304,
-            "h": 1308
+            "x": 32,
+            "y": 32,
+            "w": 1434,
+            "h": 884
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "tree",
+            "x": 32,
+            "y": 32,
+            "w": 628,
+            "h": 380
           }
         ]
       },
       "rack": {
-        "clip": {
-          "x": 334,
-          "y": 0,
-          "width": 760,
-          "height": 900
+        "clips": {
+          "figure": {
+            "x": 248,
+            "y": 104,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 548,
+            "y": 546,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -968,49 +1783,55 @@
             "h": 676
           }
         ],
-        "focus": [
+        "figure": [
           {
             "name": "elevation",
-            "x": 460,
-            "y": 1124,
+            "x": 632,
+            "y": 32,
             "w": 600,
-            "h": 676
+            "h": 884
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "elevation",
+            "x": 32,
+            "y": 32,
+            "w": 600,
+            "h": 380
           }
         ]
       },
       "topology-observed": {
-        "clip": {
-          "x": 541,
-          "y": 335,
-          "width": 760,
-          "height": 475
+        "clips": {
+          "atlas": {
+            "x": 693,
+            "y": 430,
+            "width": 456,
+            "height": 285
+          }
         },
         "full": [
           {
             "name": "edge",
-            "x": 1796,
-            "y": 1135,
-            "w": 92,
-            "h": 19
+            "x": 1799,
+            "y": 1138,
+            "w": 86,
+            "h": 12
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "edge",
-            "x": 714,
-            "y": 465,
-            "w": 92,
-            "h": 19
+            "x": 413,
+            "y": 278,
+            "w": 86,
+            "h": 12
           }
         ]
       },
       "review": {
-        "clip": {
-          "x": 240,
-          "y": 56,
-          "width": 1200,
-          "height": 510
-        },
+        "clips": {},
         "full": [
           {
             "name": "ghost-links",
@@ -1019,23 +1840,28 @@
             "w": 2304,
             "h": 923
           }
-        ],
-        "focus": [
-          {
-            "name": "ghost-links",
-            "x": 48,
-            "y": 48,
-            "w": 2304,
-            "h": 923
-          }
         ]
       },
       "nac": {
-        "clip": {
-          "x": 240,
-          "y": 47,
-          "width": 1200,
-          "height": 475
+        "clips": {
+          "atlas": {
+            "x": 248,
+            "y": 44,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 248,
+            "y": 0,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 248,
+            "y": 83,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -1046,22 +1872,54 @@
             "h": 80
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "mode",
-            "x": 48,
-            "y": 238,
-            "w": 2304,
+            "x": 32,
+            "y": 244,
+            "w": 880,
+            "h": 80
+          }
+        ],
+        "figure": [
+          {
+            "name": "mode",
+            "x": 32,
+            "y": 332,
+            "w": 1434,
+            "h": 80
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "mode",
+            "x": 32,
+            "y": 166,
+            "w": 628,
             "h": 80
           }
         ]
       },
       "compliance": {
-        "clip": {
-          "x": 240,
-          "y": 0,
-          "width": 1200,
-          "height": 900
+        "clips": {
+          "atlas": {
+            "x": 248,
+            "y": 56,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 248,
+            "y": 104,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 248,
+            "y": 104,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -1072,22 +1930,60 @@
             "h": 1656
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "section",
-            "x": 48,
-            "y": 144,
-            "w": 2304,
-            "h": 1656
+            "x": 32,
+            "y": 32,
+            "w": 880,
+            "h": 538
+          }
+        ],
+        "figure": [
+          {
+            "name": "section",
+            "x": 32,
+            "y": 32,
+            "w": 1434,
+            "h": 884
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "section",
+            "x": 32,
+            "y": 32,
+            "w": 628,
+            "h": 380
           }
         ]
       },
       "discovery-queue": {
-        "clip": {
-          "x": 240,
-          "y": 158,
-          "width": 1200,
-          "height": 520
+        "clips": {
+          "atlas": {
+            "x": 248,
+            "y": 166,
+            "width": 456,
+            "height": 285
+          },
+          "loop-phone": {
+            "x": 248,
+            "y": 166,
+            "width": 330,
+            "height": 165
+          },
+          "figure": {
+            "x": 248,
+            "y": 166,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 248,
+            "y": 166,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -1105,29 +2001,91 @@
             "h": 96
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "queue",
-            "x": 48,
-            "y": 48,
-            "w": 2304,
-            "h": 944
+            "x": 32,
+            "y": 32,
+            "w": 880,
+            "h": 538
           },
           {
             "name": "first-group",
-            "x": 98,
-            "y": 258,
-            "w": 2204,
+            "x": 82,
+            "y": 242,
+            "w": 830,
+            "h": 96
+          }
+        ],
+        "loop-phone": [
+          {
+            "name": "queue",
+            "x": 32,
+            "y": 32,
+            "w": 628,
+            "h": 298
+          },
+          {
+            "name": "first-group",
+            "x": 82,
+            "y": 242,
+            "w": 578,
+            "h": 88
+          }
+        ],
+        "figure": [
+          {
+            "name": "queue",
+            "x": 32,
+            "y": 32,
+            "w": 1434,
+            "h": 884
+          },
+          {
+            "name": "first-group",
+            "x": 82,
+            "y": 242,
+            "w": 1384,
+            "h": 96
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "queue",
+            "x": 32,
+            "y": 32,
+            "w": 628,
+            "h": 380
+          },
+          {
+            "name": "first-group",
+            "x": 82,
+            "y": 242,
+            "w": 578,
             "h": 96
           }
         ]
       },
       "map-ages": {
-        "clip": {
-          "x": 430,
-          "y": 106,
-          "width": 760,
-          "height": 581
+        "clips": {
+          "news": {
+            "x": 666,
+            "y": 514,
+            "width": 330,
+            "height": 206
+          },
+          "figure": {
+            "x": 465,
+            "y": 388,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 666,
+            "y": 514,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -1139,35 +2097,48 @@
           },
           {
             "name": "canvas",
-            "x": 530,
-            "y": 454,
-            "w": 2300,
-            "h": 1248
+            "x": 1368,
+            "y": 1168,
+            "w": 588,
+            "h": 132
           }
         ],
-        "focus": [
-          {
-            "name": "lens",
-            "x": 396,
-            "y": 48,
-            "w": 198,
-            "h": 64
-          },
+        "news": [
           {
             "name": "canvas",
-            "x": 0,
-            "y": 242,
-            "w": 1520,
-            "h": 920
+            "x": 36,
+            "y": 140,
+            "w": 588,
+            "h": 132
+          }
+        ],
+        "figure": [
+          {
+            "name": "canvas",
+            "x": 438,
+            "y": 392,
+            "w": 588,
+            "h": 132
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "canvas",
+            "x": 36,
+            "y": 140,
+            "w": 588,
+            "h": 132
           }
         ]
       },
       "ask-the-map": {
-        "clip": {
-          "x": 240,
-          "y": 0,
-          "width": 1200,
-          "height": 475
+        "clips": {
+          "news": {
+            "x": 248,
+            "y": 119,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -1178,62 +2149,132 @@
             "h": 32
           }
         ],
-        "focus": [
+        "news": [
           {
             "name": "answer",
-            "x": 48,
-            "y": 428,
-            "w": 2304,
+            "x": 32,
+            "y": 190,
+            "w": 628,
             "h": 32
           }
         ]
       },
       "design-studio": {
-        "clip": {
-          "x": 680,
-          "y": 230,
-          "width": 760,
-          "height": 520
+        "clips": {
+          "news": {
+            "x": 822,
+            "y": 307,
+            "width": 330,
+            "height": 206
+          },
+          "atlas": {
+            "x": 759,
+            "y": 268,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 621,
+            "y": 181,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 822,
+            "y": 307,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
             "name": "canvas",
-            "x": 1010,
+            "x": 602,
             "y": 508,
-            "w": 1340,
+            "w": 1748,
             "h": 1194
           },
           {
             "name": "selected",
-            "x": 2280,
+            "x": 1872,
             "y": 752,
             "w": 204,
             "h": 136
           }
         ],
-        "focus": [
+        "news": [
           {
             "name": "canvas",
             "x": 0,
-            "y": 48,
-            "w": 990,
-            "h": 992
+            "y": 0,
+            "w": 660,
+            "h": 412
           },
           {
             "name": "selected",
-            "x": 920,
-            "y": 292,
+            "x": 228,
+            "y": 138,
+            "w": 204,
+            "h": 136
+          }
+        ],
+        "atlas": [
+          {
+            "name": "canvas",
+            "x": 0,
+            "y": 0,
+            "w": 832,
+            "h": 570
+          },
+          {
+            "name": "selected",
+            "x": 354,
+            "y": 216,
+            "w": 204,
+            "h": 136
+          }
+        ],
+        "figure": [
+          {
+            "name": "canvas",
+            "x": 0,
+            "y": 146,
+            "w": 1108,
+            "h": 770
+          },
+          {
+            "name": "selected",
+            "x": 630,
+            "y": 390,
+            "w": 204,
+            "h": 136
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "canvas",
+            "x": 0,
+            "y": 0,
+            "w": 660,
+            "h": 412
+          },
+          {
+            "name": "selected",
+            "x": 228,
+            "y": 138,
             "w": 204,
             "h": 136
           }
         ]
       },
       "rack-studio": {
-        "clip": {
-          "x": 334,
-          "y": 0,
-          "width": 760,
-          "height": 900
+        "clips": {
+          "atlas": {
+            "x": 486,
+            "y": 546,
+            "width": 456,
+            "height": 285
+          }
         },
         "full": [
           {
@@ -1251,29 +2292,31 @@
             "h": 100
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "rack",
-            "x": 460,
-            "y": 1124,
+            "x": 156,
+            "y": 32,
             "w": 600,
-            "h": 676
+            "h": 538
           },
           {
             "name": "lens",
             "x": 0,
-            "y": 1340,
-            "w": 436,
+            "y": 248,
+            "w": 132,
             "h": 100
           }
         ]
       },
       "ip-plan": {
-        "clip": {
-          "x": 240,
-          "y": 89,
-          "width": 864,
-          "height": 811
+        "clips": {
+          "atlas": {
+            "x": 264,
+            "y": 120,
+            "width": 456,
+            "height": 285
+          }
         },
         "full": [
           {
@@ -1284,22 +2327,30 @@
             "h": 519
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "map",
-            "x": 48,
-            "y": 1103,
-            "w": 1632,
-            "h": 519
+            "x": 0,
+            "y": 0,
+            "w": 912,
+            "h": 570
           }
         ]
       },
       "licence": {
-        "clip": {
-          "x": 239,
-          "y": 0,
-          "width": 760,
-          "height": 475
+        "clips": {
+          "figure": {
+            "x": 252,
+            "y": 0,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 454,
+            "y": 107,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -1310,22 +2361,45 @@
             "h": 44
           }
         ],
-        "focus": [
+        "figure": [
           {
             "name": "state",
-            "x": 689,
+            "x": 663,
             "y": 398,
+            "w": 141,
+            "h": 44
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "state",
+            "x": 259,
+            "y": 184,
             "w": 141,
             "h": 44
           }
         ]
       },
       "gallery": {
-        "clip": {
-          "x": 240,
-          "y": 0,
-          "width": 1200,
-          "height": 900
+        "clips": {
+          "atlas": {
+            "x": 248,
+            "y": 575,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 699,
+            "y": 281,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 941,
+            "y": 671,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -1336,24 +2410,68 @@
             "h": 618
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "showcase",
-            "x": 48,
-            "y": 1182,
-            "w": 2304,
-            "h": 618
+            "x": 32,
+            "y": 32,
+            "w": 880,
+            "h": 538
+          }
+        ],
+        "figure": [
+          {
+            "name": "showcase",
+            "x": 0,
+            "y": 92,
+            "w": 1434,
+            "h": 824
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "showcase",
+            "x": 0,
+            "y": 0,
+            "w": 660,
+            "h": 412
           }
         ]
       }
     },
     "he": {
       "dashboard": {
-        "clip": {
-          "x": 0,
-          "y": 28,
-          "width": 1200,
-          "height": 872
+        "clips": {
+          "atlas": {
+            "x": 736,
+            "y": 310,
+            "width": 456,
+            "height": 285
+          },
+          "band": {
+            "x": 632,
+            "y": 310,
+            "width": 560,
+            "height": 350
+          },
+          "band-phone": {
+            "x": 862,
+            "y": 310,
+            "width": 330,
+            "height": 206
+          },
+          "figure": {
+            "x": 459,
+            "y": 310,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 862,
+            "y": 310,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -1364,22 +2482,66 @@
             "h": 1148
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "grid",
-            "x": 48,
-            "y": 596,
-            "w": 2304,
-            "h": 1148
+            "x": 0,
+            "y": 32,
+            "w": 880,
+            "h": 538
+          }
+        ],
+        "band": [
+          {
+            "name": "grid",
+            "x": 0,
+            "y": 32,
+            "w": 1088,
+            "h": 668
+          }
+        ],
+        "band-phone": [
+          {
+            "name": "grid",
+            "x": 0,
+            "y": 32,
+            "w": 628,
+            "h": 380
+          }
+        ],
+        "figure": [
+          {
+            "name": "grid",
+            "x": 0,
+            "y": 32,
+            "w": 1434,
+            "h": 884
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "grid",
+            "x": 0,
+            "y": 32,
+            "w": 628,
+            "h": 380
           }
         ]
       },
       "ipam-tree": {
-        "clip": {
-          "x": 0,
-          "y": 174,
-          "width": 1200,
-          "height": 702
+        "clips": {
+          "figure": {
+            "x": 459,
+            "y": 182,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 862,
+            "y": 182,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -1390,22 +2552,39 @@
             "h": 1308
           }
         ],
-        "focus": [
+        "figure": [
           {
             "name": "tree",
-            "x": 48,
-            "y": 48,
-            "w": 2304,
-            "h": 1308
+            "x": 0,
+            "y": 32,
+            "w": 1434,
+            "h": 884
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "tree",
+            "x": 0,
+            "y": 32,
+            "w": 628,
+            "h": 380
           }
         ]
       },
       "rack": {
-        "clip": {
-          "x": 346,
-          "y": 0,
-          "width": 760,
-          "height": 900
+        "clips": {
+          "figure": {
+            "x": 459,
+            "y": 104,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 562,
+            "y": 546,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -1416,49 +2595,55 @@
             "h": 676
           }
         ],
-        "focus": [
+        "figure": [
           {
             "name": "elevation",
-            "x": 460,
-            "y": 1124,
+            "x": 234,
+            "y": 32,
             "w": 600,
-            "h": 676
+            "h": 884
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "elevation",
+            "x": 28,
+            "y": 32,
+            "w": 600,
+            "h": 380
           }
         ]
       },
       "topology-observed": {
-        "clip": {
-          "x": 301,
-          "y": 335,
-          "width": 760,
-          "height": 475
+        "clips": {
+          "atlas": {
+            "x": 453,
+            "y": 430,
+            "width": 456,
+            "height": 285
+          }
         },
         "full": [
           {
             "name": "edge",
-            "x": 1316,
-            "y": 1135,
-            "w": 92,
-            "h": 19
+            "x": 1319,
+            "y": 1138,
+            "w": 86,
+            "h": 12
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "edge",
-            "x": 714,
-            "y": 465,
-            "w": 92,
-            "h": 19
+            "x": 413,
+            "y": 278,
+            "w": 86,
+            "h": 12
           }
         ]
       },
       "review": {
-        "clip": {
-          "x": 0,
-          "y": 56,
-          "width": 1200,
-          "height": 510
-        },
+        "clips": {},
         "full": [
           {
             "name": "ghost-links",
@@ -1467,23 +2652,28 @@
             "w": 2304,
             "h": 923
           }
-        ],
-        "focus": [
-          {
-            "name": "ghost-links",
-            "x": 48,
-            "y": 48,
-            "w": 2304,
-            "h": 923
-          }
         ]
       },
       "nac": {
-        "clip": {
-          "x": 0,
-          "y": 47,
-          "width": 1200,
-          "height": 475
+        "clips": {
+          "atlas": {
+            "x": 736,
+            "y": 44,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 459,
+            "y": 0,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 862,
+            "y": 83,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -1494,22 +2684,54 @@
             "h": 80
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "mode",
-            "x": 48,
-            "y": 238,
-            "w": 2304,
+            "x": 0,
+            "y": 244,
+            "w": 880,
+            "h": 80
+          }
+        ],
+        "figure": [
+          {
+            "name": "mode",
+            "x": 0,
+            "y": 332,
+            "w": 1434,
+            "h": 80
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "mode",
+            "x": 0,
+            "y": 166,
+            "w": 628,
             "h": 80
           }
         ]
       },
       "compliance": {
-        "clip": {
-          "x": 0,
-          "y": 48,
-          "width": 1200,
-          "height": 792
+        "clips": {
+          "atlas": {
+            "x": 736,
+            "y": 56,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 459,
+            "y": 104,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 862,
+            "y": 104,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -1520,22 +2742,60 @@
             "h": 1488
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "section",
-            "x": 48,
-            "y": 48,
-            "w": 2304,
-            "h": 1488
+            "x": 0,
+            "y": 32,
+            "w": 880,
+            "h": 538
+          }
+        ],
+        "figure": [
+          {
+            "name": "section",
+            "x": 0,
+            "y": 32,
+            "w": 1434,
+            "h": 884
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "section",
+            "x": 0,
+            "y": 32,
+            "w": 628,
+            "h": 380
           }
         ]
       },
       "discovery-queue": {
-        "clip": {
-          "x": 0,
-          "y": 158,
-          "width": 1200,
-          "height": 520
+        "clips": {
+          "atlas": {
+            "x": 736,
+            "y": 166,
+            "width": 456,
+            "height": 285
+          },
+          "loop-phone": {
+            "x": 862,
+            "y": 166,
+            "width": 330,
+            "height": 165
+          },
+          "figure": {
+            "x": 459,
+            "y": 166,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 862,
+            "y": 166,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -1553,29 +2813,91 @@
             "h": 96
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "queue",
-            "x": 48,
-            "y": 48,
-            "w": 2304,
-            "h": 944
+            "x": 0,
+            "y": 32,
+            "w": 880,
+            "h": 538
           },
           {
             "name": "first-group",
-            "x": 98,
-            "y": 258,
-            "w": 2204,
+            "x": 0,
+            "y": 242,
+            "w": 830,
+            "h": 96
+          }
+        ],
+        "loop-phone": [
+          {
+            "name": "queue",
+            "x": 0,
+            "y": 32,
+            "w": 628,
+            "h": 298
+          },
+          {
+            "name": "first-group",
+            "x": 0,
+            "y": 242,
+            "w": 578,
+            "h": 88
+          }
+        ],
+        "figure": [
+          {
+            "name": "queue",
+            "x": 0,
+            "y": 32,
+            "w": 1434,
+            "h": 884
+          },
+          {
+            "name": "first-group",
+            "x": 0,
+            "y": 242,
+            "w": 1384,
+            "h": 96
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "queue",
+            "x": 0,
+            "y": 32,
+            "w": 628,
+            "h": 380
+          },
+          {
+            "name": "first-group",
+            "x": 0,
+            "y": 242,
+            "w": 578,
             "h": 96
           }
         ]
       },
       "map-ages": {
-        "clip": {
-          "x": 363,
-          "y": 106,
-          "width": 760,
-          "height": 581
+        "clips": {
+          "news": {
+            "x": 578,
+            "y": 514,
+            "width": 330,
+            "height": 206
+          },
+          "figure": {
+            "x": 377,
+            "y": 388,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 578,
+            "y": 514,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -1587,35 +2909,48 @@
           },
           {
             "name": "canvas",
-            "x": 50,
-            "y": 454,
-            "w": 2300,
-            "h": 1248
+            "x": 1192,
+            "y": 1168,
+            "w": 588,
+            "h": 132
           }
         ],
-        "focus": [
-          {
-            "name": "lens",
-            "x": 700,
-            "y": 48,
-            "w": 192,
-            "h": 64
-          },
+        "news": [
           {
             "name": "canvas",
-            "x": 0,
-            "y": 242,
-            "w": 1520,
-            "h": 920
+            "x": 36,
+            "y": 140,
+            "w": 588,
+            "h": 132
+          }
+        ],
+        "figure": [
+          {
+            "name": "canvas",
+            "x": 438,
+            "y": 392,
+            "w": 588,
+            "h": 132
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "canvas",
+            "x": 36,
+            "y": 140,
+            "w": 588,
+            "h": 132
           }
         ]
       },
       "ask-the-map": {
-        "clip": {
-          "x": 0,
-          "y": 0,
-          "width": 1200,
-          "height": 475
+        "clips": {
+          "news": {
+            "x": 862,
+            "y": 119,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -1626,29 +2961,49 @@
             "h": 32
           }
         ],
-        "focus": [
+        "news": [
           {
             "name": "answer",
-            "x": 48,
-            "y": 428,
-            "w": 2304,
+            "x": 0,
+            "y": 190,
+            "w": 628,
             "h": 32
           }
         ]
       },
       "design-studio": {
-        "clip": {
-          "x": 0,
-          "y": 230,
-          "width": 760,
-          "height": 520
+        "clips": {
+          "news": {
+            "x": 572,
+            "y": 571,
+            "width": 330,
+            "height": 206
+          },
+          "atlas": {
+            "x": 509,
+            "y": 532,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 371,
+            "y": 442,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 572,
+            "y": 571,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
             "name": "canvas",
             "x": 530,
             "y": 508,
-            "w": 1340,
+            "w": 1748,
             "h": 1194
           },
           {
@@ -1659,29 +3014,79 @@
             "h": 128
           }
         ],
-        "focus": [
+        "news": [
           {
             "name": "canvas",
-            "x": 530,
-            "y": 48,
-            "w": 990,
-            "h": 992
+            "x": 0,
+            "y": 0,
+            "w": 660,
+            "h": 412
           },
           {
             "name": "selected",
-            "x": 1378,
-            "y": 824,
-            "w": 142,
+            "x": 234,
+            "y": 142,
+            "w": 192,
+            "h": 128
+          }
+        ],
+        "atlas": [
+          {
+            "name": "canvas",
+            "x": 0,
+            "y": 0,
+            "w": 912,
+            "h": 570
+          },
+          {
+            "name": "selected",
+            "x": 360,
+            "y": 220,
+            "w": 192,
+            "h": 128
+          }
+        ],
+        "figure": [
+          {
+            "name": "canvas",
+            "x": 0,
+            "y": 0,
+            "w": 1466,
+            "h": 818
+          },
+          {
+            "name": "selected",
+            "x": 636,
+            "y": 400,
+            "w": 192,
+            "h": 128
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "canvas",
+            "x": 0,
+            "y": 0,
+            "w": 660,
+            "h": 412
+          },
+          {
+            "name": "selected",
+            "x": 234,
+            "y": 142,
+            "w": 192,
             "h": 128
           }
         ]
       },
       "rack-studio": {
-        "clip": {
-          "x": 346,
-          "y": 0,
-          "width": 760,
-          "height": 900
+        "clips": {
+          "atlas": {
+            "x": 498,
+            "y": 546,
+            "width": 456,
+            "height": 285
+          }
         },
         "full": [
           {
@@ -1699,29 +3104,31 @@
             "h": 100
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "rack",
-            "x": 460,
-            "y": 1124,
+            "x": 156,
+            "y": 32,
             "w": 600,
-            "h": 676
+            "h": 538
           },
           {
             "name": "lens",
-            "x": 1084,
-            "y": 1340,
-            "w": 436,
+            "x": 780,
+            "y": 248,
+            "w": 132,
             "h": 100
           }
         ]
       },
       "ip-plan": {
-        "clip": {
-          "x": 336,
-          "y": 89,
-          "width": 864,
-          "height": 811
+        "clips": {
+          "atlas": {
+            "x": 720,
+            "y": 120,
+            "width": 456,
+            "height": 285
+          }
         },
         "full": [
           {
@@ -1732,22 +3139,30 @@
             "h": 519
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "map",
-            "x": 48,
-            "y": 1103,
-            "w": 1632,
-            "h": 519
+            "x": 0,
+            "y": 0,
+            "w": 912,
+            "h": 570
           }
         ]
       },
       "licence": {
-        "clip": {
-          "x": 444,
-          "y": 0,
-          "width": 760,
-          "height": 475
+        "clips": {
+          "figure": {
+            "x": 457,
+            "y": 0,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 659,
+            "y": 107,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -1758,22 +3173,45 @@
             "h": 44
           }
         ],
-        "focus": [
+        "figure": [
           {
             "name": "state",
-            "x": 670,
+            "x": 644,
             "y": 398,
+            "w": 178,
+            "h": 44
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "state",
+            "x": 240,
+            "y": 184,
             "w": 178,
             "h": 44
           }
         ]
       },
       "gallery": {
-        "clip": {
-          "x": 0,
-          "y": 0,
-          "width": 1200,
-          "height": 900
+        "clips": {
+          "atlas": {
+            "x": 736,
+            "y": 555,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 8,
+            "y": 442,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 169,
+            "y": 651,
+            "width": 330,
+            "height": 206
+          }
         },
         "full": [
           {
@@ -1784,13 +3222,31 @@
             "h": 658
           }
         ],
-        "focus": [
+        "atlas": [
           {
             "name": "showcase",
-            "x": 48,
-            "y": 1142,
-            "w": 2304,
+            "x": 0,
+            "y": 32,
+            "w": 880,
+            "h": 538
+          }
+        ],
+        "figure": [
+          {
+            "name": "showcase",
+            "x": 32,
+            "y": 258,
+            "w": 1434,
             "h": 658
+          }
+        ],
+        "figure-phone": [
+          {
+            "name": "showcase",
+            "x": 0,
+            "y": 0,
+            "w": 660,
+            "h": 412
           }
         ]
       }

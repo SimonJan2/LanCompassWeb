@@ -774,9 +774,9 @@ export const he: Copy = {
     "map-ages": {
       // C-MAP-1, C-MAP-2
       caption: "המפה של מטה דמו: קו אחד לכל כבל, וכל קו אומר בן כמה הוא.",
+      // W11: the figure is a crop around the open card; the Changes lens's note went with the
+      // window's top bar it pointed at (C-MAP-4 stays cited in the map section above).
       notes: {
-        // C-MAP-4
-        lens: "עדשת „שינויים מאז”: מה זז או השתתק מאז התאריך שבוחרים.",
         // C-MAP-2
         canvas: "הכרטיס של כבל: מתי הוא אומת ברשת בפעם האחרונה.",
       },

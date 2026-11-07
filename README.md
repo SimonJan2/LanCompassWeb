@@ -138,18 +138,25 @@ Product screens come from the **signed release bundle**, run on a throwaway stac
 (`scripts/capture-stack/README.md`: the bundle checked, `lcweb-cap` up, the admin, the demo
 estate, the staged writes, the teardown). `scripts/capture-screenshots.mjs` signs in to that
 stack, sets the theme and language (`en`, `he`) in the capture browser's `localStorage` only,
-and saves, for each of the fifteen keys (`src/lib/screens.ts`), a 2× PNG of the full window
-(`src/assets/screens/<set>/<locale>/<key>.png`, 2880 × 1800) and a focus crop around the key's
-main element (`<key>.focus.png`), with a copy in `media-library/screens/`. It records each
-crop's clip and up to four named anchors per frame in `src/content/screen-anchors.json`, and
-the capture (bundle checksum, release key, demo load time, routes, staged writes) in
-`media-library/screens/CAPTURED.json`. `LANCOMPASS_CAPTURE_THEME` picks the product theme:
-`survey` (Survey, the product's default light theme: the light site's set) or `night-chart`
-(Night chart, its default dark theme: the dark site's set; `auto` ships both). `--check` walks
-every key without writing a file and fails on a missing route or element; `--keys a,b` and
-`--locales en` narrow a run; `--probe <key>` prints the page's `data-*` attributes and saves a
-screenshot to `.tmp/probe/`. Narrow slots (What's new, the atlas previews) show the crop, wide
-ones (the product sections) the full window.
+renders the 1440 × 900 window at device scale 3, and saves into `media-library/screens/<set>/<locale>/`,
+for each of the fifteen keys (`src/lib/screens.ts`), the full window (`<key>.png`, 2880 × 1800)
+and, for every slot that shows the key, a crop of the slot's size around the one thing its
+caption names (`<key>.<slot>.png`, and `<key>.<slot>-phone.png` where a phone gets its own; W11).
+`src/content/screen-slots.json` holds the slots: the width each draws its picture at 1,440 and
+390 px, the crop that fits it (never wider, so the product's text is drawn at its own size or
+larger), the served width (twice the drawn width: sharp at device scale 2) and each key's task
+focus. From the record it derives the served files, `public/screens/<set>/<locale>/*.webp`, at
+exactly those sizes; their stable same-origin paths keep the home and product pages inside their
+first round trip, and nginx caches them like the other media files. It records each crop's clip
+and up to four named anchors per picture in `src/content/screen-anchors.json`, and the capture
+(bundle checksum, release key, demo load time, routes, each slot's focus and clip, staged
+writes) in `media-library/screens/CAPTURED.json`. `LANCOMPASS_CAPTURE_THEME` picks the product
+theme: `survey` (Survey, the product's default light theme: the light site's set) or
+`night-chart` (Night chart, its default dark theme: the dark site's set; `auto` ships both).
+`--check` walks every key and slot without writing a file and fails on a missing route, element
+or focus; `--keys a,b` and `--locales en` narrow a run; `--probe <key>` prints the page's
+`data-*` attributes and each slot's focus and clip, and saves a screenshot to `.tmp/probe/`;
+`--derive` rewrites the served files from the record without a browser.
 
 `scripts/record-video.mjs <key>` records one product video on the same capture stack
 (navigation, hover, scrolling, the Q key, opening a card or a preview). Its one kind of write
@@ -189,9 +196,11 @@ docker run --rm --network host --ipc=host --user "$(id -u):$(id -g)" -e HOME=/tm
   node scripts/record-video.mjs documented-vs-observed --check
 ```
 
-Rebuild afterwards: `ScreenshotFrame` picks the files up automatically and serves them as
-AVIF + WebP with `srcset`. Until a file exists, a schematic placeholder of the same 16:10
-shape is shown. Check every capture for non-demo data before committing.
+Rebuild afterwards: `ScreenshotFrame` picks the served files up automatically, one `<picture>`
+per slot with one candidate per `<source>` (the phone crop below 960 px, the desktop crop as the
+`<img>`, and in `auto` the Night chart twin of each). Until a file exists, a schematic
+placeholder of the same 16:10 shape is shown. `tests/legibility.spec.ts` measures every slot at
+1,440 and 390 px. Check every crop for non-demo data before committing.
 
 ## Adding a locale (for example `ar`)
 
@@ -224,13 +233,14 @@ src/
   styles/          tokens.css (design tokens), global.css (Tailwind + base), fonts.css
   scripts/         the small client scripts (site, two sheets, forms, scroll-spy)
   lib/             build-time helpers: screenshots, OG images, WOFF2 decoding, media
-  assets/          brand/ (compass mark), screens/{survey,night-chart}/{en,he}/ (captures)
+  assets/          brand/ (compass mark)
 scripts/           capture-screenshots.mjs, record-video.mjs, build-test.mjs, lhci.mjs,
                    capture-stack/ (the throwaway stack from the signed bundle),
                    sync-changelog.mjs (W8: the release notes from CHANGELOG.md at a tag),
                    sync-docs.mjs (W9: the docs from an archive of the tag),
                    check-claims.mjs (W10: each claim row's sources exist at the release tag)
-media-library/     captured screens (Survey + Night chart) and videos, en + he, not built
+media-library/     captured screens (Survey + Night chart: the whole windows and each slot's
+                   crop) and videos, en + he, not built; public/screens/ holds the served crops
 tests/             Playwright specs
 docs/headers.md    security headers and nginx equivalents
 docs/design/       originality.md: the identity, measured against NetBox Labs (ΔE, fonts)

@@ -4,31 +4,141 @@
       "route": "/",
       "follow": null,
       "ready": "[data-tour-id=\"tour:dash-grid\"]",
-      "focus": "[data-tour-id=\"tour:dash-grid\"]",
+      "focus": {
+        "atlas": "the first row of widgets",
+        "band": "the first widgets, with their numbers",
+        "band-phone": "the first widget",
+        "figure": "offline devices, failed scans and the monitors' events",
+        "figure-phone": "the offline devices widget"
+      },
       "clips": {
         "survey/en": {
-          "x": 240,
-          "y": 28,
-          "width": 1200,
-          "height": 872
+          "atlas": {
+            "x": 248,
+            "y": 310,
+            "width": 456,
+            "height": 285
+          },
+          "band": {
+            "x": 248,
+            "y": 310,
+            "width": 560,
+            "height": 350
+          },
+          "band-phone": {
+            "x": 248,
+            "y": 310,
+            "width": 330,
+            "height": 206
+          },
+          "figure": {
+            "x": 248,
+            "y": 310,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 248,
+            "y": 310,
+            "width": 330,
+            "height": 206
+          }
         },
         "survey/he": {
-          "x": 0,
-          "y": 28,
-          "width": 1200,
-          "height": 872
+          "atlas": {
+            "x": 736,
+            "y": 310,
+            "width": 456,
+            "height": 285
+          },
+          "band": {
+            "x": 632,
+            "y": 310,
+            "width": 560,
+            "height": 350
+          },
+          "band-phone": {
+            "x": 862,
+            "y": 310,
+            "width": 330,
+            "height": 206
+          },
+          "figure": {
+            "x": 459,
+            "y": 310,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 862,
+            "y": 310,
+            "width": 330,
+            "height": 206
+          }
         },
         "night-chart/en": {
-          "x": 240,
-          "y": 28,
-          "width": 1200,
-          "height": 872
+          "atlas": {
+            "x": 248,
+            "y": 310,
+            "width": 456,
+            "height": 285
+          },
+          "band": {
+            "x": 248,
+            "y": 310,
+            "width": 560,
+            "height": 350
+          },
+          "band-phone": {
+            "x": 248,
+            "y": 310,
+            "width": 330,
+            "height": 206
+          },
+          "figure": {
+            "x": 248,
+            "y": 310,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 248,
+            "y": 310,
+            "width": 330,
+            "height": 206
+          }
         },
         "night-chart/he": {
-          "x": 0,
-          "y": 28,
-          "width": 1200,
-          "height": 872
+          "atlas": {
+            "x": 736,
+            "y": 310,
+            "width": 456,
+            "height": 285
+          },
+          "band": {
+            "x": 632,
+            "y": 310,
+            "width": 560,
+            "height": 350
+          },
+          "band-phone": {
+            "x": 862,
+            "y": 310,
+            "width": 330,
+            "height": 206
+          },
+          "figure": {
+            "x": 459,
+            "y": 310,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 862,
+            "y": 310,
+            "width": 330,
+            "height": 206
+          }
         }
       }
     },
@@ -36,31 +146,66 @@
       "route": "/tree",
       "follow": null,
       "ready": "[role=\"tree\"] [role=\"treeitem\"]",
-      "focus": "[role=\"tree\"]",
+      "focus": {
+        "figure": "the first rows of the tree: a site, its VRFs, their prefixes",
+        "figure-phone": "the first rows of the tree"
+      },
       "clips": {
         "survey/en": {
-          "x": 240,
-          "y": 174,
-          "width": 1200,
-          "height": 702
+          "figure": {
+            "x": 248,
+            "y": 182,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 248,
+            "y": 182,
+            "width": 330,
+            "height": 206
+          }
         },
         "survey/he": {
-          "x": 0,
-          "y": 174,
-          "width": 1200,
-          "height": 702
+          "figure": {
+            "x": 459,
+            "y": 182,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 862,
+            "y": 182,
+            "width": 330,
+            "height": 206
+          }
         },
         "night-chart/en": {
-          "x": 240,
-          "y": 174,
-          "width": 1200,
-          "height": 702
+          "figure": {
+            "x": 248,
+            "y": 182,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 248,
+            "y": 182,
+            "width": 330,
+            "height": 206
+          }
         },
         "night-chart/he": {
-          "x": 0,
-          "y": 174,
-          "width": 1200,
-          "height": 702
+          "figure": {
+            "x": 459,
+            "y": 182,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 862,
+            "y": 182,
+            "width": 330,
+            "height": 206
+          }
         }
       }
     },
@@ -68,31 +213,66 @@
       "route": "/racks/<DC-A01>",
       "follow": null,
       "ready": "main svg",
-      "focus": "the largest svg in main (the elevation)",
+      "focus": {
+        "figure": "the lenses beside the front elevation's top units (the caption: its lenses beside the elevation)",
+        "figure-phone": "three units of the elevation"
+      },
       "clips": {
         "survey/en": {
-          "x": 334,
-          "y": 0,
-          "width": 760,
-          "height": 900
+          "figure": {
+            "x": 248,
+            "y": 104,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 548,
+            "y": 546,
+            "width": 330,
+            "height": 206
+          }
         },
         "survey/he": {
-          "x": 346,
-          "y": 0,
-          "width": 760,
-          "height": 900
+          "figure": {
+            "x": 459,
+            "y": 104,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 562,
+            "y": 546,
+            "width": 330,
+            "height": 206
+          }
         },
         "night-chart/en": {
-          "x": 334,
-          "y": 0,
-          "width": 760,
-          "height": 900
+          "figure": {
+            "x": 248,
+            "y": 104,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 548,
+            "y": 546,
+            "width": 330,
+            "height": 206
+          }
         },
         "night-chart/he": {
-          "x": 346,
-          "y": 0,
-          "width": 760,
-          "height": 900
+          "figure": {
+            "x": 459,
+            "y": 104,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 562,
+            "y": 546,
+            "width": 330,
+            "height": 206
+          }
         }
       }
     },
@@ -100,31 +280,41 @@
       "route": "/review",
       "follow": "a[href*=\"/topology?\"][href*=\"focus=edge:obs-\"]",
       "ready": ".react-flow__edge.topo-focus",
-      "focus": ".react-flow__edge.topo-focus",
+      "focus": {
+        "atlas": "the focused observed link and the two devices it joins"
+      },
       "clips": {
         "survey/en": {
-          "x": 541,
-          "y": 335,
-          "width": 760,
-          "height": 475
+          "atlas": {
+            "x": 693,
+            "y": 430,
+            "width": 456,
+            "height": 285
+          }
         },
         "survey/he": {
-          "x": 301,
-          "y": 335,
-          "width": 760,
-          "height": 475
+          "atlas": {
+            "x": 453,
+            "y": 430,
+            "width": 456,
+            "height": 285
+          }
         },
         "night-chart/en": {
-          "x": 541,
-          "y": 335,
-          "width": 760,
-          "height": 475
+          "atlas": {
+            "x": 693,
+            "y": 430,
+            "width": 456,
+            "height": 285
+          }
         },
         "night-chart/he": {
-          "x": 301,
-          "y": 335,
-          "width": 760,
-          "height": 475
+          "atlas": {
+            "x": 453,
+            "y": 430,
+            "width": 456,
+            "height": 285
+          }
         }
       }
     },
@@ -132,63 +322,103 @@
       "route": "/review",
       "follow": null,
       "ready": "[data-page-meta]",
-      "focus": "the card holding the ghost-link rows",
+      "focus": {},
       "clips": {
-        "survey/en": {
-          "x": 240,
-          "y": 56,
-          "width": 1200,
-          "height": 510
-        },
-        "survey/he": {
-          "x": 0,
-          "y": 56,
-          "width": 1200,
-          "height": 510
-        },
-        "night-chart/en": {
-          "x": 240,
-          "y": 56,
-          "width": 1200,
-          "height": 510
-        },
-        "night-chart/he": {
-          "x": 0,
-          "y": 56,
-          "width": 1200,
-          "height": 510
-        }
+        "survey/en": {},
+        "survey/he": {},
+        "night-chart/en": {},
+        "night-chart/he": {}
       }
     },
     "nac": {
       "route": "/nac",
       "follow": null,
       "ready": "[data-nac-banner]",
-      "focus": "the detection banner and the first card (findings by kind)",
+      "focus": {
+        "atlas": "the mode banner: detection only",
+        "figure": "the mode banner and the counts under it",
+        "figure-phone": "the mode banner"
+      },
       "clips": {
         "survey/en": {
-          "x": 240,
-          "y": 47,
-          "width": 1200,
-          "height": 475
+          "atlas": {
+            "x": 248,
+            "y": 44,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 248,
+            "y": 0,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 248,
+            "y": 83,
+            "width": 330,
+            "height": 206
+          }
         },
         "survey/he": {
-          "x": 0,
-          "y": 47,
-          "width": 1200,
-          "height": 475
+          "atlas": {
+            "x": 736,
+            "y": 44,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 459,
+            "y": 0,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 862,
+            "y": 83,
+            "width": 330,
+            "height": 206
+          }
         },
         "night-chart/en": {
-          "x": 240,
-          "y": 47,
-          "width": 1200,
-          "height": 475
+          "atlas": {
+            "x": 248,
+            "y": 44,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 248,
+            "y": 0,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 248,
+            "y": 83,
+            "width": 330,
+            "height": 206
+          }
         },
         "night-chart/he": {
-          "x": 0,
-          "y": 47,
-          "width": 1200,
-          "height": 475
+          "atlas": {
+            "x": 736,
+            "y": 44,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 459,
+            "y": 0,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 862,
+            "y": 83,
+            "width": 330,
+            "height": 206
+          }
         }
       }
     },
@@ -196,31 +426,91 @@
       "route": "/reports",
       "follow": null,
       "ready": "#report-compliance",
-      "focus": "#report-compliance",
+      "focus": {
+        "atlas": "the compliance section's heading and first findings",
+        "figure": "the compliance section's heading and first findings",
+        "figure-phone": "the compliance section's heading and its counts by severity, pack and site"
+      },
       "clips": {
         "survey/en": {
-          "x": 240,
-          "y": 0,
-          "width": 1200,
-          "height": 900
+          "atlas": {
+            "x": 248,
+            "y": 56,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 248,
+            "y": 104,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 248,
+            "y": 104,
+            "width": 330,
+            "height": 206
+          }
         },
         "survey/he": {
-          "x": 0,
-          "y": 48,
-          "width": 1200,
-          "height": 792
+          "atlas": {
+            "x": 736,
+            "y": 56,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 459,
+            "y": 104,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 862,
+            "y": 104,
+            "width": 330,
+            "height": 206
+          }
         },
         "night-chart/en": {
-          "x": 240,
-          "y": 0,
-          "width": 1200,
-          "height": 900
+          "atlas": {
+            "x": 248,
+            "y": 56,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 248,
+            "y": 104,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 248,
+            "y": 104,
+            "width": 330,
+            "height": 206
+          }
         },
         "night-chart/he": {
-          "x": 0,
-          "y": 48,
-          "width": 1200,
-          "height": 792
+          "atlas": {
+            "x": 736,
+            "y": 56,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 459,
+            "y": 104,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 862,
+            "y": 104,
+            "width": 330,
+            "height": 206
+          }
         }
       }
     },
@@ -228,31 +518,116 @@
       "route": "/discovery",
       "follow": null,
       "ready": "[data-queue] li[data-queue-group]",
-      "focus": "[data-queue]",
+      "focus": {
+        "atlas": "the queue's count and its first groups",
+        "loop-phone": "the queue's count and its first group",
+        "figure": "the queue's count and its first groups",
+        "figure-phone": "the queue's count and its first group"
+      },
       "clips": {
         "survey/en": {
-          "x": 240,
-          "y": 158,
-          "width": 1200,
-          "height": 520
+          "atlas": {
+            "x": 248,
+            "y": 166,
+            "width": 456,
+            "height": 285
+          },
+          "loop-phone": {
+            "x": 248,
+            "y": 166,
+            "width": 330,
+            "height": 165
+          },
+          "figure": {
+            "x": 248,
+            "y": 166,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 248,
+            "y": 166,
+            "width": 330,
+            "height": 206
+          }
         },
         "survey/he": {
-          "x": 0,
-          "y": 158,
-          "width": 1200,
-          "height": 520
+          "atlas": {
+            "x": 736,
+            "y": 166,
+            "width": 456,
+            "height": 285
+          },
+          "loop-phone": {
+            "x": 862,
+            "y": 166,
+            "width": 330,
+            "height": 165
+          },
+          "figure": {
+            "x": 459,
+            "y": 166,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 862,
+            "y": 166,
+            "width": 330,
+            "height": 206
+          }
         },
         "night-chart/en": {
-          "x": 240,
-          "y": 158,
-          "width": 1200,
-          "height": 520
+          "atlas": {
+            "x": 248,
+            "y": 166,
+            "width": 456,
+            "height": 285
+          },
+          "loop-phone": {
+            "x": 248,
+            "y": 166,
+            "width": 330,
+            "height": 165
+          },
+          "figure": {
+            "x": 248,
+            "y": 166,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 248,
+            "y": 166,
+            "width": 330,
+            "height": 206
+          }
         },
         "night-chart/he": {
-          "x": 0,
-          "y": 158,
-          "width": 1200,
-          "height": 520
+          "atlas": {
+            "x": 736,
+            "y": 166,
+            "width": 456,
+            "height": 285
+          },
+          "loop-phone": {
+            "x": 862,
+            "y": 166,
+            "width": 330,
+            "height": 165
+          },
+          "figure": {
+            "x": 459,
+            "y": 166,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 862,
+            "y": 166,
+            "width": 330,
+            "height": 206
+          }
         }
       }
     },
@@ -260,31 +635,91 @@
       "route": "/topology?scope=site:<Demo HQ>&view=1&since=7d",
       "follow": null,
       "ready": ".topo-canvas .react-flow__edge",
-      "focus": "the open line card with its age, and the Changes lens chip",
+      "focus": {
+        "news": "the open line card: one cable, verified on the wire, and how long ago",
+        "figure": "the open line card among the lines it belongs to",
+        "figure-phone": "the open line card"
+      },
       "clips": {
         "survey/en": {
-          "x": 430,
-          "y": 106,
-          "width": 760,
-          "height": 581
+          "news": {
+            "x": 666,
+            "y": 514,
+            "width": 330,
+            "height": 206
+          },
+          "figure": {
+            "x": 465,
+            "y": 388,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 666,
+            "y": 514,
+            "width": 330,
+            "height": 206
+          }
         },
         "survey/he": {
-          "x": 363,
-          "y": 106,
-          "width": 760,
-          "height": 581
+          "news": {
+            "x": 578,
+            "y": 514,
+            "width": 330,
+            "height": 206
+          },
+          "figure": {
+            "x": 377,
+            "y": 388,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 578,
+            "y": 514,
+            "width": 330,
+            "height": 206
+          }
         },
         "night-chart/en": {
-          "x": 430,
-          "y": 106,
-          "width": 760,
-          "height": 581
+          "news": {
+            "x": 666,
+            "y": 514,
+            "width": 330,
+            "height": 206
+          },
+          "figure": {
+            "x": 465,
+            "y": 388,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 666,
+            "y": 514,
+            "width": 330,
+            "height": 206
+          }
         },
         "night-chart/he": {
-          "x": 363,
-          "y": 106,
-          "width": 760,
-          "height": 581
+          "news": {
+            "x": 578,
+            "y": 514,
+            "width": 330,
+            "height": 206
+          },
+          "figure": {
+            "x": 377,
+            "y": 388,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 578,
+            "y": 514,
+            "width": 330,
+            "height": 206
+          }
         }
       }
     },
@@ -292,31 +727,41 @@
       "route": "/topology?scope=site:<Demo HQ>&view=1&q=where%20is%20%3Can%20address%3E",
       "follow": null,
       "ready": "[data-question-answer]",
-      "focus": "[data-question-answer]",
+      "focus": {
+        "news": "the answer under the question bar"
+      },
       "clips": {
         "survey/en": {
-          "x": 240,
-          "y": 0,
-          "width": 1200,
-          "height": 475
+          "news": {
+            "x": 248,
+            "y": 119,
+            "width": 330,
+            "height": 206
+          }
         },
         "survey/he": {
-          "x": 0,
-          "y": 0,
-          "width": 1200,
-          "height": 475
+          "news": {
+            "x": 862,
+            "y": 119,
+            "width": 330,
+            "height": 206
+          }
         },
         "night-chart/en": {
-          "x": 240,
-          "y": 0,
-          "width": 1200,
-          "height": 475
+          "news": {
+            "x": 248,
+            "y": 119,
+            "width": 330,
+            "height": 206
+          }
         },
         "night-chart/he": {
-          "x": 0,
-          "y": 0,
-          "width": 1200,
-          "height": 475
+          "news": {
+            "x": 862,
+            "y": 119,
+            "width": 330,
+            "height": 206
+          }
         }
       }
     },
@@ -324,31 +769,116 @@
       "route": "/topology?d=<Branch refresh>",
       "follow": null,
       "ready": ".design-canvas",
-      "focus": "the selected object at the canvas's inner edge and the inspector beside it",
+      "focus": {
+        "news": "the selected switch on the canvas",
+        "atlas": "the selected switch on the canvas",
+        "figure": "the selected switch and the canvas around it",
+        "figure-phone": "the selected switch"
+      },
       "clips": {
         "survey/en": {
-          "x": 680,
-          "y": 230,
-          "width": 760,
-          "height": 520
+          "news": {
+            "x": 822,
+            "y": 307,
+            "width": 330,
+            "height": 206
+          },
+          "atlas": {
+            "x": 759,
+            "y": 268,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 621,
+            "y": 181,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 822,
+            "y": 307,
+            "width": 330,
+            "height": 206
+          }
         },
         "survey/he": {
-          "x": 0,
-          "y": 230,
-          "width": 760,
-          "height": 520
+          "news": {
+            "x": 572,
+            "y": 571,
+            "width": 330,
+            "height": 206
+          },
+          "atlas": {
+            "x": 509,
+            "y": 532,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 371,
+            "y": 442,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 572,
+            "y": 571,
+            "width": 330,
+            "height": 206
+          }
         },
         "night-chart/en": {
-          "x": 680,
-          "y": 230,
-          "width": 760,
-          "height": 520
+          "news": {
+            "x": 822,
+            "y": 307,
+            "width": 330,
+            "height": 206
+          },
+          "atlas": {
+            "x": 759,
+            "y": 268,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 621,
+            "y": 181,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 822,
+            "y": 307,
+            "width": 330,
+            "height": 206
+          }
         },
         "night-chart/he": {
-          "x": 0,
-          "y": 230,
-          "width": 760,
-          "height": 520
+          "news": {
+            "x": 572,
+            "y": 571,
+            "width": 330,
+            "height": 206
+          },
+          "atlas": {
+            "x": 509,
+            "y": 532,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 371,
+            "y": 442,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 572,
+            "y": 571,
+            "width": 330,
+            "height": 206
+          }
         }
       }
     },
@@ -356,31 +886,41 @@
       "route": "/racks/<DC-A01>?lens=power",
       "follow": null,
       "ready": "[data-lens=\"power\"][aria-pressed=\"true\"]",
-      "focus": "the largest svg in main (the rack, power lens)",
+      "focus": {
+        "atlas": "the top of the rack under the power lens"
+      },
       "clips": {
         "survey/en": {
-          "x": 334,
-          "y": 0,
-          "width": 760,
-          "height": 900
+          "atlas": {
+            "x": 486,
+            "y": 546,
+            "width": 456,
+            "height": 285
+          }
         },
         "survey/he": {
-          "x": 346,
-          "y": 0,
-          "width": 760,
-          "height": 900
+          "atlas": {
+            "x": 498,
+            "y": 546,
+            "width": 456,
+            "height": 285
+          }
         },
         "night-chart/en": {
-          "x": 334,
-          "y": 0,
-          "width": 760,
-          "height": 900
+          "atlas": {
+            "x": 486,
+            "y": 546,
+            "width": 456,
+            "height": 285
+          }
         },
         "night-chart/he": {
-          "x": 346,
-          "y": 0,
-          "width": 760,
-          "height": 900
+          "atlas": {
+            "x": 498,
+            "y": 546,
+            "width": 456,
+            "height": 285
+          }
         }
       }
     },
@@ -388,31 +928,41 @@
       "route": "/prefixes/<10.130.100.0/24>?tab=plan&view=grid",
       "follow": null,
       "ready": "[data-address-map]",
-      "focus": "[data-address-map]",
+      "focus": {
+        "atlas": "the address map card's first rows (from its edge: the line above it is an empty state)"
+      },
       "clips": {
         "survey/en": {
-          "x": 240,
-          "y": 89,
-          "width": 864,
-          "height": 811
+          "atlas": {
+            "x": 264,
+            "y": 120,
+            "width": 456,
+            "height": 285
+          }
         },
         "survey/he": {
-          "x": 336,
-          "y": 89,
-          "width": 864,
-          "height": 811
+          "atlas": {
+            "x": 720,
+            "y": 120,
+            "width": 456,
+            "height": 285
+          }
         },
         "night-chart/en": {
-          "x": 240,
-          "y": 89,
-          "width": 864,
-          "height": 811
+          "atlas": {
+            "x": 264,
+            "y": 120,
+            "width": 456,
+            "height": 285
+          }
         },
         "night-chart/he": {
-          "x": 336,
-          "y": 89,
-          "width": 864,
-          "height": 811
+          "atlas": {
+            "x": 720,
+            "y": 120,
+            "width": 456,
+            "height": 285
+          }
         }
       }
     },
@@ -420,31 +970,66 @@
       "route": "/settings/license",
       "follow": null,
       "ready": "[data-license-state=\"evaluation\"]",
-      "focus": "[data-license-state=\"evaluation\"]",
+      "focus": {
+        "figure": "the licence card in its evaluation state",
+        "figure-phone": "the licence state"
+      },
       "clips": {
         "survey/en": {
-          "x": 239,
-          "y": 0,
-          "width": 760,
-          "height": 475
+          "figure": {
+            "x": 252,
+            "y": 0,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 454,
+            "y": 107,
+            "width": 330,
+            "height": 206
+          }
         },
         "survey/he": {
-          "x": 444,
-          "y": 0,
-          "width": 760,
-          "height": 475
+          "figure": {
+            "x": 457,
+            "y": 0,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 659,
+            "y": 107,
+            "width": 330,
+            "height": 206
+          }
         },
         "night-chart/en": {
-          "x": 239,
-          "y": 0,
-          "width": 760,
-          "height": 475
+          "figure": {
+            "x": 252,
+            "y": 0,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 454,
+            "y": 107,
+            "width": 330,
+            "height": 206
+          }
         },
         "night-chart/he": {
-          "x": 444,
-          "y": 0,
-          "width": 760,
-          "height": 475
+          "figure": {
+            "x": 457,
+            "y": 0,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 659,
+            "y": 107,
+            "width": 330,
+            "height": 206
+          }
         }
       }
     },
@@ -452,46 +1037,106 @@
       "route": "/gallery",
       "follow": null,
       "ready": "[data-gallery-collection=\"showcase\"]",
-      "focus": "[data-gallery-collection=\"showcase\"]",
+      "focus": {
+        "atlas": "the Showcase row",
+        "figure": "the Showcase's first entry: its name, who it is for, and Preview, Follow, Make it mine (from the entry's far edge, where its text is)",
+        "figure-phone": "the Showcase's first entry: its name, who it is for, and its actions"
+      },
       "clips": {
         "survey/en": {
-          "x": 240,
-          "y": 0,
-          "width": 1200,
-          "height": 900
+          "atlas": {
+            "x": 248,
+            "y": 575,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 699,
+            "y": 281,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 941,
+            "y": 671,
+            "width": 330,
+            "height": 206
+          }
         },
         "survey/he": {
-          "x": 0,
-          "y": 0,
-          "width": 1200,
-          "height": 900
+          "atlas": {
+            "x": 736,
+            "y": 555,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 8,
+            "y": 442,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 169,
+            "y": 651,
+            "width": 330,
+            "height": 206
+          }
         },
         "night-chart/en": {
-          "x": 240,
-          "y": 0,
-          "width": 1200,
-          "height": 900
+          "atlas": {
+            "x": 248,
+            "y": 575,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 699,
+            "y": 281,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 941,
+            "y": 671,
+            "width": 330,
+            "height": 206
+          }
         },
         "night-chart/he": {
-          "x": 0,
-          "y": 0,
-          "width": 1200,
-          "height": 900
+          "atlas": {
+            "x": 736,
+            "y": 555,
+            "width": 456,
+            "height": 285
+          },
+          "figure": {
+            "x": 8,
+            "y": 442,
+            "width": 733,
+            "height": 458
+          },
+          "figure-phone": {
+            "x": 169,
+            "y": 651,
+            "width": 330,
+            "height": 206
+          }
         }
       }
     }
   },
-  "$comment": "W3: where the site's product screens come from. Written by scripts/capture-screenshots.mjs.",
+  "$comment": "Where the site's product screens come from (W3; W11's slot crops). Written by scripts/capture-screenshots.mjs.",
   "product_version": "0.7.0",
   "bundle_sha256": "13b573f5a0268e16e32026aa9fef73ad1006853c99e066bcc523f7f6377e41d8",
   "release_key_fingerprint": "C0:47:0E:92:CE:F4:F9:DC:EC:DC:35:23:D5:8D:2A:82:DF:8E:B6:73:04:31:E3:AD:B2:47:D6:D2:17:E5:51:8D",
-  "captured_on": "2026-11-06",
-  "demo_estate_loaded_at": "2026-11-06T14:58:31+02:00",
+  "captured_on": "2026-11-07",
+  "demo_estate_loaded_at": "2026-11-07T06:49:50+02:00",
   "viewport": {
     "width": 1440,
     "height": 900
   },
-  "device_scale_factor": 2,
+  "device_scale_factor": 3,
   "sets": ["night-chart", "survey"],
   "locales": ["en", "he"],
   "staged_writes": [
@@ -500,43 +1145,42 @@
       "design": "Branch refresh",
       "design_id": 3,
       "comment": {
-        "id": 5,
+        "id": 1,
         "on": "object d-demo-br-sw BR-SW-01",
         "body": "Check the uplink speed on this switch before the cut-over."
       },
       "reply": {
-        "id": 6,
+        "id": 2,
         "body": "Confirmed: 10G on both ends."
       },
       "version": {
         "id": 1,
         "name": "Reviewed for the branch cut-over",
-        "signed_at": "2026-11-06T12:59:17.275030Z"
+        "signed_at": "2026-11-07T04:50:01.768577Z"
       }
-    },
-    {
-      "lang": "he",
-      "removed_comment": 3,
-      "reason": "re-pinned to an object"
     },
     {
       "lang": "he",
       "design": "תכנון DMZ חדש",
       "design_id": 4,
       "comment": {
-        "id": 7,
+        "id": 3,
         "on": "object d-demo-dmz-core CORE-SW-01",
         "body": "לבדוק את מהירות הקישור במתג הזה לפני ההעברה."
       },
       "reply": {
-        "id": 8,
+        "id": 4,
         "body": "נבדק: 10G בשני הקצוות."
       },
       "version": {
         "id": 2,
         "name": "נבדק לפני ההעברה",
-        "signed_at": "2026-11-06T12:59:17.336580Z"
+        "signed_at": "2026-11-07T04:50:01.849924Z"
       }
     }
-  ]
+  ],
+  "full_window_pixels": {
+    "width": 2880,
+    "height": 1800
+  }
 }

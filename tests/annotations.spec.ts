@@ -4,21 +4,24 @@ import { join } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 import { en } from "../src/content/copy/en";
 import { he } from "../src/content/copy/he";
-import { figureMarks, MAX_MARKS, type AnchorFile } from "../src/lib/annotations";
+import { figureMarks, figureNotes, MAX_MARKS, type AnchorFile } from "../src/lib/annotations";
 import type { ScreenSet } from "../src/lib/screens";
 import { pages, siteProject } from "./helpers";
 
 /**
  * W4: the annotated figures (AnnotatedScreen.astro) and "What talks to what" (HowItRuns.astro),
- * in both locales and every theme project.
+ * in both locales and every theme project; W11: each figure is a crop, with its own phone crop.
  *
- *  - Marks equal their legend items in number and order; each is an in-page link to its item
- *    and carries the note in its accessible name.
- *  - Each mark is at least 24 × 24 CSS px (WCAG 2.2, 2.5.8) and lies inside its picture.
+ *  - The legend has every note of the figure at every width; each mark carries its note's
+ *    number, is an in-page link to its item and carries the note in its accessible name.
+ *  - At a 1,440- and a 390-px window, each drawn mark is at least 24 × 24 CSS px (WCAG 2.2,
+ *    2.5.8) and lies inside its picture.
  *  - Marks sit exactly where the page locale's anchors (src/content/screen-anchors.json) put
- *    them, for the set the build ships: Hebrew pages use the Hebrew captures' anchors.
+ *    them, in the picture that width shows (the desktop crop, or the phone crop below 960 px),
+ *    for the set the build ships: Hebrew pages use the Hebrew captures' anchors. A note whose
+ *    anchor is outside the picture has no mark at that width.
  *  - Figure numbers run 1 … n per page; every caption is non-empty.
- *  - A cropped figure links to its full window, served from the site's origin.
+ *  - Every cropped figure links to its full window, served from the site's origin.
  *  - A key, set or locale without anchors gets no marks (src/lib/annotations.ts).
  *  - The drawing is an image with a title and a description, numbered 1–7 like its list of
  *    seven items, mirrored in Hebrew; axe finds nothing in the figures or the drawing.
@@ -29,12 +32,8 @@ const anchors = JSON.parse(
   readFileSync(join(root, "src", "content", "screen-anchors.json"), "utf8"),
 ) as AnchorFile;
 const copies = { en, he };
-
-/** A PNG's pixel size, from its IHDR chunk. */
-function pngSize(file: string) {
-  const b = readFileSync(file);
-  return { width: b.readUInt32BE(16), height: b.readUInt32BE(20) };
-}
+/** The picture a window width shows (W11): the desktop crop, or the phone crop below 960 px. */
+const pictureAt = (width: number) => (width >= 960 ? "figure" : "figure-phone");
 
 function setsShipped(): ScreenSet[] {
   const { theme } = siteProject();
@@ -65,24 +64,28 @@ interface DomFigure {
   caption: string;
 }
 
+/** The page's figures; `marks` holds the marks drawn at the window's width (W11: a mark with no
+ *  anchor in the picture that width shows is display: none). */
 async function readFigures(page: Page): Promise<DomFigure[]> {
   return page.evaluate(() =>
     [...document.querySelectorAll<HTMLElement>("figure.fig")].map((f) => ({
       id: f.id,
       screen: f.querySelector<HTMLElement>(".shot")?.dataset["screen"] ?? "",
-      marks: [...f.querySelectorAll<HTMLElement>(".fig-a")].map((span) => {
-        const a = span.querySelector("a")!;
-        const css = getComputedStyle(span);
-        return {
-          href: a.getAttribute("href") ?? "",
-          text: (a.textContent ?? "").trim(),
-          label: a.getAttribute("aria-label") ?? "",
-          style: ["--x", "--y", "--w", "--h"]
-            .map((p) => `${p}:${css.getPropertyValue(p).trim()}`)
-            .join(";"),
-          inline: span.hasAttribute("style"),
-        };
-      }),
+      marks: [...f.querySelectorAll<HTMLElement>(".fig-a")]
+        .filter((span) => getComputedStyle(span).display !== "none")
+        .map((span) => {
+          const a = span.querySelector("a")!;
+          const css = getComputedStyle(span);
+          return {
+            href: a.getAttribute("href") ?? "",
+            text: (a.textContent ?? "").trim(),
+            label: a.getAttribute("aria-label") ?? "",
+            style: ["--x", "--y", "--w", "--h"]
+              .map((p) => `${p}:${css.getPropertyValue(p).trim()}`)
+              .join(";"),
+            inline: span.hasAttribute("style"),
+          };
+        }),
       notes: [...f.querySelectorAll<HTMLElement>(".fig-notes li")].map((li) => ({
         id: li.id,
         text: (li.textContent ?? "").replace(/\s+/g, " ").trim(),
@@ -94,28 +97,40 @@ async function readFigures(page: Page): Promise<DomFigure[]> {
 
 test.describe("W4: annotated figures", () => {
   for (const { path, locale } of productPages) {
-    test(`${path}: marks equal their legend items, in order, each linking to its note`, async ({
-      page,
-    }) => {
-      await page.goto(path);
-      const figures = await readFigures(page);
-      // Every section with a screen: ten figures (the reports section has none).
-      expect(figures.length).toBe(10);
-      for (const f of figures) {
-        expect(f.marks.length, f.id).toBe(f.notes.length);
-        expect(f.marks.length, f.id).toBeLessThanOrEqual(MAX_MARKS);
-        f.marks.forEach((m, i) => {
-          const note = f.notes[i]!;
-          expect(m.text).toBe(String(i + 1));
-          expect(note.id).toBe(`${f.id}-${i + 1}`);
-          expect(m.href).toBe(`#${note.id}`);
-          expect(m.label.replace(/\s+/g, " ")).toContain(note.text);
-        });
-      }
-      // Every legend item a mark points at exists on the page, once.
-      const targets = figures.flatMap((f) => f.marks.map((m) => m.href.slice(1)));
-      for (const id of targets) await expect(page.locator(`[id="${id}"]`)).toHaveCount(1);
-    });
+    for (const width of [1440, 390]) {
+      test(`${path} at ${width}px: the legend has every note; each mark carries its note's number and links to it`, async ({
+        page,
+      }) => {
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(path);
+        const figures = await readFigures(page);
+        // Every section with a screen: ten figures (the reports section has none).
+        expect(figures.length).toBe(10);
+        let drawn = 0;
+        for (const f of figures) {
+          const notes = (
+            copies[locale].figures as Record<string, { notes: Record<string, string> }>
+          )[f.screen]!.notes;
+          expect(f.notes.length, f.id).toBe(Math.min(Object.keys(notes).length, MAX_MARKS));
+          f.notes.forEach((note, i) => expect(note.id).toBe(`${f.id}-${i + 1}`));
+          expect(f.marks.length, f.id).toBeLessThanOrEqual(f.notes.length);
+          let last = 0;
+          for (const m of f.marks) {
+            const n = Number(m.text);
+            expect(n, `${f.id}: marks in the legend's order`).toBeGreaterThan(last);
+            last = n;
+            const note = f.notes[n - 1]!;
+            expect(m.href).toBe(`#${note.id}`);
+            expect(m.label.replace(/\s+/g, " ")).toContain(note.text);
+          }
+          drawn += f.marks.length;
+        }
+        expect(drawn, "some marks are drawn at this width").toBeGreaterThan(0);
+        // Every legend item a mark points at exists on the page, once.
+        const targets = figures.flatMap((f) => f.marks.map((m) => m.href.slice(1)));
+        for (const id of targets) await expect(page.locator(`[id="${id}"]`)).toHaveCount(1);
+      });
+    }
 
     for (const width of [1440, 390]) {
       test(`${path} at ${width}px: every mark is ≥ 24 × 24 px, inside its picture, on its box's starting corner`, async ({
@@ -127,7 +142,10 @@ test.describe("W4: annotated figures", () => {
         const boxes = await page.evaluate(() =>
           [...document.querySelectorAll<HTMLElement>("figure.fig")].flatMap((f) => {
             const pic = f.querySelector(".shot-img")!.getBoundingClientRect();
-            return [...f.querySelectorAll<HTMLElement>(".fig-a")].map((span) => {
+            const drawn = [...f.querySelectorAll<HTMLElement>(".fig-a")].filter(
+              (span) => getComputedStyle(span).display !== "none",
+            );
+            return drawn.map((span) => {
               const a = span.querySelector("a")!;
               const r = a.getBoundingClientRect();
               const v = (name: string) =>
@@ -161,45 +179,47 @@ test.describe("W4: annotated figures", () => {
       });
     }
 
-    test(`${path}: marks sit where the ${locale} anchors put them`, async ({ page }) => {
-      await page.goto(path);
-      const figures = await readFigures(page);
+    test(`${path}: marks sit where the ${locale} anchors put them, at both widths`, async ({
+      page,
+    }) => {
       const sets = setsShipped();
       const other = locale === "he" ? "en" : "he";
       let differsFromOther = 0;
-      for (const f of figures) {
-        const notes = (copies[locale].figures as Record<string, { notes: Record<string, string> }>)[
-          f.screen
-        ]!.notes;
-        const expected = (loc: "en" | "he") => {
-          const size = pngSize(
-            join(root, "src", "assets", "screens", sets[0]!, loc, `${f.screen}.png`),
-          );
-          return figureMarks(anchors, {
-            sets,
-            locale: loc,
-            screen: f.screen,
-            variant: "full",
-            notes,
-            width: size.width,
-            height: size.height,
-          }).map((m) => `--x:${m.x};--y:${m.y};--w:${m.w};--h:${m.h}`);
-        };
-        const mine = expected(locale);
-        expect(
-          f.marks.map((m) => m.style),
-          f.id,
-        ).toEqual(mine);
-        // The position comes from the stylesheet, never a style attribute (the CSP blocks those).
-        expect(
-          f.marks.filter((m) => m.inline).length,
-          `${f.id}: marks with a style attribute`,
-        ).toBe(0);
-        if (JSON.stringify(mine) !== JSON.stringify(expected(other))) differsFromOther++;
+      for (const width of [1440, 390]) {
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(path);
+        const figures = await readFigures(page);
+        const picture = pictureAt(width);
+        for (const f of figures) {
+          const notes = (
+            copies[locale].figures as Record<string, { notes: Record<string, string> }>
+          )[f.screen]!.notes;
+          const expected = (loc: "en" | "he") =>
+            figureNotes(anchors, { sets, locale: loc, screen: f.screen, notes })
+              .map((n) => n.marks[picture])
+              .filter((m) => m !== undefined)
+              .map((m) => `--x:${m.x};--y:${m.y};--w:${m.w};--h:${m.h}`);
+          const mine = expected(locale);
+          expect(
+            f.marks.map((m) => m.style),
+            `${f.id} @${width}`,
+          ).toEqual(mine);
+          // The position comes from the stylesheet, never a style attribute (the CSP blocks those).
+          expect(
+            f.marks.filter((m) => m.inline).length,
+            `${f.id}: marks with a style attribute`,
+          ).toBe(0);
+          if (JSON.stringify(mine) !== JSON.stringify(expected(other))) differsFromOther++;
+        }
       }
-      // The two locales' captures differ (the Hebrew window is mirrored by the product itself),
-      // so a page that used the other locale's anchors would fail above on most figures.
-      expect(differsFromOther).toBeGreaterThan(5);
+      // The two locales' crops differ (the Hebrew window is mirrored by the product itself, and
+      // its crops start from the right), so a page that used the other locale's anchors would
+      // fail above on some figure.
+      test.info().annotations.push({
+        type: "figures whose marks differ from the other locale's",
+        description: String(differsFromOther),
+      });
+      expect(differsFromOther).toBeGreaterThan(0);
     });
   }
 
@@ -229,6 +249,8 @@ test.describe("W4: annotated figures", () => {
       );
       const croppedHere = await page.locator("figure.fig[data-cropped]").count();
       cropped += croppedHere;
+      // W11: every figure is a crop, so every figure links to its whole window.
+      expect(croppedHere).toBe(await page.locator("figure.fig").count());
       if (croppedHere > 0) expect(links.length).toBeGreaterThanOrEqual(croppedHere);
       for (const link of links) {
         expect(link.inCropped).toBe(true);
@@ -238,9 +260,9 @@ test.describe("W4: annotated figures", () => {
         expect(res.headers()["content-type"]).toMatch(/^image\//);
       }
     }
-    // W4 decision (report): no page shows a cropped annotated figure yet; the home's figures stay
-    // plain for the first-round-trip budget. The count is recorded, not required.
+    // /product's ten figures in each locale; the home's frames are not numbered figures.
     test.info().annotations.push({ type: "cropped figures", description: String(cropped) });
+    expect(cropped).toBe(20);
   });
 
   test("a key, set or locale without anchors gets no marks; the rules hold (lib/annotations)", () => {
@@ -254,13 +276,13 @@ test.describe("W4: annotated figures", () => {
       sets: ["survey"] as ScreenSet[],
       locale: "en" as const,
       screen: "k",
-      variant: "full" as const,
+      picture: "full",
       notes: { a: "Note A", b: "Note B" },
       width: 2880,
       height: 1800,
     };
     expect(figureMarks(file, { ...base, screen: "missing" })).toEqual([]);
-    expect(figureMarks(file, { ...base, variant: "focus" })).toEqual([]);
+    expect(figureMarks(file, { ...base, picture: "figure" })).toEqual([]);
     expect(figureMarks(file, { ...base, sets: ["survey", "night-chart"] })).toEqual([]);
     expect(figureMarks(file, base).map((m) => m.name)).toEqual(["a", "b"]);
     expect(figureMarks(file, { ...base, notes: { b: "Note B" } }).map((m) => m.name)).toEqual([
@@ -279,6 +301,30 @@ test.describe("W4: annotated figures", () => {
     expect(figureMarks({ survey: { en: { k: { full: many } } } }, { ...base, notes }).length).toBe(
       MAX_MARKS,
     );
+    // W11: every note keeps its legend item; its mark is in the pictures that hold its anchor.
+    const cropped: AnchorFile = {
+      survey: {
+        en: {
+          k: {
+            clips: {
+              figure: { x: 0, y: 0, width: 753, height: 471 },
+              "figure-phone": { x: 0, y: 0, width: 350, height: 219 },
+            },
+            figure: [a],
+            "figure-phone": [],
+          },
+        },
+      },
+    };
+    const items = figureNotes(cropped, {
+      sets: ["survey"],
+      locale: "en",
+      screen: "k",
+      notes: { a: "Note A", b: "Note B" },
+    });
+    expect(items.map((i) => i.name)).toEqual(["a", "b"]);
+    expect(Object.keys(items[0]!.marks)).toEqual(["figure"]);
+    expect(items[1]!.marks).toEqual({});
   });
 });
 

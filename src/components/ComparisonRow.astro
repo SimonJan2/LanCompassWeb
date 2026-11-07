@@ -23,8 +23,7 @@ const { locale, screen, items } = Astro.props;
         screen={screen}
         locale={locale}
         screenLocale={item.screenLocale}
-        single={1200}
-        singleDark
+        slot="band"
       />
       <figcaption class="compare-caption">{item.caption}</figcaption>
     </figure>

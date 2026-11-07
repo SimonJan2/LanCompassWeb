@@ -1,0 +1,287 @@
+{
+  "$comment": "W11: the slots that draw a product screen, one entry per slot kind. drawn: the width the slot draws its picture at a 1,440- and a 390-px window (CSS px; null where the slot is not drawn), in a light and a dark build (the dark frame's card-indigo mat, night.css, takes 20 px), measured on a build (start: 50b33ed, night E's probe; result: this wave's build). crop: the app view a crop holds (CSS px of the product's 1,440 x 900 window), never wider than the slot draws it in either theme, 2 px to spare (DECISIONS.md D-LEGIBLE; the two sets share their clips, so an auto build marks both alike), 16:10 like the window (the loop's 2:1 band like its frame); phone: the crop a window below the breakpoint loads (D-PHONE-SCREENS), null where the desktop crop serves both widths or the slot is not drawn on a phone. full: the slot draws the whole window on a desktop. serve: the served WebP's width in pixels, twice the widest drawn width plus 2 px for sub-pixel layout, so a device-scale-2 screen gets two pixels per CSS px. quality: the served WebP's quality (default 80; What's new 70: its three images load before the English home's hero paints, and Lighthouse counts their bytes against the LCP budget). focus: per key and picture, the one thing the slot's caption or text names (selector: the first visible match, largest: the largest one; text: the first element whose text matches; card: its nearest bordered box at least this wide; union: several of these together; note: what the crop shows); scripts/capture-screenshots.mjs cuts a clip of the crop's size around it, pad px (default 16) outside it, inside the window: centred when the thing is smaller than the clip (fit start: from its start edge anyway), from its start edge when larger — its left in English, its right in Hebrew (edge end: the other one). Read by the capture script, src/lib/screens.ts and tests/legibility.spec.ts.",
+  "breakpoint": 960,
+  "windows": [1440, 390],
+  "slots": {
+    "news": {
+      "where": "the home page's What's new (/, /he/), three per page",
+      "keys": ["map-ages", "ask-the-map", "design-studio"],
+      "drawn": {
+        "start": {
+          "light": { "1440": 376.7, "390": 352.5 },
+          "dark": { "1440": 356.7, "390": 332.5 }
+        },
+        "result": {
+          "light": { "1440": 376.7, "390": 352.5 },
+          "dark": { "1440": 356.7, "390": 332.5 }
+        }
+      },
+      "crop": { "width": 330, "height": 206, "serve": 756, "quality": 70 },
+      "phone": null
+    },
+    "atlas": {
+      "where": "the home page's atlas previews, desktop only; light set only in auto (AtlasIndex.astro)",
+      "keys": [
+        "ip-plan",
+        "rack-studio",
+        "discovery-queue",
+        "topology-observed",
+        "design-studio",
+        "compliance",
+        "nac",
+        "dashboard",
+        "gallery"
+      ],
+      "drawn": {
+        "start": {
+          "light": { "1440": 478, "390": null },
+          "dark": { "1440": 458, "390": null }
+        },
+        "result": {
+          "light": { "1440": 478, "390": null },
+          "dark": { "1440": 458, "390": null }
+        }
+      },
+      "crop": { "width": 456, "height": 285, "serve": 958 },
+      "phone": null
+    },
+    "band": {
+      "where": "the home page's Hebrew band: the same screen in English and in Hebrew, side by side",
+      "keys": ["dashboard"],
+      "drawn": {
+        "start": {
+          "light": { "1440": 582, "390": 352.5 },
+          "dark": { "1440": 562, "390": 332.5 }
+        },
+        "result": {
+          "light": { "1440": 582, "390": 352.5 },
+          "dark": { "1440": 562, "390": 332.5 }
+        }
+      },
+      "crop": { "width": 560, "height": 350, "serve": 1166 },
+      "phone": { "width": 330, "height": 206, "serve": 707 }
+    },
+    "loop": {
+      "where": "the home page's loop figure: the whole window's top 2:1 band on a desktop",
+      "keys": ["discovery-queue"],
+      "drawn": {
+        "start": {
+          "light": { "1440": 1198, "390": 352.5 },
+          "dark": { "1440": 1178, "390": 332.5 }
+        },
+        "result": {
+          "light": { "1440": 1198, "390": 352.5 },
+          "dark": { "1440": 1178, "390": 332.5 }
+        }
+      },
+      "crop": null,
+      "full": { "width": 1440, "height": 900, "serve": 2398 },
+      "phone": { "width": 330, "height": 165, "serve": 707 }
+    },
+    "figure": {
+      "where": "/product's numbered figures (AnnotatedScreen.astro), Fig. 1-10",
+      "keys": [
+        "ipam-tree",
+        "rack",
+        "discovery-queue",
+        "map-ages",
+        "design-studio",
+        "compliance",
+        "nac",
+        "dashboard",
+        "gallery",
+        "licence"
+      ],
+      "drawn": {
+        "start": {
+          "light": { "1440": 755.3, "390": 352.5 },
+          "dark": { "1440": 735.3, "390": 332.5 }
+        },
+        "result": {
+          "light": { "1440": 755.3, "390": 352.5 },
+          "dark": { "1440": 735.3, "390": 332.5 }
+        }
+      },
+      "crop": { "width": 733, "height": 458, "serve": 1513 },
+      "phone": { "width": 330, "height": 206, "serve": 707 }
+    }
+  },
+  "focus": {
+    "map-ages": {
+      "news": {
+        "text": "verified on the wire|אומת ברשת",
+        "card": 250,
+        "note": "the open line card: one cable, verified on the wire, and how long ago"
+      },
+      "figure": {
+        "text": "verified on the wire|אומת ברשת",
+        "card": 250,
+        "note": "the open line card among the lines it belongs to"
+      },
+      "figure-phone": {
+        "text": "verified on the wire|אומת ברשת",
+        "card": 250,
+        "note": "the open line card"
+      }
+    },
+    "ask-the-map": {
+      "news": {
+        "selector": "[data-question-answer]",
+        "note": "the answer under the question bar"
+      }
+    },
+    "design-studio": {
+      "news": {
+        "selector": ".react-flow__node.selected",
+        "note": "the selected switch on the canvas"
+      },
+      "atlas": {
+        "selector": ".react-flow__node.selected",
+        "note": "the selected switch on the canvas"
+      },
+      "figure": {
+        "selector": ".react-flow__node.selected",
+        "note": "the selected switch and the canvas around it"
+      },
+      "figure-phone": {
+        "selector": ".react-flow__node.selected",
+        "note": "the selected switch"
+      }
+    },
+    "ip-plan": {
+      "atlas": {
+        "selector": "[data-address-map]",
+        "pad": 0,
+        "note": "the address map card's first rows (from its edge: the line above it is an empty state)"
+      }
+    },
+    "rack-studio": {
+      "atlas": {
+        "selector": "main svg",
+        "largest": true,
+        "note": "the top of the rack under the power lens"
+      }
+    },
+    "discovery-queue": {
+      "atlas": {
+        "selector": "[data-queue]",
+        "note": "the queue's count and its first groups"
+      },
+      "loop-phone": {
+        "selector": "[data-queue]",
+        "note": "the queue's count and its first group"
+      },
+      "figure": {
+        "selector": "[data-queue]",
+        "note": "the queue's count and its first groups"
+      },
+      "figure-phone": {
+        "selector": "[data-queue]",
+        "note": "the queue's count and its first group"
+      }
+    },
+    "topology-observed": {
+      "atlas": {
+        "selector": ".react-flow__edge.topo-focus",
+        "note": "the focused observed link and the two devices it joins"
+      }
+    },
+    "compliance": {
+      "atlas": {
+        "selector": "#report-compliance",
+        "note": "the compliance section's heading and first findings"
+      },
+      "figure": {
+        "selector": "#report-compliance",
+        "note": "the compliance section's heading and first findings"
+      },
+      "figure-phone": {
+        "selector": "#report-compliance",
+        "note": "the compliance section's heading and its counts by severity, pack and site"
+      }
+    },
+    "nac": {
+      "atlas": {
+        "selector": "[data-nac-banner]",
+        "note": "the mode banner: detection only"
+      },
+      "figure": {
+        "selector": "[data-nac-banner]",
+        "note": "the mode banner and the counts under it"
+      },
+      "figure-phone": {
+        "selector": "[data-nac-banner]",
+        "note": "the mode banner"
+      }
+    },
+    "dashboard": {
+      "atlas": {
+        "selector": "[data-tour-id=\"tour:dash-grid\"]",
+        "note": "the first row of widgets"
+      },
+      "band": {
+        "selector": "[data-tour-id=\"tour:dash-grid\"]",
+        "note": "the first widgets, with their numbers"
+      },
+      "band-phone": {
+        "selector": "[data-tour-id=\"tour:dash-grid\"]",
+        "note": "the first widget"
+      },
+      "figure": {
+        "selector": "[data-tour-id=\"tour:dash-grid\"]",
+        "note": "offline devices, failed scans and the monitors' events"
+      },
+      "figure-phone": {
+        "selector": "[data-tour-id=\"tour:dash-grid\"]",
+        "note": "the offline devices widget"
+      }
+    },
+    "gallery": {
+      "atlas": {
+        "selector": "[data-gallery-collection=\"showcase\"]",
+        "note": "the Showcase row"
+      },
+      "figure": {
+        "selector": "[data-gallery-hero]",
+        "edge": "end",
+        "note": "the Showcase's first entry: its name, who it is for, and Preview, Follow, Make it mine (from the entry's far edge, where its text is)"
+      },
+      "figure-phone": {
+        "selector": "[data-gallery-hero] > :last-child",
+        "note": "the Showcase's first entry: its name, who it is for, and its actions"
+      }
+    },
+    "ipam-tree": {
+      "figure": {
+        "selector": "[role=\"tree\"]",
+        "note": "the first rows of the tree: a site, its VRFs, their prefixes"
+      },
+      "figure-phone": {
+        "selector": "[role=\"tree\"]",
+        "note": "the first rows of the tree"
+      }
+    },
+    "rack": {
+      "figure": {
+        "union": ["[data-lens-switcher]", { "selector": "main svg", "largest": true }],
+        "fit": "start",
+        "note": "the lenses beside the front elevation's top units (the caption: its lenses beside the elevation)"
+      },
+      "figure-phone": {
+        "selector": "main svg",
+        "largest": true,
+        "note": "three units of the elevation"
+      }
+    },
+    "licence": {
+      "figure": {
+        "selector": "[data-license-state=\"evaluation\"]",
+        "note": "the licence card in its evaluation state"
+      },
+      "figure-phone": {
+        "selector": "[data-license-state=\"evaluation\"]",
+        "note": "the licence state"
+      }
+    }
+  }
+}

@@ -211,8 +211,42 @@ for (const [path, pageLang, browserLocale] of [
   });
 }
 
-/** The W3 screen sets: every key in Survey and Night chart, en and he, full and focus crop. */
-const screensDir = join(process.cwd(), "src", "assets", "screens");
+/** The screen sets (W3; W11): every key in Survey and Night chart, en and he — its whole window
+ *  and each slot's crop — recorded in media-library/screens/ and served from public/screens/. */
+const libraryDir = join(process.cwd(), "media-library", "screens");
+const servedDir = join(process.cwd(), "public", "screens");
+const slotTable = JSON.parse(
+  readFileSync(join(process.cwd(), "src", "content", "screen-slots.json"), "utf8"),
+) as {
+  slots: Record<
+    string,
+    {
+      keys: string[];
+      crop: { width: number; height: number; serve: number } | null;
+      phone: { width: number; height: number; serve: number } | null;
+      full?: { width: number; height: number; serve: number };
+    }
+  >;
+};
+/** Every crop the slots ask for: { key, picture, width, height (CSS px), serve (px) }. */
+const crops = Object.entries(slotTable.slots).flatMap(([slot, s]) =>
+  s.keys.flatMap((key) => [
+    ...(s.crop ? [{ key, picture: slot, ...s.crop }] : []),
+    ...(s.phone ? [{ key, picture: `${slot}-phone`, ...s.phone }] : []),
+  ]),
+);
+/** A WebP file's pixel size, from its header (as src/lib/screens.ts → webpSize). */
+function webpSize(file: string): { width: number; height: number } {
+  const b = readFileSync(file);
+  const chunk = b.toString("ascii", 12, 16);
+  if (chunk === "VP8 ")
+    return { width: b.readUInt16LE(26) & 0x3fff, height: b.readUInt16LE(28) & 0x3fff };
+  if (chunk === "VP8L") {
+    const bits = b.readUInt32LE(21);
+    return { width: (bits & 0x3fff) + 1, height: ((bits >> 14) & 0x3fff) + 1 };
+  }
+  return { width: b.readUIntLE(24, 3) + 1, height: b.readUIntLE(27, 3) + 1 };
+}
 const W3_KEYS = [
   "dashboard",
   "ipam-tree",
@@ -236,87 +270,129 @@ function pngSize(file: string): { width: number; height: number } {
   return { width: b.readUInt32BE(16), height: b.readUInt32BE(20) };
 }
 
-test.describe("screen sets on disk (W3)", () => {
+test.describe("screen sets on disk (W3, W11)", () => {
   test.beforeEach(() => {
     test.skip(siteProject().theme !== "light", "a source check: light project only");
   });
+  type Clip = { x: number; y: number; width: number; height: number };
+  type Anchor = { name: string; x: number; y: number; w: number; h: number };
   const record = JSON.parse(
     readFileSync(join(process.cwd(), "media-library", "screens", "CAPTURED.json"), "utf8"),
-  ) as { sets: string[]; locales: string[]; undone?: string[]; keys: Record<string, unknown> };
+  ) as {
+    sets: string[];
+    locales: string[];
+    undone?: string[];
+    keys: Record<string, { clips?: Record<string, Record<string, Clip>> }>;
+  };
   const anchors = JSON.parse(
     readFileSync(join(process.cwd(), "src", "content", "screen-anchors.json"), "utf8"),
   ) as Record<
     string,
-    Record<
-      string,
-      Record<
-        string,
-        {
-          clip: { x: number; y: number; width: number; height: number };
-          full: { name: string; x: number; y: number; w: number; h: number }[];
-          focus: { name: string; x: number; y: number; w: number; h: number }[];
-        }
-      >
-    >
+    Record<string, Record<string, { clips: Record<string, Clip> } & Record<string, unknown>>>
   >;
+  const undone = new Set(record.undone ?? []);
+  const each = (fn: (set: string, locale: string) => void) => {
+    for (const set of ["survey", "night-chart"]) for (const locale of ["en", "he"]) fn(set, locale);
+  };
 
-  test("only the survey and night-chart sets; no light or nightwire screen folder", () => {
-    expect(readdirSync(screensDir).sort()).toEqual(["night-chart", "survey"]);
+  test("only the survey and night-chart sets; no light or nightwire screen folder; no src/assets/screens", () => {
+    expect(existsSync(join(process.cwd(), "src", "assets", "screens"))).toBe(false);
+    expect(readdirSync(servedDir).sort()).toEqual(["night-chart", "survey"]);
     expect(
-      readdirSync(join(process.cwd(), "media-library", "screens"))
-        .filter((f) => !f.endsWith(".json"))
+      readdirSync(libraryDir)
+        .filter((f) => !f.endsWith(".json") && !f.endsWith(".md"))
         .sort(),
     ).toEqual(["night-chart", "survey"]);
     expect(record.sets).toEqual(["night-chart", "survey"]);
   });
 
-  test("each of the fifteen keys exists in both sets and both locales, full and crop (or is listed as undone)", () => {
-    const undone = new Set(record.undone ?? []);
-    for (const set of ["survey", "night-chart"])
-      for (const locale of ["en", "he"])
-        for (const key of W3_KEYS) {
+  test("each of the fifteen keys has its whole window, 2,880 × 1,800, in both sets and locales (or is listed as undone)", () => {
+    each((set, locale) => {
+      for (const key of W3_KEYS) {
+        if (undone.has(`${set}/${locale}/${key}`)) continue;
+        const file = join(libraryDir, set, locale, `${key}.png`);
+        expect(existsSync(file), `${set}/${locale}/${key}.png`).toBe(true);
+        expect([pngSize(file).width, pngSize(file).height], file).toEqual([2880, 1800]);
+      }
+    });
+  });
+
+  test("every slot crop exists in both sets and locales, recorded and served, at its serve size", () => {
+    each((set, locale) => {
+      for (const c of crops) {
+        if (undone.has(`${set}/${locale}/${c.key}`)) continue;
+        const name = `${set}/${locale}/${c.key}.${c.picture}`;
+        const png = join(libraryDir, set, locale, `${c.key}.${c.picture}.png`);
+        const webp = join(servedDir, set, locale, `${c.key}.${c.picture}.webp`);
+        expect(existsSync(png), `${name}.png`).toBe(true);
+        expect(existsSync(webp), `${name}.webp`).toBe(true);
+        const size = { width: c.serve, height: Math.round((c.serve * c.height) / c.width) };
+        expect(pngSize(png), `${name}.png`).toEqual(size);
+        expect(webpSize(webp), `${name}.webp`).toEqual(size);
+      }
+      // The whole windows the slots draw: the loop's, and each figure's "Open the full screen".
+      for (const [slot, s] of Object.entries(slotTable.slots))
+        for (const key of s.keys) {
           if (undone.has(`${set}/${locale}/${key}`)) continue;
-          for (const file of [`${key}.png`, `${key}.focus.png`])
-            expect(
-              existsSync(join(screensDir, set, locale, file)),
-              `${set}/${locale}/${file}`,
-            ).toBe(true);
+          if (s.full)
+            expect(webpSize(join(servedDir, set, locale, `${key}.${slot}.webp`)).width).toBe(
+              s.full.serve,
+            );
+          if (slot === "figure")
+            expect(webpSize(join(servedDir, set, locale, `${key}.webp`))).toEqual({
+              width: 2880,
+              height: 1800,
+            });
         }
+    });
   });
 
-  test("full windows are 2,880 × 1,800; crops are at least 1,520 wide", () => {
-    for (const set of ["survey", "night-chart"])
-      for (const locale of ["en", "he"])
-        for (const file of readdirSync(join(screensDir, set, locale)).filter((f) =>
-          f.endsWith(".png"),
-        )) {
-          const { width, height } = pngSize(join(screensDir, set, locale, file));
-          if (file.endsWith(".focus.png")) {
-            expect(width, file).toBeGreaterThanOrEqual(1520);
-            expect(height, file).toBeGreaterThanOrEqual(950);
-          } else expect([width, height], `${set}/${locale}/${file}`).toEqual([2880, 1800]);
+  test("every crop's clip is recorded, no wider than its slot's crop; every anchor lies inside its picture", () => {
+    each((set, locale) => {
+      for (const key of W3_KEYS) {
+        if (undone.has(`${set}/${locale}/${key}`)) continue;
+        const a = anchors[set]?.[locale]?.[key];
+        expect(a, `${set}/${locale}/${key}`).toBeTruthy();
+        for (const n of (a!["full"] ?? []) as Anchor[]) {
+          expect(n.x + n.w, `${key} ${n.name}`).toBeLessThanOrEqual(2880);
+          expect(n.y + n.h, `${key} ${n.name}`).toBeLessThanOrEqual(1800);
+          expect(Math.min(n.x, n.y, n.w, n.h)).toBeGreaterThanOrEqual(0);
         }
+      }
+      for (const c of crops) {
+        if (undone.has(`${set}/${locale}/${c.key}`)) continue;
+        const a = anchors[set]![locale]![c.key]!;
+        const clip = a.clips[c.picture];
+        const name = `${set}/${locale}/${c.key}.${c.picture}`;
+        expect(clip, name).toBeTruthy();
+        expect([clip!.width, clip!.height], name).toEqual([c.width, c.height]);
+        expect(clip!.x + clip!.width, `${name} inside the window`).toBeLessThanOrEqual(1440);
+        expect(clip!.y + clip!.height, `${name} inside the window`).toBeLessThanOrEqual(900);
+        expect(Math.min(clip!.x, clip!.y)).toBeGreaterThanOrEqual(0);
+        expect(record.keys[c.key]?.clips?.[`${set}/${locale}`]?.[c.picture], name).toEqual(clip);
+        for (const n of (a[c.picture] ?? []) as Anchor[]) {
+          expect(n.x + n.w, `${name} ${n.name}`).toBeLessThanOrEqual(clip!.width * 2);
+          expect(n.y + n.h, `${name} ${n.name}`).toBeLessThanOrEqual(clip!.height * 2);
+          expect(Math.min(n.x, n.y, n.w, n.h)).toBeGreaterThanOrEqual(0);
+        }
+      }
+    });
   });
 
-  test("every crop has its clip recorded, and every anchor lies inside its image", () => {
-    for (const set of ["survey", "night-chart"])
-      for (const locale of ["en", "he"])
-        for (const key of W3_KEYS) {
-          const a = anchors[set]?.[locale]?.[key];
-          expect(a, `${set}/${locale}/${key}`).toBeTruthy();
-          const crop = pngSize(join(screensDir, set, locale, `${key}.focus.png`));
-          expect([a!.clip.width * 2, a!.clip.height * 2]).toEqual([crop.width, crop.height]);
-          for (const n of a!.full) {
-            expect(n.x + n.w, `${key} ${n.name}`).toBeLessThanOrEqual(2880);
-            expect(n.y + n.h, `${key} ${n.name}`).toBeLessThanOrEqual(1800);
-            expect(Math.min(n.x, n.y, n.w, n.h)).toBeGreaterThanOrEqual(0);
-          }
-          for (const n of a!.focus) {
-            expect(n.x + n.w, `${key} ${n.name} (crop)`).toBeLessThanOrEqual(crop.width);
-            expect(n.y + n.h, `${key} ${n.name} (crop)`).toBeLessThanOrEqual(crop.height);
-            expect(Math.min(n.x, n.y, n.w, n.h)).toBeGreaterThanOrEqual(0);
-          }
-        }
+  test("no W3 focus crop is left (*.focus.png), and nothing in src/ names one", () => {
+    const left: string[] = [];
+    const walk = (dir: string) => {
+      if (!existsSync(dir)) return;
+      for (const e of readdirSync(dir, { withFileTypes: true })) {
+        const full = join(dir, e.name);
+        if (e.isDirectory()) walk(full);
+        else if (/\.focus\.(png|webp)$/.test(e.name)) left.push(full);
+        else if (/\.(astro|ts|json|mjs)$/.test(e.name) && full.includes("/src/"))
+          if (readFileSync(full, "utf8").includes(".focus.png")) left.push(full);
+      }
+    };
+    for (const dir of ["src", "public", "media-library"]) walk(join(process.cwd(), dir));
+    expect(left).toEqual([]);
   });
 
   test("the retired deep-discovery key appears nowhere in src/", () => {
@@ -335,12 +411,10 @@ test.describe("screen sets on disk (W3)", () => {
 });
 
 test.describe("screen slots", () => {
-  /** The capture set a project's build shows (src/lib/screens.ts → findScreen). */
+  /** The capture set a project's build shows (src/lib/screens.ts → screenSets). */
   const screenSet = () => (siteProject().theme === "dark" ? "night-chart" : "survey");
   const captured = (locale: string, key: string) =>
-    [`${key}.png`, `${key}.focus.png`].some((f) =>
-      existsSync(join(process.cwd(), "src", "assets", "screens", screenSet(), locale, f)),
-    );
+    existsSync(join(servedDir, screenSet(), locale, `${key}.news.webp`));
 
   for (const [path, locale] of [
     ["/", "en"],

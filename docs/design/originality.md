@@ -267,7 +267,7 @@ Hebrew display cut stays 600.
   vellum a translucent card film with paper-ink lines and boxes, the drift mark pink, the
   resolved link emerald, registration marks paper ink at reduced opacity. Timeline, pause,
   offscreen pause and the reduced-motion frame are unchanged.
-- **Screenshots** are the product's Night chart captures (`src/assets/screens/night-chart/`);
+- **Screenshots** are the product's Night chart captures (`public/screens/night-chart/`);
   W3 replaced the Nightwire set, whose near-black and cyan sat close to NetBox. Frames get a
   `--lc-rule-strong` hairline and a card-indigo mat, so the product window reads as an object on
   the table, not as the page.

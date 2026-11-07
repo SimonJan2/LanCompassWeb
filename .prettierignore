@@ -6,7 +6,7 @@ dist-*/
 test-results/
 playwright-report/
 package-lock.json
-src/assets/screens/
+public/screens/
 public/media/
 # W6: the release's SBOM, byte-identical to the bundle's (its SHA-256 is on /verify/).
 public/verify/
