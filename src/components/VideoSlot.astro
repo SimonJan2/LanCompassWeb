@@ -142,7 +142,7 @@ const captionLabels: Record<Locale, string> = Object.fromEntries(
     inset: 0;
     inline-size: 100%;
     block-size: 100%;
-    border-radius: var(--lc-radius);
+    border-radius: var(--lc-radius-window);
     object-fit: cover;
   }
 
@@ -156,13 +156,19 @@ const captionLabels: Record<Locale, string> = Object.fromEntries(
     background: transparent;
   }
 
+  /* W14 (DECISIONS.md D-FRAME): a player is a window too — the screenshots' edge, corners and
+     lift (ScreenshotFrame.astro; by night the glow, src/styles/night.css), but no title bar: the
+     player keeps its box, so nothing moves. */
   .video .video-el,
   .video .video-poster {
     inline-size: 100%;
     aspect-ratio: 16 / 9;
-    border: 1px solid var(--lc-rule-strong);
-    border-radius: var(--lc-radius);
-    background: var(--lc-paper-raised);
+    border: 1px solid var(--lc-window-edge);
+    border-radius: var(--lc-radius-window);
+    background: var(--lc-paper-raised) padding-box;
+    box-shadow:
+      0 1px 2px var(--lc-window-lift-near),
+      0 26px 50px -20px var(--lc-window-lift-far);
   }
 
   .video .video-poster {

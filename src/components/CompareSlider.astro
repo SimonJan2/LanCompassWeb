@@ -48,8 +48,17 @@ const s = getCopy(locale).showcase;
 </section>
 
 <style is:global>
+  /* W14 (DECISIONS.md D-TABLE): the slider sits on the chart table, across the whole window
+     although the section is the site's centred column: a border-image, its outset as wide as the
+     window, paints the table and its hairline on either side (no wrapper element; the body clips
+     what passes the window's edge, so nothing scrolls sideways). The hairline closes the table at
+     its bottom, with room under the legend (1rem before the table); at its top the section bar's
+     own ink rule is the line. */
   .compare {
-    padding-block: clamp(3rem, 2.5rem + 3vw, 5rem) 1rem;
+    padding-block: clamp(3rem, 2.5rem + 3vw, 5rem) clamp(2rem, 1.5rem + 2vw, 3rem);
+    background: var(--lc-table);
+    border-image: linear-gradient(var(--lc-table) calc(100% - 1px), var(--lc-table-rule) 0) 0 fill /
+      0 / 0 100vw;
   }
 
   /* The two windows share one cell; the second (Night chart) is drawn on the inline-end side of

@@ -28,6 +28,17 @@
     0.14
   ); /* @surface — indigo-tinted shadow, composited over paper ΔE 24.5 */
 
+  /* W14 (DECISIONS.md D-FRAME, D-TABLE): a product picture is an app window (an edge ΔE ≥ 15
+     from its ground, a title bar, a lift in two layers), and the sections that show the product
+     sit on the chart table, a ground a step off the page. ScreenshotFrame composes them. */
+  --lc-window-edge: rgba(28, 33, 64, 0.36); /* @surface ΔE 29.9 — 19.7 on paper, 19.4 on table */
+  --lc-window-bar: #e6e0d3; /* @surface ΔE 23.0 — the title bar */
+  --lc-window-lift-near: rgba(28, 33, 64, 0.1); /* @surface ΔE 24.1 — the lift's near layer */
+  --lc-window-lift-far: rgba(28, 33, 64, 0.45); /* @surface ΔE 33.7 — the lift's far layer */
+  --lc-window-ink: #4a4e5a; /* @text 6.31:1 on the bar — the label, "LanCompass 0.7.0" */
+  --lc-table: #e0d8c7; /* @surface ΔE 22.9 — 6.9 from paper, 4.2 from sunk */
+  --lc-table-rule: #d1c9b8; /* @surface ΔE 23.2 — the table's hairline, top and bottom */
+
   /* Night: the accent band (at most two per page). Deep indigo, not neutral black. */
   --lc-night: #1c2140; /* @surface ΔE 16.2 */
   --lc-night-raised: #262c55; /* @surface ΔE 18.5 */
@@ -88,6 +99,7 @@
   --lc-section: clamp(4.5rem, 2.5rem + 7vw, 9rem);
   --lc-radius: 4px;
   --lc-radius-sm: 3px;
+  --lc-radius-window: 10px; /* W14: a product picture's window, and the videos' players */
 
   /* Motion. Springs are defined once, as linear() curves; micro-interactions stay ≤ 200 ms. */
   --lc-spring: linear(
@@ -182,6 +194,17 @@
   --lc-dark-drift-wash: #3a2142; /* @surface ΔE 19.2 */
   --lc-dark-observed: #9db4ff; /* @accent ΔE 36.8 — periwinkle: 8.21 / 7.23 / 6.57, 6.20 on its wash */
   --lc-dark-observed-wash: #252f66; /* @surface ΔE 19.2 */
+
+  /* W14: the window by night stands off by light, a periwinkle glow, never by a darker layer
+     (a near-black one is within ΔE 15 of NetBox); the table is lamp-lit, lighter than the page. */
+  --lc-dark-window-edge: #6d76b8; /* @surface ΔE 34.7 — 32.2 on night, 27.5 on the table */
+  --lc-dark-window-bar: #2a3062; /* @surface ΔE 19.7 — the title bar */
+  --lc-dark-window-lift-near: rgba(14, 18, 50, 0.5); /* @surface ΔE 15.9 over night */
+  --lc-dark-window-lift-far: rgba(14, 18, 50, 0.75); /* @surface ΔE 15.7 over night */
+  --lc-dark-window-glow: rgba(140, 165, 255, 0.32); /* @surface ΔE 22.2 over night — the lamp */
+  --lc-dark-window-ink: #b7bbd4; /* @text 6.52:1 on the bar */
+  --lc-dark-table: #222859; /* @surface ΔE 19.1 — 6.2 from night, and lighter */
+  --lc-dark-table-rule: #343b6e; /* @surface ΔE 21.0 — the table's hairline */
 }
 
 /* @night-rules: the mapping. Semantic token → dark value; nothing here defines a colour. */
@@ -225,6 +248,16 @@
   --lc-observed: var(--lc-dark-observed);
   --lc-observed-night: var(--lc-dark-observed);
   --lc-observed-wash: var(--lc-dark-observed-wash);
+
+  /* W14: the window and the table. The glow is the night's alone (night.css composes it). */
+  --lc-window-edge: var(--lc-dark-window-edge);
+  --lc-window-bar: var(--lc-dark-window-bar);
+  --lc-window-lift-near: var(--lc-dark-window-lift-near);
+  --lc-window-lift-far: var(--lc-dark-window-lift-far);
+  --lc-window-glow: var(--lc-dark-window-glow);
+  --lc-window-ink: var(--lc-dark-window-ink);
+  --lc-table: var(--lc-dark-table);
+  --lc-table-rule: var(--lc-dark-table-rule);
 
   color-scheme: dark;
 }

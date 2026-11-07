@@ -209,16 +209,20 @@ const picProps = marked ? { class: "shot-pic" } : {};
 
 <style is:global>
   /* The window: since W3 the product's own themes are the site's pair (a Survey window on
-     survey paper, a Night chart window on Night chart), so the frame gives the window an edge
-     of its own: the strong hairline (ΔE2000 ≥ 10 from the page ground, tests/identity.spec.ts),
-     a raised plate and a sunk title bar, and a box-shadow in the site's indigo, never black.
+     survey paper, a Night chart window on Night chart), so since W14 (DECISIONS.md D-FRAME) every
+     picture is drawn as an app window that stands off the page: an edge ΔE2000 ≥ 15 from its
+     ground (tests/identity.spec.ts), corners of a window, a title bar that names it, and a lift
+     in two layers of the site's indigo by day — by night src/styles/night.css adds a periwinkle
+     glow instead of a darker layer. The edge is translucent, drawn over the ground, not the plate.
      (Comments here avoid bare Tailwind words: Tailwind scans every file for class names.) */
   .shot {
     overflow: hidden;
-    border: 1px solid var(--lc-rule-strong);
-    border-radius: var(--lc-radius);
-    background: var(--lc-paper-raised);
-    box-shadow: 0 30px 60px -40px var(--lc-shadow);
+    border: 1px solid var(--lc-window-edge);
+    border-radius: var(--lc-radius-window);
+    background: var(--lc-paper-raised) padding-box;
+    box-shadow:
+      0 1px 2px var(--lc-window-lift-near),
+      0 26px 50px -20px var(--lc-window-lift-far);
   }
 
   /* The title bar's three window dots, drawn (no elements: W2 keeps the home page inside its
@@ -230,13 +234,32 @@ const picProps = marked ? { class: "shot-pic" } : {};
       var(--lc-rule-strong) 3px 4px,
       transparent 4.5px
     );
-    block-size: 27px;
-    border-block-end: 1px solid var(--lc-rule-strong);
+    position: relative;
+    block-size: 30px;
+    border-block-end: 1px solid var(--lc-window-edge);
     background:
-      var(--dot) 12px 9px / 8px 8px no-repeat,
-      var(--dot) 26px 9px / 8px 8px no-repeat,
-      var(--dot) 40px 9px / 8px 8px no-repeat,
-      var(--lc-paper-sunk);
+      var(--dot) 12px 10px / 8px 8px no-repeat,
+      var(--dot) 26px 10px / 8px 8px no-repeat,
+      var(--dot) 40px 10px / 8px 8px no-repeat,
+      var(--lc-window-bar);
+  }
+
+  /* The window's name: "LanCompass" and the release the pictures show, generated content (the
+     build writes --lc-window-label from the capture's record: astro.config.mjs → themeCss), so no
+     HTML byte; the bar is aria-hidden. Latin in both languages, centred, clear of the dots (the
+     bar's first 52 px) on either side. On a narrow figure it follows the dots instead, clear of
+     the "Survey | Night chart" control at the bar's right end (AnnotatedScreen.astro). */
+  .shot .shot-bar::after {
+    position: absolute;
+    inset: 0;
+    padding-inline: 60px;
+    color: var(--lc-window-ink);
+    content: var(--lc-window-label);
+    direction: ltr;
+    font: 400 0.6875rem/29px var(--lc-font-mono);
+    letter-spacing: 0.06em;
+    text-align: center;
+    white-space: nowrap;
   }
 
   .shot .shot-img {

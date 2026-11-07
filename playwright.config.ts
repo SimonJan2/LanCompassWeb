@@ -36,6 +36,8 @@ const themed = [
   // W13: the switch (auto builds; it checks that light and dark have none) and the showcase.
   "theme-switch",
   "showcase",
+  // W14: the product's pictures as windows, and the table they sit on.
+  "frames",
 ].map((name) => `${name}.spec.ts`);
 
 export default defineConfig({

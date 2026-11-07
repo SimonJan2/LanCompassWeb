@@ -269,8 +269,58 @@ Hebrew display cut stays 600.
   offscreen pause and the reduced-motion frame are unchanged.
 - **Screenshots** are the product's Night chart captures (`public/screens/night-chart/`);
   W3 replaced the Nightwire set, whose near-black and cyan sat close to NetBox. Frames get a
-  `--lc-rule-strong` hairline and a card-indigo mat, so the product window reads as an object on
-  the table, not as the page.
+  card-indigo mat, so the product window reads as an object on the table, not as the page; since
+  W14 they are app windows with a periwinkle glow (below).
 - **OG images**: indigo ground, paper title, the compass tile, the two-sheets motif in night
   colours (`src/lib/og.ts` with `src/lib/palette.ts`). `auto` keeps paper cards: social cards
   have no colour scheme.
+
+## The window and the table (W14)
+
+The site and the product share their palette (C-THM-1: Survey and Night chart are both), so a
+product picture drawn at the product's own size melted into the page. Since W14 (DECISIONS.md
+D-FRAME, D-TABLE) the palette stays and every product picture is an **app window**
+(`ScreenshotFrame.astro`, the videos' players in `VideoSlot.astro`): an edge ΔE2000 ≥ 15 from its
+ground, 10 px corners, a title bar naming "LanCompass" and the pictures' release (CSS generated
+content, `--lc-window-label` from `media-library/screens/CAPTURED.json`), and a lift in two
+layers of indigo by day; by night a periwinkle **glow** between two indigo layers
+(`src/styles/night.css`), because a darker layer would be near-black, within ΔE 15 of NetBox. The
+sections whose pictures are the product sit on the **chart table**, a ground a step off the
+page — a deeper paper by day, a lamp-lit indigo by night, never darker than the page.
+
+Measured as `tests/identity.spec.ts` measures (translucent values composited over the theme's page,
+to whole channel values as it does), against the page, the sunk ground, the table and the nearest
+NetBox colour:
+
+| Token                        | Value                       | Tag      | Opaque    | vs page | vs sunk | vs table | Min ΔE to NetBox | ≥ 15   |
+| ---------------------------- | --------------------------- | -------- | --------- | ------- | ------- | -------- | ---------------- | ------ |
+| `--lc-window-edge`           | `rgba(28, 33, 64, 0.36)`    | @surface | `#a6a6ad` | 19.7    | 18.6    | 17.4     | 29.9 `#90EEB4`   | ✓      |
+| `--lc-window-bar`            | `#e6e0d3`                   | @surface | —         | 4.5     | 1.8     | 2.4      | 23.0 `#90EEB4`   | ✓      |
+| `--lc-window-lift-near`      | `rgba(28, 33, 64, 0.1)`     | @surface | `#dedcd9` | 4.9     | 4.4     | 6.2      | 24.1 `#90EEB4`   | ✓      |
+| `--lc-window-lift-far`       | `rgba(28, 33, 64, 0.45)`    | @surface | `#93939e` | 25.7    | 24.6    | 23.2     | 33.7 `#FF2F13`   | ✓      |
+| `--lc-window-ink`            | `#4a4e5a`                   | @text    | —         | —       | —       | —        | —                | exempt |
+| `--lc-table`                 | `#e0d8c7`                   | @surface | —         | 6.9     | 4.2     | —        | 22.9 `#90EEB4`   | ✓      |
+| `--lc-table-rule`            | `#d1c9b8`                   | @surface | —         | 10.0    | 7.3     | 3.6      | 23.2 `#90EEB4`   | ✓      |
+| `--lc-dark-window-edge`      | `#6d76b8`                   | @surface | —         | 32.2    | 30.5    | 27.5     | 34.7 `#023035`   | ✓      |
+| `--lc-dark-window-bar`       | `#2a3062`                   | @surface | —         | 8.2     | 6.1     | 2.5      | 19.7 `#012229`   | ✓      |
+| `--lc-dark-window-lift-near` | `rgba(14, 18, 50, 0.5)`     | @surface | `#131737` | 1.6     | 3.4     | 7.3      | 15.9 `#02060A`   | ✓      |
+| `--lc-dark-window-lift-far`  | `rgba(14, 18, 50, 0.75)`    | @surface | `#101535` | 2.2     | 3.9     | 7.7      | 15.7 `#02060A`   | ✓      |
+| `--lc-dark-window-glow`      | `rgba(140, 165, 255, 0.32)` | @surface | `#3c487a` | 15.1    | 13.4    | 10.2     | 22.2 `#252929`   | ✓      |
+| `--lc-dark-window-ink`       | `#b7bbd4`                   | @text    | —         | —       | —       | —        | —                | exempt |
+| `--lc-dark-table`            | `#222859`                   | @surface | —         | 6.2     | 3.9     | —        | 19.1 `#012229`   | ✓      |
+| `--lc-dark-table-rule`       | `#343b6e`                   | @surface | —         | 11.3    | 9.4     | 6.1      | 21.0 `#252929`   | ✓      |
+
+- **The edge over each of its grounds** (the rule: ≥ 15): by day 19.7 on paper, 19.5 on the sunk
+  ground, 19.4 on the table; by night 32.2, 30.5 and 27.5. Before W14 the edge was
+  `--lc-rule-strong`, 1.82:1 on paper and 2.41:1 on the night page, held to ≥ 10.
+- **The table's steps**: by day 6.9 from paper and 4.2 from the sunk ground (rules: ≥ 5 and ≥ 4;
+  the brief's starting value `#e0d8c8` measured 3.95 from the sunk ground, so its blue channel
+  came down one step); by night 6.2 from the night page and lighter (L\* 18.3 against 11.5; the
+  rule: ≥ 5 and lighter).
+  A hairline in `--lc-table-rule` closes it where it meets the page's own grounds; a night band,
+  `/product`'s section bar, `/pilot`'s hero rule and the home datasheet's rule draw that line
+  themselves.
+- **Text on the table** keeps AA: by day ink 12.02:1, muted ink 5.86:1; by night ink 11.72:1,
+  muted 7.30:1. The window's name is 6.31:1 on its bar by day and 6.52:1 by night.
+- **Not used:** a near-black lift by night (`rgba(2, 3, 12, 0.95)`: ΔE 3.1 from `#02060A`); a
+  white inset highlight (`rgba(255, 255, 255, 0.08)`: 15.7, at the guard's edge).

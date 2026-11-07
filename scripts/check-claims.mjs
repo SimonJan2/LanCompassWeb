@@ -22,7 +22,8 @@
  *   - files that live in the signed bundle or in a night's evidence, not in the repository
  *     (`MANIFEST.json`, `SHA256SUMS`, `sbom.cdx.json`, `lancompass-release.pub`, `w6-facts/…`,
  *     the product's `dist/`) are listed as "outside the tag" and not failed: night C read them
- *     from the bundle (Reports/WEB_NIGHT_C/w6-facts/).
+ *     from the bundle (Reports/WEB_NIGHT_C/w6-facts/). So is the site's own capture record
+ *     (`media-library/…`, W14): tests/release.spec.ts ties it to the newest release.
  * Quoted evidence in a clause ("Every 15 minutes") is looked up, word for word, in the files that
  * clause names ("…" splits a quote into pieces that must each be there; Markdown emphasis, code
  * marks, comment markers and line breaks are ignored).
@@ -76,6 +77,7 @@ const OUTSIDE = [
   /^\d+-[a-z0-9-]+\.txt$/,
   /^dist\/?$/,
   /^lancompass-\d/,
+  /^media-library\//,
 ];
 
 const git = (...a) =>

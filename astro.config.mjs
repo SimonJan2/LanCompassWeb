@@ -46,11 +46,16 @@ if (!["light", "dark", "auto"].includes(siteTheme)) {
  *           data-theme="auto" into "light" or "dark" for a visitor who chose an override, so
  *           "dark" renders exactly as the dark build and "light" (no dark block applies) as the
  *           light build. Without an override nothing here applies: the page is today's auto.
+ * W14 (DECISIONS.md D-FRAME): every build also gets --lc-window-label, the name a product
+ * picture's title bar shows (ScreenshotFrame.astro, CSS generated content: no HTML byte), from the
+ * capture's own record, media-library/screens/CAPTURED.json → product_version: the release the
+ * pictures show, which tests/release.spec.ts ties to the newest release.
  * Tailwind reads imported stylesheets from disk, so this runs on global.css, before Tailwind.
  * @returns {import("vite").Plugin}
  */
 function themeCss() {
   const styles = fileURLToPath(new URL("./src/styles/", import.meta.url));
+  const captured = fileURLToPath(new URL("./media-library/screens/CAPTURED.json", import.meta.url));
   const read = (/** @type {string} */ name) => readFile(join(styles, name), "utf8");
   return {
     name: "lancompass:theme-css",
@@ -59,11 +64,21 @@ function themeCss() {
       if (!id.split("?")[0]?.endsWith("/src/styles/global.css")) return null;
       for (const name of ["tokens.css", "night.css", "auto.css"])
         this.addWatchFile(join(styles, name));
+      this.addWatchFile(captured);
       const tokens = await read("tokens.css");
       const [light = "", night = ""] = tokens.split("/* @night */");
       const cut = night.indexOf("/* @night-rules");
       const darkTokens = night.slice(0, cut);
       const mapping = night.slice(cut);
+      const record = await readFile(captured, "utf8").catch(() => {
+        throw new Error(
+          "themeCss: media-library/screens/CAPTURED.json is missing (a Docker build context must keep it: .dockerignore)",
+        );
+      });
+      const version = String(JSON.parse(record).product_version ?? "");
+      if (!/^\d+\.\d+\.\d+$/.test(version)) {
+        throw new Error(`themeCss: CAPTURED.json has no product_version (got "${version}")`);
+      }
       let css = light;
       if (siteTheme === "dark") css = `${tokens}\n${await read("night.css")}`;
       if (siteTheme === "auto") {
@@ -71,6 +86,7 @@ function themeCss() {
         const rules = dark.replaceAll('[data-theme="dark"]', '[data-theme="auto"]');
         css = `${light}\n${darkTokens}\n${await read("auto.css")}\n@media (prefers-color-scheme: dark) {\n${rules}\n}\n${dark}`;
       }
+      css += `\n:root {\n  --lc-window-label: "LanCompass ${version}";\n}\n`;
       const marker = '@import "./tokens.css";';
       if (!code.includes(marker)) throw new Error(`themeCss: ${marker} not found in global.css`);
       return { code: code.replace(marker, () => css), map: null };

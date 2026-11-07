@@ -166,8 +166,8 @@ Sections 3 to 7 are open: only the operator can do them.
 
 ## 8. The markers
 
-Every `TODO(operator)` in the repository after night F, from
-`git grep -n "TODO(operator)"` (generated; line numbers as of night F). None shows in the deploy:
+Every `TODO(operator)` in the repository after W14, from
+`git grep -n "TODO(operator)"` (generated; line numbers as of W14). None shows in the deploy:
 the visible ones need a value the deploy sets, or a form service it does not use.
 
 | File                                                 | Line   | Kind    | Shows only when                                                                                       |
@@ -177,7 +177,7 @@ the visible ones need a value the deploy sets, or a form service it does not use
 | `src/content/pages/en/privacy.mdx`, `he/privacy.mdx` | 27     | form    | `PUBLIC_FORM_ENDPOINT` is set: name the form service on `/privacy/` before using a form               |
 | `src/pages/[...lang]/verify.astro`                   | 52, 54 | a guard | `releases.json` or `fingerprints.json` lose the release's facts — never today                         |
 
-Text about the markers, not markers: `.env.example:8`, `README.md:48`, `:298`, `:390`,
+Text about the markers, not markers: `.env.example:8`, `README.md:48`, `:311`, `:403`,
 `src/config/site.ts:38`, `src/components/ContactEmail.astro:2`, `src/pages/[...lang]/verify.astro:8`,
 this file, and `docs/copy/he-review.md` (the W10 note, `:836`; the `ui.form.noContact` gloss,
 `:1299`). Tests that hold them: `tests/content.spec.ts`, `tests/flags.spec.ts`,

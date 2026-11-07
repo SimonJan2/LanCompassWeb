@@ -47,6 +47,13 @@ const s = getCopy(locale).showcase.sweep;
 </section>
 
 <style is:global>
+  /* W14 (DECISIONS.md D-TABLE): on the chart table, continuing What's new's above it (the home
+     page's own style), and closing it with the table's hairline. */
+  .sweep {
+    border-block-end: 1px solid var(--lc-table-rule);
+    background: var(--lc-table);
+  }
+
   /* The still state (D's twin frames): both pictures whole, one under the other. */
   .sweep .sweep-stage {
     display: grid;

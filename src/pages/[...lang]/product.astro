@@ -304,9 +304,12 @@ const figures = p.sections.map((s) =>
   }
 
   /* An old anchor (#studios, #snmp) that now lands on the section that took it over: out of
-     the section's grid, at its top edge. */
+     the section's grid, at its top edge. W14: a figure's window lies along the section's
+     inline-end edge, and a deferred section (content-visibility: auto) clips what it paints at
+     that edge — the clip margin lets the window's lift and its night glow pass it. */
   .capability {
     position: relative;
+    overflow-clip-margin: 3rem;
   }
 
   .anchor-alias {

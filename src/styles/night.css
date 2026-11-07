@@ -37,8 +37,9 @@
 }
 
 /* Product screenshots (Night chart, the page's own indigo since W3) sit on the table as
-   objects: a mat of card indigo inside the strong hairline, with a little more room around the
-   window, so a Night chart window never melts into a Night chart page. */
+   objects: a mat of card indigo inside the window's edge, with a little more room around the
+   window, so a Night chart window never melts into a Night chart page. (W11's drawn widths and
+   2× files were measured with this mat, so W14 keeps it.) */
 :root[data-theme="dark"] .shot {
   padding: 0 0.625rem 0.625rem;
 }
@@ -52,8 +53,15 @@
   border-radius: 2px;
 }
 
-:root[data-theme="dark"] :is(.video-el, .video-poster) {
-  border-color: var(--lc-rule-strong);
+/* W14 (DECISIONS.md D-FRAME): by night a window stands off by light, not darkness — a soft
+   periwinkle glow (the lamp) between the near and far indigo layers of its lift; never black,
+   never grey (a near-black layer is within ΔE 15 of NetBox: tests/identity.spec.ts). The players
+   (VideoSlot.astro) are windows too. */
+:root[data-theme="dark"] :is(.shot, .video-el, .video-poster) {
+  box-shadow:
+    0 1px 2px var(--lc-window-lift-near),
+    0 0 44px -4px var(--lc-window-glow),
+    0 28px 56px -20px var(--lc-window-lift-far);
 }
 
 /* Two sheets: the observed sheet is a raised indigo plate (the lamp-lit tone), the vellum a

@@ -227,11 +227,12 @@ test.describe("identity: distance from NetBox Labs", () => {
   }
 });
 
-test.describe("identity: the screenshot frame stands off the page (W3)", () => {
-  // Since W3 the screens are in the site's own pair (Survey, Night chart): the window's edge,
-  // its strong hairline, must be measurably distinct from the ground it sits on.
+test.describe("identity: the screenshot frame stands off the page (W3, W14)", () => {
+  // Since W3 the screens are in the site's own pair (Survey, Night chart): the window's edge
+  // must be measurably distinct from the ground it sits on — the page, the sunk ground, or since
+  // W14 the chart table (DECISIONS.md D-FRAME, D-TABLE). The floor was 10 until W14.
   for (const path of ["/", "/product/", "/he/product/"]) {
-    test(`${path}: every frame's edge is ΔE2000 ≥ 10 from its page ground`, async ({ page }) => {
+    test(`${path}: every frame's edge is ΔE2000 ≥ 15 from its page ground`, async ({ page }) => {
       await page.goto(path);
       const pairs = await page.evaluate(() => {
         const ctx = document.createElement("canvas").getContext("2d")!;
@@ -266,7 +267,7 @@ test.describe("identity: the screenshot frame stands off the page (W3)", () => {
       for (const { edge, ground } of pairs) {
         const g = parseColour(ground, night ? NIGHT : PAPER)!;
         const e = parseColour(edge, g)!;
-        expect(deltaE2000(toLab(e), toLab(g)), `${edge} on ${ground}`).toBeGreaterThanOrEqual(10);
+        expect(deltaE2000(toLab(e), toLab(g)), `${edge} on ${ground}`).toBeGreaterThanOrEqual(15);
       }
     });
   }

@@ -512,6 +512,31 @@ const atlasRows = h.atlas.rows.map((row) => ({
     margin-block-start: 2.5rem;
   }
 
+  /* W14 (DECISIONS.md D-TABLE): the sections whose pictures are the product sit on the chart
+     table, a ground a step off the page, with a hairline where it meets the page's own grounds.
+     What's new runs on into the dusk sweep below it (DuskSweep.astro), one table: the sweep's
+     hairline closes it; it opens under the datasheet's own rule. Where a table meets a night
+     band, the band's edge is the line (it paints last, over the table's edge row): the Hebrew
+     band's top, the videos' bottom. Below the Hebrew band the table's hairline replaces the
+     integrations section's own top rule. */
+  .whats-new,
+  #hebrew,
+  #videos {
+    background: var(--lc-table);
+  }
+
+  #videos {
+    border-block-start: 1px solid var(--lc-table-rule);
+  }
+
+  #hebrew {
+    border-block-end: 1px solid var(--lc-table-rule);
+  }
+
+  #hebrew + #integrations {
+    border-block-start: 0;
+  }
+
   /* Offline band (night) */
   .offline-band,
   .partners-band {

@@ -108,6 +108,19 @@ motion), `/product`'s slider before Fig. 1 (`CompareSlider.astro`, a native rang
 in `src/content/screen-slots.json`; a light or dark build keeps exactly the other set's files they
 use (`astro.config.mjs` → `screensForTheme`).
 
+**Pictures as windows, on a table** (W14, DECISIONS.md D-FRAME and D-TABLE, every build): the site
+keeps its palette, which the product shares, and every product picture is drawn as an app window
+(`ScreenshotFrame.astro`): an edge ΔE2000 ≥ 15 from its ground, 10 px corners, a two-layer indigo
+lift by day and a periwinkle glow by night (`src/styles/night.css`), and a title bar that names
+it — "LanCompass" and the release the pictures show, CSS generated content from
+`--lc-window-label`, which `themeCss` writes from `media-library/screens/CAPTURED.json`
+(`product_version`), so a new capture renames every window with no HTML change. The videos'
+players get the same edge, corners and lift, without a bar. The sections that show the product sit
+on the chart table (`--lc-table`, a hairline in `--lc-table-rule` at its top and bottom): What's new
+with the dusk sweep, the Hebrew band and the videos on the home, `/product`'s slider and `/pilot`'s
+twin frames — the last two run the whole window's width from inside the centred column through a
+`border-image` outset. The tokens and their distances are in `docs/design/originality.md`.
+
 How it is built: `<html data-theme>` carries the theme. `src/styles/tokens.css` holds the light
 tokens and, after its `@night` marker, every dark value once as a tagged `--lc-dark-*` token
 plus the mapping from semantic tokens to them; `src/styles/night.css` holds the few dark

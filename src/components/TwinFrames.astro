@@ -36,6 +36,18 @@ const s = getCopy(locale).showcase;
 </section>
 
 <style is:global>
+  /* W14 (DECISIONS.md D-TABLE): the twin frames sit on the chart table, across the whole window
+     although the section is inside the site's centred column: as /product's slider
+     (CompareSlider.astro), a border-image whose outset is as wide as the window. The table opens
+     at /pilot's hero rule — the 3rem above the heading, once the page's own, is the table's, so
+     the pictures stay where they were — and its hairline closes it. */
+  .twin {
+    padding-block: 3rem;
+    background: var(--lc-table);
+    border-image: linear-gradient(var(--lc-table) calc(100% - 1px), var(--lc-table-rule) 0) 0 fill /
+      0 / 0 100vw;
+  }
+
   .twin .twin-pair {
     display: grid;
     gap: 2rem;

@@ -14,3 +14,5 @@ playwright-report
 !.env.example
 *.log
 media-library
+# W14: the capture's record names the release the pictures show (astro.config.mjs → themeCss).
+!media-library/screens/CAPTURED.json
