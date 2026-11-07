@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { expect, test } from "@playwright/test";
 import { FINGERPRINT, parseFingerprints } from "../src/lib/fingerprint-schema";
 import { EXPIRES_DAYS, securityTxt } from "../src/lib/security-txt";
-import { pathFor, siteProject } from "./helpers";
+import { layOutInFull, pathFor, siteProject } from "./helpers";
 
 /**
  * W6: /verify/ and /he/verify/, the release key on /security#verification, the SBOM file and
@@ -64,8 +64,9 @@ test.describe("/verify/ (W6)", () => {
         await expect(page.locator(`section#${id} > h2`)).toHaveCount(1);
       }
       await expect(page.locator("#check ol > li")).toHaveCount(3);
+      await layOutInFull(page);
       const results = await new AxeBuilder({ page })
-        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "best-practice"])
+        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"])
         .analyze();
       expect(results.violations.map((v) => v.id)).toEqual([]);
     });

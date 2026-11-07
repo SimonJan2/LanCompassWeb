@@ -1,15 +1,7 @@
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import { join, relative } from "node:path";
 import { expect, test } from "@playwright/test";
-import {
-  builtHtml,
-  docsSample,
-  DEFAULT,
-  FLAGS,
-  FLAG_VALUES,
-  pages,
-  sectionPages,
-  siteBase,
-  siteProject,
-} from "./helpers";
+import { builtHtml, DEFAULT, FLAGS, FLAG_VALUES, siteBase, siteProject } from "./helpers";
 
 /** The external links in the product's docs at v0.7.0 (frontend/src/content/docs/{en,he}/racks.md). */
 const DOCS_LINKS = [
@@ -17,22 +9,81 @@ const DOCS_LINKS = [
   "https://github.com/netbox-community/devicetype-library",
 ];
 
+/** Every page of a built site, as the path a browser asks for (W10: the crawl covers them all). */
+function builtPaths(dist: string): string[] {
+  const root = join(process.cwd(), dist);
+  const out: string[] = [];
+  const walk = (d: string) => {
+    for (const name of readdirSync(d)) {
+      const full = join(d, name);
+      if (statSync(full).isDirectory()) walk(full);
+      else if (name.endsWith(".html"))
+        out.push(`/${relative(root, full).replace(/index\.html$/, "")}`);
+    }
+  };
+  walk(root);
+  return out.sort();
+}
+
+/** The crawl runs in this many tests per project, each walking its share of the pages in one tab. */
+const CHUNKS = 8;
+
 test.describe("no third parties", () => {
-  // W8: the release-note pages too; W9: a sample of the docs (their images are the site's own).
-  for (const p of [...pages, ...sectionPages, ...docsSample]) {
-    test(`${p.path}: every request stays on the site's origin`, async ({ page }) => {
-      const origins = new Set<string>();
+  // W10: every page in the project's dist/ (pages, release notes, all 130 docs articles, the
+  // 404s and the redirect pages), each scrolled to its end so lazy images and videos ask too.
+  for (let chunk = 0; chunk < CHUNKS; chunk++) {
+    test(`every built page, part ${chunk + 1} of ${CHUNKS}: every request stays on the site's origin`, async ({
+      page,
+    }) => {
+      test.setTimeout(180_000);
+      const all = builtPaths(siteProject().dist);
+      expect(all.length).toBeGreaterThanOrEqual(166);
+      const mine = all.filter((_, i) => i % CHUNKS === chunk);
+      const origins = new Map<string, string>();
+      let current = "";
       page.on("request", (r) => {
         const url = new URL(r.url());
-        if (url.protocol.startsWith("http")) origins.add(url.origin);
+        if (url.protocol.startsWith("http") && !origins.has(url.origin)) {
+          origins.set(url.origin, `${current} → ${r.url()}`);
+        }
       });
-      await page.goto(p.path, { waitUntil: "networkidle" });
-      await page.mouse.wheel(0, 20000);
-      await page.waitForLoadState("networkidle");
-      expect([...origins]).toEqual([siteBase()]);
+      for (const path of mine) {
+        current = path;
+        await page.goto(path, { waitUntil: "load" });
+        // W7's redirect pages navigate on their own (meta refresh): the scroll may lose its page.
+        await page
+          .evaluate(async () => {
+            const frame = () => new Promise((r) => requestAnimationFrame(r));
+            for (let y = 0; y < document.documentElement.scrollHeight; y += innerHeight) {
+              scrollTo(0, y);
+              await frame();
+            }
+            scrollTo(0, document.documentElement.scrollHeight);
+            await frame();
+          })
+          .catch(() => undefined);
+        await page.waitForLoadState("networkidle");
+      }
+      const foreign = [...origins].filter(([o]) => o !== siteBase()).map(([, first]) => first);
+      expect(foreign).toEqual([]);
       expect(await page.context().cookies()).toEqual([]);
     });
   }
+
+  test("the built stylesheets and scripts name no other origin", () => {
+    // What a page's CSS or JavaScript could fetch on its own (fonts, @import, fetch()).
+    const dir = join(process.cwd(), siteProject().dist, "_astro");
+    const offenders: string[] = [];
+    for (const name of readdirSync(dir).filter((n) => /\.(css|js)$/.test(n))) {
+      const text = readFileSync(join(dir, name), "utf8");
+      for (const m of text.matchAll(
+        /(?:url\(\s*["']?|@import\s+["']|fetch\(\s*["'`])((?:https?:)?\/\/[^"')`\s]+)/g,
+      )) {
+        offenders.push(`${name}: ${m[1]}`);
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
 
   test("built HTML has no inline style or script: the CSP (no 'unsafe-inline') would block it", () => {
     // `astro preview` sends no CSP, so the browser tests cannot see a violation; nginx can

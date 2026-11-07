@@ -15,8 +15,17 @@ import plexMonoFont from "@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-40
 import "../components/motifs/Contours.astro";
 import "../components/Eyebrow.astro";
 import BaseLayout from "./BaseLayout.astro";
+import { site } from "../config/site";
 import { getCopy } from "../content/copy";
-import { fill, sectionPath, type Locale, type LocalePaths } from "../i18n";
+import {
+  absoluteUrl,
+  fill,
+  pagePath,
+  sectionPath,
+  useUi,
+  type Locale,
+  type LocalePaths,
+} from "../i18n";
 import { byCategory, chromeHtml, docPath, type DocPage } from "../lib/docs";
 
 interface Props {
@@ -36,6 +45,21 @@ const groups = byCategory(pages);
 const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
 const title = `${page.data.title} — ${copy.meta.docs.title}`;
 const isolate = (s: string) => chromeHtml(s, locale);
+/** W10: the article's place in the site, as structured data (LanCompass → Docs → the article). */
+const breadcrumbs = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    [site.name, pagePath(locale, "home")],
+    [useUi(locale).nav.docs, sectionPath(locale, "docs")],
+    [page.data.title, docPath(locale, page.slug)],
+  ].map(([name, path], i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    name,
+    item: absoluteUrl(path!),
+  })),
+};
 ---
 
 <BaseLayout
@@ -132,6 +156,9 @@ const isolate = (s: string) => chromeHtml(s, locale);
       </div>
     )}
   </div>
+  {/* After the article, not in the head: the long articles sit at the edge of their LCP budget,
+       and 84 B more ahead of the article put /docs/topology/ at 1.80 s in auto (night E). */}
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbs)} />
 </BaseLayout>
 
 <style>

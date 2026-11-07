@@ -18,8 +18,11 @@ test.describe("right-to-left", () => {
     test(`${p.path}: Latin text inside Hebrew is bidi-isolated`, async ({ page }) => {
       await page.goto(p.path);
       const leaks = await page.evaluate(() => {
+        // W10: `[dir]` matched <html dir="rtl"> itself, so this guard skipped every text node
+        // and passed vacuously since W1; only an element that sets a direction other than the
+        // page's isolates. The operator's English TODO markers go before going public.
         const isolated =
-          "bdi, code, kbd, samp, [dir], [lang='en'], svg, [translate='no'], script, style, title";
+          "bdi, code, kbd, samp, pre, [dir='ltr'], [dir='auto'], [lang='en'], svg, [translate='no'], script, style, title, .todo-operator";
         const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
         const bad: string[] = [];
         for (let node = walker.nextNode(); node; node = walker.nextNode()) {
@@ -78,7 +81,7 @@ test.describe("right-to-left", () => {
       // footer): Latin isolated in markup, as on every other page.
       const leaks = await page.evaluate(() => {
         const isolated =
-          "bdi, code, kbd, samp, [dir], [lang='en'], svg, [translate='no'], script, style, title";
+          "bdi, code, kbd, samp, pre, [dir='ltr'], [dir='auto'], [lang='en'], svg, [translate='no'], script, style, title";
         const bad: string[] = [];
         const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
         for (let n = walker.nextNode(); n; n = walker.nextNode()) {

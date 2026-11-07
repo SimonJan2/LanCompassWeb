@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { pathFor } from "./helpers";
+import { layOutInFull, pathFor } from "./helpers";
 
 /**
  * W7: /pilot/ and /licensing/, both locales, in every theme project (playwright.config.ts →
@@ -34,8 +34,9 @@ const EVERY_FEATURE = {
 const APPLY = { en: "Apply for a pilot", he: "בקשה לפיילוט" };
 
 async function axeClean(page: import("@playwright/test").Page) {
+  await layOutInFull(page);
   const results = await new AxeBuilder({ page })
-    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "best-practice"])
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"])
     .analyze();
   expect(results.violations.map((v) => `${v.id}: ${v.nodes.length}`)).toEqual([]);
 }

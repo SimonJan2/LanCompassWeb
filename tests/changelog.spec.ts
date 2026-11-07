@@ -5,7 +5,7 @@ import { mkdtempSync, readdirSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { dropWaveNumbers, parseChangelog, sectionFacts } from "../scripts/sync-changelog.mjs";
-import { releaseVersions, siteBase, siteProject } from "./helpers";
+import { layOutInFull, releaseVersions, siteBase, siteProject } from "./helpers";
 
 /**
  * W8: the release notes. The sync script and its text rule (run once, in the light project),
@@ -357,8 +357,9 @@ for (const locale of ["en", "he"] as const) {
         for (const width of [390, 1440]) {
           await page.setViewportSize({ width, height: 900 });
           await page.goto(path);
+          await layOutInFull(page);
           const results = await new AxeBuilder({ page })
-            .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "best-practice"])
+            .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"])
             .analyze();
           expect(
             results.violations.map(

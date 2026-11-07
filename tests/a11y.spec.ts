@@ -1,12 +1,34 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { FLAGS, pages, pathFor, siteBase, siteProject } from "./helpers";
+import { readdirSync, statSync } from "node:fs";
+import { join, relative } from "node:path";
+import { builtHtml, FLAGS, layOutInFull, pages, pathFor, siteBase, siteProject } from "./helpers";
 
 /** A build with the form endpoint configured: the light flags build, or the theme build
  *  itself (the dark and auto test builds set PUBLIC_FORM_ENDPOINT; scripts/build-test.mjs). */
 const formsBase = () => (siteProject().theme === "light" ? FLAGS : siteBase());
 
 const widths = [390, 1440];
+
+/** W10: WCAG 2.2 AA — axe's wcag22aa rules (target-size) on top of 2.0 and 2.1 A and AA. */
+const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"];
+
+/** Every page of the project's build, as a path (W10: axe on every page, not a sample). */
+function builtPaths(dist: string): string[] {
+  const root = join(process.cwd(), dist);
+  const out: string[] = [];
+  const walk = (d: string) => {
+    for (const name of readdirSync(d)) {
+      const full = join(d, name);
+      if (statSync(full).isDirectory()) walk(full);
+      else if (name.endsWith(".html"))
+        out.push(`/${relative(root, full).replace(/index\.html$/, "")}`);
+    }
+  };
+  walk(root);
+  return out.sort();
+}
+const SWEEP_CHUNKS = 8;
 
 /**
  * Contrast is measured at rest. axe scrolls each element into view while it checks, and the
@@ -25,9 +47,8 @@ test.describe("axe: zero violations", () => {
       test(`${p.path} at ${width}px`, async ({ page }) => {
         await page.setViewportSize({ width, height: 900 });
         await page.goto(p.path);
-        const results = await new AxeBuilder({ page })
-          .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "best-practice"])
-          .analyze();
+        await layOutInFull(page);
+        const results = await new AxeBuilder({ page }).withTags(TAGS).analyze();
         expect(
           results.violations.map(
             (v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`,
@@ -37,15 +58,43 @@ test.describe("axe: zero violations", () => {
     }
   }
 
+  // W10: every other page of the build — the release notes, all 130 docs articles and both
+  // indexes, the 404s — at 1440 px, in every theme (the pages above run at both widths).
+  for (let chunk = 0; chunk < SWEEP_CHUNKS; chunk++) {
+    test(`every built page, part ${chunk + 1} of ${SWEEP_CHUNKS}, at 1440px`, async ({ page }) => {
+      test.setTimeout(240_000);
+      const covered = new Set(pages.map((p) => p.path));
+      const all = builtPaths(siteProject().dist).filter(
+        (path) => !covered.has(path) && !/design-partners/.test(path),
+      );
+      expect(all.length).toBeGreaterThanOrEqual(144);
+      await page.setViewportSize({ width: 1440, height: 900 });
+      const failures: string[] = [];
+      for (const path of all.filter((_, i) => i % SWEEP_CHUNKS === chunk)) {
+        await page.goto(path);
+        await layOutInFull(page);
+        const axe = new AxeBuilder({ page }).withTags(TAGS);
+        // The product's own article text (W9, verbatim): its dashboard-gallery table leaves the
+        // corner header cell empty ("| | Follow | Make it mine |"), which axe's best-practice
+        // rule flags (no WCAG criterion requires it). A product finding (night E report).
+        if (/\/docs\/dashboard-gallery\/$/.test(path)) axe.disableRules(["empty-table-header"]);
+        const results = await axe.analyze();
+        for (const v of results.violations) {
+          failures.push(`${path} ${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`);
+        }
+      }
+      expect(failures).toEqual([]);
+    });
+  }
+
   test("forms (endpoint configured) have zero violations in both locales", async ({ page }) => {
     for (const locale of ["en", "he"] as const) {
       for (const which of ["pilot", "contact"] as const) {
         await page.goto(`${formsBase()}${pathFor(locale, which)}`);
         // Show every error state too.
         await page.locator("form[data-lc-form] button[type=submit]").click();
-        const results = await new AxeBuilder({ page })
-          .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
-          .analyze();
+        await layOutInFull(page);
+        const results = await new AxeBuilder({ page }).withTags(TAGS).analyze();
         expect(
           results.violations.map(
             (v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`,
@@ -221,5 +270,74 @@ test.describe("atlas index", () => {
     await expect(page.locator("[data-atlas] .atlas-previews")).toBeHidden();
     await page.locator('[data-atlas-row="nac"]').focus();
     await expect(page.locator('[data-atlas-row="nac"]')).toBeFocused();
+  });
+});
+
+/**
+ * W10: the WCAG 2.2 criteria axe cannot check. 2.4.11 (focus not obscured) is tests/focus.spec.ts
+ * and 2.5.8 (target size) tests/targets.spec.ts; these two read the markup.
+ */
+test.describe("WCAG 2.2: consistent help, redundant entry, accessible authentication", () => {
+  test("3.2.6: every page offers the contact page in the same place — the footer, same position", () => {
+    const root = join(process.cwd(), siteProject().dist);
+    const orders = new Map<string, string[]>();
+    for (const { file, html } of builtHtml(root)) {
+      if (html.includes('<meta http-equiv="refresh"')) continue;
+      const footer = html.match(/<nav class="footer-nav"[\s\S]*?<\/nav>/)?.[0] ?? "";
+      // The footer's links, the locale prefix dropped: the same list on every page.
+      const links = [...footer.matchAll(/<a href="([^"]+)"/g)].map((m) =>
+        m[1]!.replace(/^\/he\//, "/"),
+      );
+      orders.set(relative(root, file), links);
+    }
+    expect(orders.size).toBeGreaterThanOrEqual(164);
+    const [first, ...rest] = [...orders];
+    expect(first![1]).toContain("/contact/");
+    for (const [file, links] of rest) expect(links, file).toEqual(first![1]);
+  });
+
+  test("3.3.7 and 3.3.8: each form asks for each thing once, in one step, with no puzzle and no password", async ({
+    page,
+  }) => {
+    for (const locale of ["en", "he"] as const) {
+      for (const which of ["pilot", "contact"] as const) {
+        await page.goto(`${formsBase()}${pathFor(locale, which)}`);
+        const form = page.locator("form[data-lc-form]");
+        await expect(form, `${locale} ${which}`).toHaveCount(1);
+        const fields = await form.evaluate((f) =>
+          Array.from(
+            f.querySelectorAll<HTMLInputElement>(
+              "input:not([type=hidden]):not([data-honeypot]), select, textarea",
+            ),
+          ).map((el) => ({
+            name: el.name,
+            type: el.type,
+            autocomplete: el.getAttribute("autocomplete") ?? "",
+            label: (el.labels?.[0]?.textContent ?? "").trim(),
+          })),
+        );
+        // A checkbox or radio group shares one name: it is one question.
+        const names = fields
+          .filter((x) => x.type !== "checkbox" && x.type !== "radio")
+          .map((x) => x.name);
+        expect(new Set(names).size, `${locale} ${which}: a field asked twice`).toBe(names.length);
+        const tokens = fields.map((x) => x.autocomplete).filter((t) => t && t !== "off");
+        expect(new Set(tokens).size, `${locale} ${which}: autocomplete twice`).toBe(tokens.length);
+        expect(fields.map((x) => x.label).join("|")).not.toMatch(/confirm|again|repeat|אימות|שוב/i);
+        // The name and the address can be filled in by the browser (3.3.7's "available to select").
+        expect(tokens).toEqual(expect.arrayContaining(["name", "email"]));
+        // One step: one submit button, no "next".
+        await expect(form.locator("button[type=submit]")).toHaveCount(1);
+        await expect(page.locator('input[type="password"]')).toHaveCount(0);
+        // No CAPTCHA or puzzle; the spam guard is a honeypot hidden from people and from AT.
+        expect(
+          await page.locator("iframe, [class*=captcha i], [id*=captcha i], [data-sitekey]").count(),
+        ).toBe(0);
+        await expect(form.locator(".hp")).toHaveAttribute("aria-hidden", "true");
+        await expect(form.locator("[data-honeypot]")).toHaveAttribute("tabindex", "-1");
+        const box = await form.locator(".hp").boundingBox();
+        expect((box?.width ?? 0) <= 1 && (box?.height ?? 0) <= 1, "honeypot clipped").toBe(true);
+      }
+    }
   });
 });

@@ -1,5 +1,8 @@
+import { readFileSync } from "node:fs";
+import { join, relative } from "node:path";
 import { expect, test } from "@playwright/test";
 import {
+  builtHtml,
   defaultLocale,
   localeCodes,
   locales,
@@ -7,6 +10,7 @@ import {
   pathFor,
   sectionPages,
   siteBase,
+  siteProject,
 } from "./helpers";
 
 test.describe("routes and locales", () => {
@@ -217,6 +221,50 @@ test.describe("routes and locales", () => {
     expect(sitemap).not.toContain("design-partners");
     expect(sitemap).toContain(`${siteBase()}/pilot/`);
     expect(sitemap).toContain(`${siteBase()}/he/licensing/`);
+  });
+
+  test("W10: every page's hreflang pair is reciprocal with x-default; the sitemap lists each public page once, with its alternates", () => {
+    const root = join(process.cwd(), siteProject().dist);
+    const base = siteBase();
+    /** Each public page (not the 404s, not W7's redirect pages): its URL and its alternates. */
+    const alternates = new Map<string, Record<string, string>>();
+    for (const { file, html } of builtHtml(root)) {
+      if (/\/404\.html$/.test(file) || html.includes('<meta http-equiv="refresh"')) continue;
+      const url = `${base}/${relative(root, file).replace(/index\.html$/, "")}`;
+      const links = Object.fromEntries(
+        [...html.matchAll(/<link rel="alternate" hreflang="([^"]+)" href="([^"]+)"/g)].map((m) => [
+          m[1]!,
+          m[2]!,
+        ]),
+      );
+      alternates.set(url, links);
+    }
+    expect(alternates.size).toBe(162);
+    const hreflangs = [...localeCodes.map((c) => locales[c].htmlLang), "x-default"].sort();
+    for (const [url, links] of alternates) {
+      expect(Object.keys(links).sort(), url).toEqual(hreflangs);
+      expect(links["x-default"], url).toBe(links[locales[defaultLocale].htmlLang]);
+      const own = localeCodes.find((c) => c !== defaultLocale && url.startsWith(`${base}/${c}/`));
+      expect(links[locales[own ?? defaultLocale].htmlLang], `${url} names itself`).toBe(url);
+      for (const code of localeCodes) {
+        const twin = links[locales[code].htmlLang]!;
+        expect(alternates.get(twin), `${url} → ${twin} exists and points back`).toEqual(links);
+      }
+    }
+    const sitemap = readFileSync(join(root, "sitemap-0.xml"), "utf8");
+    const entries = [...sitemap.matchAll(/<url><loc>([^<]+)<\/loc>([\s\S]*?)<\/url>/g)];
+    const locs = entries.map((e) => e[1]!);
+    expect(new Set(locs).size, "each URL once").toBe(locs.length);
+    expect([...locs].sort()).toEqual([...alternates.keys()].sort());
+    for (const [, loc, rest] of entries) {
+      const listed = Object.fromEntries(
+        [...rest!.matchAll(/hreflang="([^"]+)" href="([^"]+)"/g)].map((m) => [m[1]!, m[2]!]),
+      );
+      for (const code of localeCodes) {
+        const lang = locales[code].htmlLang;
+        expect(listed[lang], `${loc} ${lang}`).toBe(alternates.get(loc!)![lang]);
+      }
+    }
   });
 
   test("sitemap, robots, manifest, icons and OG images are built", async ({ request }) => {

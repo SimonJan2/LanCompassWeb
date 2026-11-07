@@ -1,4 +1,4 @@
-import { test } from "@playwright/test";
+import { test, type Page } from "@playwright/test";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import {
@@ -126,6 +126,17 @@ export function siteProject(): SiteProject {
 /** The origin of the site under test (DEFAULT for the light build). */
 export function siteBase(): string {
   return String(test.info().project.use.baseURL ?? DEFAULT).replace(/\/$/, "");
+}
+
+/**
+ * W10: lay out the whole page before measuring geometry (axe's target-size, tests/targets.spec).
+ * The footer and other `.defer-render` sections, and the docs' long articles, render lazily
+ * (content-visibility: auto): until a reader scrolls there their boxes keep placeholder sizes,
+ * so a measurement at load put the footer's "How it works" link 57 px from the article's last
+ * link on /docs/first-run/ at 390 px, when the laid-out page has them 2,977 px apart (night E).
+ */
+export async function layOutInFull(page: Page): Promise<void> {
+  await page.addStyleTag({ content: "* { content-visibility: visible !important; }" });
 }
 
 /** Whether the page renders the Night chart palette in this project. */

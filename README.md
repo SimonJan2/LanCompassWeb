@@ -228,7 +228,8 @@ src/
 scripts/           capture-screenshots.mjs, record-video.mjs, build-test.mjs, lhci.mjs,
                    capture-stack/ (the throwaway stack from the signed bundle),
                    sync-changelog.mjs (W8: the release notes from CHANGELOG.md at a tag),
-                   sync-docs.mjs (W9: the docs from an archive of the tag)
+                   sync-docs.mjs (W9: the docs from an archive of the tag),
+                   check-claims.mjs (W10: each claim row's sources exist at the release tag)
 media-library/     captured screens (Survey + Night chart) and videos, en + he, not built
 tests/             Playwright specs
 docs/headers.md    security headers and nginx equivalents
@@ -236,6 +237,7 @@ docs/design/       originality.md: the identity, measured against NetBox Labs (Î
 docs/copy/         he-voice.md (how Hebrew is written), he-review.md (every Hebrew string, glossed)
 docs/claims.md     the claims register: every product fact the site states, with its source at
                    the product's release tag; the copy cites its rows (tests/claims.spec.ts)
+docs/go-public.md  W10: the operator's checklist before going public, with every TODO(operator)
 ```
 
 ### Product claims
@@ -245,7 +247,12 @@ beside it (`// C-MAP-1` in `src/content/copy/*.ts`, `{/* C-SEC-3 */}` in `.mdx`)
 in the copy appears in the row it cites. `tests/claims.spec.ts` checks both, and that every row is
 cited or marked `unused â€”` with a reason. At a product release: re-read each row's source at the
 new tag, change what changed, add the release to `src/content/releases.json` (the datasheet's
-Release row, What's new and the JSON-LD read it), and run the tests.
+Release row, What's new and the JSON-LD read it), and run the tests. On the host (Node 18 is
+enough), `node scripts/check-claims.mjs ../LanCompass v0.7.0` checks with `git` that every file
+and `CHANGELOG.md` section a row cites is at the tag (exit 1 on a missing one) and notes a cited
+heading or quoted phrase it cannot find there; `--sample 20 --seed <8 hex digits>` also picks
+rows to re-read by hand. `tests/release.spec.ts` holds every place that names the current
+release to the newest entry.
 
 ## Identity and motion
 
@@ -315,14 +322,14 @@ docker/smoke.sh http://localhost:8088 dark   # the same against a dark build
 docker compose down
 ```
 
-| File                                                | Role                                                                                                                                                                              |
-| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Dockerfile`                                        | Build stage (`npm ci --omit=dev`, `astro build`) and nginx runtime stage with OCI labels and a health check.                                                                      |
-| `compose.yaml`                                      | One `web` service: read-only filesystem with a `/tmp` tmpfs, all capabilities dropped, `no-new-privileges`, CPU and memory limits, log rotation, health check.                    |
-| `docker/nginx/nginx.conf`, `docker/nginx/site.conf` | Trailing-slash redirects, per-locale 404 pages, gzip, immutable caching for `/_astro/`, `/healthz`.                                                                               |
-| `docker/render-nginx-headers.mjs`                   | Turns the built `dist/_headers` into nginx `add_header` lines at image build, so `public/_headers` stays the single source of the CSP and the form endpoint's origin is included. |
-| `docker/smoke.sh`                                   | Checks a running container.                                                                                                                                                       |
-| `tests/container.spec.ts`                           | Loads every page under the real headers and fails on any CSP violation or console error: `DOCKER_BASE_URL=http://localhost:8088 npx playwright test tests/container.spec.ts`.     |
+| File                                                | Role                                                                                                                                                                                                                                                                                                                                              |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Dockerfile`                                        | Build stage (`npm ci --omit=dev`, `astro build`) and nginx runtime stage with OCI labels and a health check.                                                                                                                                                                                                                                      |
+| `compose.yaml`                                      | One `web` service: read-only filesystem with a `/tmp` tmpfs, all capabilities dropped, `no-new-privileges`, CPU and memory limits, log rotation, health check.                                                                                                                                                                                    |
+| `docker/nginx/nginx.conf`, `docker/nginx/site.conf` | Trailing-slash redirects, per-locale 404 pages, gzip, immutable caching for `/_astro/`, `/healthz`.                                                                                                                                                                                                                                               |
+| `docker/render-nginx-headers.mjs`                   | Turns the built `dist/_headers` into nginx `add_header` lines at image build, so `public/_headers` stays the single source of the CSP and the form endpoint's origin is included.                                                                                                                                                                 |
+| `docker/smoke.sh`                                   | Checks a running container.                                                                                                                                                                                                                                                                                                                       |
+| `tests/container.spec.ts`                           | Loads every page under the real headers and fails on any CSP violation or console error: `DOCKER_BASE_URL=http://localhost:8088 npx playwright test tests/container.spec.ts`. W10: also every header `docs/headers.md` lists, behind a TLS proxy and without one; with `EXPECT_SITE_URL` set to the image's `PUBLIC_SITE_URL`, the absolute URLs. |
 
 `PUBLIC_*` values are **build arguments**: set them in `.env` (compose reads it) and rebuild with
 `--build`. `PUBLIC_SITE_URL` defaults to `http://localhost:<port>`; set the real origin for
@@ -340,4 +347,5 @@ LAN address without TLS.
 
 Any static host. Apply the headers in `public/_headers` (Netlify, Cloudflare Pages), the
 nginx equivalents in `docs/headers.md`, or run the Docker image above, which applies them
-itself. Keep the site on a private preview URL until the trademark search is cleared.
+itself. Keep the site on a private preview URL until the trademark search is cleared, and until
+every box of [`docs/go-public.md`](docs/go-public.md) is ticked.

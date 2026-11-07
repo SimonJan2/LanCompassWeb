@@ -2,32 +2,34 @@
 eyebrow: Accessibility
 title: Accessibility statement
 lead: We want everyone to be able to use this site, in English and in Hebrew, with any device and any assistive technology.
-updated: "2026-10-11"
+updated: "2026-11-07"
 legalReview: true
 ---
 import ContactEmail from "../../../components/ContactEmail.astro";
 
 ## The standard we follow
 
-This site is built to meet the Web Content Accessibility Guidelines (WCAG) 2.1 at level AA. The Israeli Standard IS 5568, which the Equal Rights for Persons with Disabilities regulations refer to, is based on the same guidelines.
+This site is built to meet Israeli Standard 5568 Part 1 (2023), at its AA level (WCAG 2.0 with national changes), the standard the Equal Rights for Persons with Disabilities regulations refer to; it is also tested against WCAG 2.2 AA. Every page was last checked on <time datetime="2026-11-07">7 November 2026</time>.
 
-## What we did
+## The adjustments we made
 
 - Every page exists in English and in Hebrew, with the correct language and reading direction.
-- The site works with a keyboard alone. A “Skip to content” link is the first thing on every page, and every interactive element shows a visible focus ring.
+- The site works with a keyboard alone. A “Skip to content” link is the first thing on every page, every interactive element shows a visible focus ring, and the header that stays at the top of the screen never covers the element in focus.
+- Links and buttons outside running text are at least 24 × 24 pixels, or have that much room around them.
+- Help is always in the same place: the footer of every page links to the contact page.
 - Pages use headings, landmarks and lists so screen readers can move through them.
 - Images have text alternatives in both languages; decorative images are hidden from assistive technology.
 - Text contrast is at least 4.5:1, and colour is never the only way information is shown.
 - Animation is calm and can be paused. If your system asks for reduced motion, the site shows still images instead.
-- Forms have visible labels, say which fields are required, and explain errors in text.
+- The product videos have no sound. Each has captions in English and in Hebrew, and [the videos page](/videos/) lists, as text, the steps each one shows.
+- Forms have visible labels, say which fields are required, and explain errors in text. They ask for each thing only once and never ask you to solve a puzzle.
 - The site works without JavaScript.
 
-We test every page in both languages with automated accessibility checks at phone and desktop widths, and by keyboard.
+Every page, in both languages, is checked automatically against WCAG 2.2 AA in the light and the dark theme and walked with the keyboard; the main pages are checked at phone width too.
 
 ## Known limitations
 
 - Product screenshots show the LanCompass interface. The text alternative describes each screen, not every value in it.
-- The product videos have captions in English and Hebrew.
 
 <p><span class="todo-operator">TODO(operator): legal review — confirm this statement against the current Israeli accessibility regulations, and add the date of the last manual accessibility review.</span></p>
 
@@ -35,4 +37,4 @@ We test every page in both languages with automated accessibility checks at phon
 
 If something on this site is hard to use, tell us and we will fix it. Write to <ContactEmail subject="Accessibility" /> and describe the page and the problem.
 
-<p><span class="todo-operator">TODO(operator): add the accessibility coordinator’s name and phone number, as the Israeli regulations require.</span></p>
+<p><span class="todo-operator">TODO(operator): the regulations require an accessibility coordinator only of some service providers (public-service providers with 25 or more employees); if the company is one, add the coordinator’s name and phone number here.</span></p>

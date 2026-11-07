@@ -30,3 +30,10 @@ if (links.size > 0 && sections.length > 0 && "IntersectionObserver" in window) {
   );
   sections.forEach((s) => observer.observe(s));
 }
+
+// W10: the bar scrolls sideways when its tabs do not fit, and a browser does not scroll a focused
+// element that is already partly in view: Tab onto the last tab at 1440 px left 46 of its 82 px
+// clipped. Bring the focused tab wholly into the bar.
+document.querySelector("[data-scrollspy] ul")?.addEventListener("focusin", (e) => {
+  (e.target as HTMLElement).scrollIntoView({ block: "nearest", inline: "nearest" });
+});

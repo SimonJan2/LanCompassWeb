@@ -13,7 +13,9 @@
         "http://localhost:4321/he/verify/",
         "http://localhost:4321/changelog/0.7.0/",
         "http://localhost:4321/docs/",
-        "http://localhost:4321/docs/topology/"
+        "http://localhost:4321/docs/topology/",
+        "http://localhost:4321/pilot/",
+        "http://localhost:4321/licensing/"
       ],
       "numberOfRuns": 3,
       "settings": {

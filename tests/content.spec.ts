@@ -227,19 +227,71 @@ test.describe("verify and disclosure (W6)", () => {
 });
 
 test.describe("accessibility statement", () => {
-  for (const [path, says, never] of [
-    [
-      "/accessibility/",
-      "The product videos have captions in English and Hebrew.",
-      /not published yet/i,
-    ],
-    ["/he/accessibility/", "לסרטוני המוצר יש כתוביות בעברית ובאנגלית.", /עוד לא פורסמו/],
-  ] as const) {
-    test(`${path} states that the videos have captions`, async ({ page }) => {
-      await page.goto(path);
+  /** W10: the standard stated right (IS 5568 Part 1 is WCAG 2.0 with national changes, not 2.1),
+   *  the WCAG 2.2 AA check and its date, the videos' captions and step lists, the contact. */
+  const CHECKED = "2026-11-07";
+  for (const s of [
+    {
+      path: "/accessibility/",
+      standard:
+        "This site is built to meet Israeli Standard 5568 Part 1 (2023), at its AA level (WCAG 2.0 with national changes)",
+      wcag22: "it is also tested against WCAG 2.2 AA",
+      date: "Every page was last checked on 7 November 2026.",
+      videos: "Each has captions in English and in Hebrew",
+      videosPage: "/videos/",
+      wrong: [/based on the same guidelines/i, /WCAG\) 2\.1/, /not published yet/i],
+    },
+    {
+      path: "/he/accessibility/",
+      standard:
+        "האתר בנוי לפי התקן הישראלי ת״י 5568 חלק 1 (2023), ברמת AA שלו (הנחיות WCAG 2.0 עם השינויים הלאומיים)",
+      wcag22: "האתר נבדק גם מול WCAG 2.2 ברמת AA.",
+      date: "כל דפי האתר נבדקו לאחרונה ב־7 בנובמבר 2026.",
+      videos: "לכל סרטון יש כתוביות בעברית ובאנגלית",
+      videosPage: "/he/videos/",
+      wrong: [/מבוסס על אותן הנחיות/, /WCAG 2\.1/, /עוד לא פורסמו/],
+    },
+  ]) {
+    test(`${s.path} states IS 5568 Part 1 (2023) and the WCAG 2.2 check, with its date`, async ({
+      page,
+    }) => {
+      await page.goto(s.path);
       const text = await page.evaluate(() => document.body.innerText);
-      expect(text).toContain(says);
-      expect(text).not.toMatch(never);
+      expect(text).toContain(s.standard);
+      expect(text).toContain(s.wcag22);
+      expect(text).toContain(s.date);
+      await expect(page.locator(`main time[datetime="${CHECKED}"]`)).toHaveCount(2);
+      for (const w of s.wrong) expect(text).not.toMatch(w);
+    });
+
+    test(`${s.path} lists the adjustments, the videos' captions and step lists, and the contact`, async ({
+      page,
+    }) => {
+      await page.goto(s.path);
+      const text = await page.evaluate(() => document.body.innerText);
+      expect(text).toContain(s.videos);
+      await expect(page.locator(`main .prose a[href="${s.videosPage}"]`)).toHaveCount(1);
+      // The adjustments (regulation 35ה): one list of eleven, the WCAG 2.2 ones among them.
+      const items = page.locator("main h2 + ul").first().locator("li");
+      await expect(items).toHaveCount(11);
+      // The contact for reporting a problem, and the coordinator left to the operator.
+      await expect(page.locator('main a[href^="mailto:"]')).toHaveCount(1);
+      expect(text).toMatch(
+        /TODO\(operator\): the regulations require an accessibility coordinator/,
+      );
     });
   }
+
+  test("W10: the long-form pages' lists show their markers (preflight removed them)", async ({
+    page,
+  }) => {
+    for (const path of ["/accessibility/", "/he/accessibility/", "/security/", "/he/privacy/"]) {
+      await page.goto(path);
+      const types = await page
+        .locator("main .prose ul:not([class]):not([role])")
+        .evaluateAll((els) => els.map((el) => getComputedStyle(el).listStyleType));
+      expect(types.length, path).toBeGreaterThan(0);
+      expect(new Set(types), path).toEqual(new Set(["disc"]));
+    }
+  });
 });

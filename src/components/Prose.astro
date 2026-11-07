@@ -46,6 +46,17 @@ const { class: className } = Astro.props;
     padding-inline-start: 1.25rem;
   }
 
+  /* W10: Tailwind's preflight removes every list marker (and Safari then reads a list as plain
+     text); the long-form pages' own lists show theirs again. A component's list inside Prose
+     (it has a class or role="list") keeps its own design. */
+  .prose :global(ul:not([class], [role])) {
+    list-style: disc;
+  }
+
+  .prose :global(ol:not([class], [role])) {
+    list-style: decimal;
+  }
+
   .prose :global(li) {
     margin-block-end: 0.4rem;
     padding-inline-start: 0.25rem;

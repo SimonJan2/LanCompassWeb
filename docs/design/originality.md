@@ -267,10 +267,10 @@ Hebrew display cut stays 600.
   vellum a translucent card film with paper-ink lines and boxes, the drift mark pink, the
   resolved link emerald, registration marks paper ink at reduced opacity. Timeline, pause,
   offscreen pause and the reduced-motion frame are unchanged.
-- **Screenshots** are the product's Nightwire captures (`src/assets/screens/nightwire/`). That
-  theme is near-black and cyan, close to NetBox, which is acceptable inside product imagery but
-  never in site tokens. Frames get a `--lc-rule-strong` hairline and a card-indigo mat, so the
-  product window reads as an object on the table, not as the page.
+- **Screenshots** are the product's Night chart captures (`src/assets/screens/night-chart/`);
+  W3 replaced the Nightwire set, whose near-black and cyan sat close to NetBox. Frames get a
+  `--lc-rule-strong` hairline and a card-indigo mat, so the product window reads as an object on
+  the table, not as the page.
 - **OG images**: indigo ground, paper title, the compass tile, the two-sheets motif in night
   colours (`src/lib/og.ts` with `src/lib/palette.ts`). `auto` keeps paper cards: social cards
   have no colour scheme.

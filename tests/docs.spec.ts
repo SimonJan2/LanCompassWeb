@@ -4,7 +4,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdtempSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { FLAGS, siteBase, siteProject } from "./helpers";
+import { FLAGS, layOutInFull, siteBase, siteProject } from "./helpers";
 
 /**
  * W9: the product's docs on the site. The sync script on a two-page fixture (once, in the light
@@ -288,8 +288,9 @@ for (const locale of ["en", "he"] as const) {
         for (const width of i < 4 ? [390, 1440] : [1440]) {
           await page.setViewportSize({ width, height: 900 });
           await page.goto(`${prefix}/docs/${slug}/`);
+          await layOutInFull(page);
           const results = await new AxeBuilder({ page })
-            .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "best-practice"])
+            .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"])
             .analyze();
           expect(
             results.violations.map(
@@ -306,8 +307,9 @@ for (const locale of ["en", "he"] as const) {
       for (const width of [390, 1440]) {
         await page.setViewportSize({ width, height: 900 });
         await page.goto(`${prefix}/docs/`);
+        await layOutInFull(page);
         const results = await new AxeBuilder({ page })
-          .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "best-practice"])
+          .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"])
           .analyze();
         expect(
           results.violations.map((v) => v.id),
