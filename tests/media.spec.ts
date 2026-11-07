@@ -222,17 +222,18 @@ const slotTable = JSON.parse(
     string,
     {
       keys: string[];
-      crop: { width: number; height: number; serve: number } | null;
-      phone: { width: number; height: number; serve: number } | null;
+      crop: { width: number; height: number; serve: number; from?: string } | null;
+      phone: { width: number; height: number; serve: number; from?: string } | null;
       full?: { width: number; height: number; serve: number };
     }
   >;
 };
-/** Every crop the slots ask for: { key, picture, width, height (CSS px), serve (px) }. */
+/** Every crop the slots ask for: { key, picture, width, height (CSS px), serve (px) }. W13: a
+ *  picture with `from` is that slot's crop, reused (the same file, size and clip). */
 const crops = Object.entries(slotTable.slots).flatMap(([slot, s]) =>
   s.keys.flatMap((key) => [
-    ...(s.crop ? [{ key, picture: slot, ...s.crop }] : []),
-    ...(s.phone ? [{ key, picture: `${slot}-phone`, ...s.phone }] : []),
+    ...(s.crop ? [{ key, ...s.crop, picture: s.crop.from ?? slot }] : []),
+    ...(s.phone ? [{ key, ...s.phone, picture: s.phone.from ?? `${slot}-phone` }] : []),
   ]),
 );
 /** A WebP file's pixel size, from its header (as src/lib/screens.ts → webpSize). */

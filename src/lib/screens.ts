@@ -30,8 +30,30 @@ export type ScreenKey = (typeof screenKeys)[number];
  *  Night chart (its default dark theme), the site's own pair (W3). */
 export type ScreenSet = "survey" | "night-chart";
 
-/** The kinds of slot that draw a screen (src/content/screen-slots.json, W11). */
-export type SlotKind = "news" | "atlas" | "band" | "loop" | "figure";
+/** The kinds of slot that draw a screen (src/content/screen-slots.json, W11). W13's showcase adds
+ *  three that draw both sets in every build: the sweep (the home), the slider (/product) and the
+ *  twin frames (/pilot, and the sweep's still state). */
+export type SlotKind = "news" | "atlas" | "band" | "loop" | "figure" | "sweep" | "compare" | "twin";
+
+/** A slot's picture: its size, and (W13) the slot whose file it reuses (`from`), if any. */
+interface SlotPicture {
+  width: number;
+  height: number;
+  serve: number;
+  quality?: number;
+  from?: string;
+}
+
+interface Slot {
+  keys: string[];
+  crop: SlotPicture | null;
+  full?: SlotPicture;
+  phone: SlotPicture | null;
+  /** W13: the slot draws both sets in every build (a light or dark build keeps these files). */
+  both?: boolean;
+}
+
+const slots = slotTable.slots as unknown as Record<SlotKind, Slot>;
 
 /** The capture sets a site theme shows: light → Survey, dark → Night chart, auto → both
  *  (Survey first, Night chart behind a prefers-color-scheme: dark source). */
@@ -87,19 +109,51 @@ export function servedScreen(set: ScreenSet, locale: Locale, file: string): Serv
   return size ? { src: `/${rel}`, ...size } : null;
 }
 
-/** A slot's two pictures of a key in one set: the crop a desktop draws (for the loop, the whole
- *  window) and, where the slot has one, the phone crop. */
+/** The served file names of a slot's two pictures of a key: the desktop crop (or, for a slot that
+ *  draws the whole window, `<key>.<slot>.webp` at the slot's serve width) and the phone crop. A
+ *  picture with `from` reuses that picture's file (W13: the showcase draws the crops W11 cut). */
+function slotFiles(slot: SlotKind, screen: string): { desktop: string; phone: string | null } {
+  const s = slots[slot];
+  const desktop = s.crop?.from ?? slot;
+  const phone = s.phone ? (s.phone.from ?? `${slot}-phone`) : null;
+  return {
+    desktop: `${screen}.${desktop}.webp`,
+    phone: phone ? `${screen}.${phone}.webp` : null,
+  };
+}
+
+/** A slot's two pictures of a key in one set: the crop a desktop draws (for the loop, the sweep
+ *  and the slider, the whole window) and, where the slot has one, the phone crop. */
 export function slotPictures(
   slot: SlotKind,
   set: ScreenSet,
   locale: Locale,
   screen: ScreenKey,
 ): { desktop: ServedScreen | null; phone: ServedScreen | null } {
-  const hasPhone = slotTable.slots[slot].phone !== null;
+  const files = slotFiles(slot, screen);
   return {
-    desktop: servedScreen(set, locale, `${screen}.${slot}.webp`),
-    phone: hasPhone ? servedScreen(set, locale, `${screen}.${slot}-phone.webp`) : null,
+    desktop: servedScreen(set, locale, files.desktop),
+    phone: files.phone ? servedScreen(set, locale, files.phone) : null,
   };
+}
+
+/**
+ * W13: the served files every build carries in both sets (astro.config.mjs → screensForTheme): the
+ * pictures of the slots that draw both sets (`both` in screen-slots.json: the sweep, the slider,
+ * the twin frames) and each /product figure's two crops, which its Survey | Night chart switch
+ * shows in the other set on request. File names only (the same in every locale).
+ */
+export function bothSetFiles(): string[] {
+  const out = new Set<string>();
+  for (const [slot, s] of Object.entries(slots) as [SlotKind, Slot][]) {
+    if (!s.both && slot !== "figure") continue;
+    for (const key of s.keys) {
+      const files = slotFiles(slot, key);
+      out.add(files.desktop);
+      if (files.phone) out.add(files.phone);
+    }
+  }
+  return [...out].sort();
 }
 
 /** The whole window of a key, 2880 px wide: a cropped figure's "Open the full screen". */

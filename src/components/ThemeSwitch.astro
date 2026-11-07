@@ -1,0 +1,29 @@
+---
+/**
+ * W13 (DECISIONS.md D-SWITCH): the site's two-state light/dark switch, rendered in an `auto`
+ * build only (SiteHeader, beside the language menu; MobileNav, in its sheet). One button: a sun
+ * or a moon drawn in CSS (src/styles/auto.css) offering the opposite of the scheme on screen, and
+ * an off-screen name saying what a press does. Both names are in the markup and the stylesheet
+ * keeps the one that fits the scheme on screen, so the name follows every change — the system's
+ * or the visitor's — with no script. Without JavaScript the button is not shown (no
+ * `html[data-js]`, which only src/scripts/site.ts sets), its box kept so nothing moves.
+ * src/scripts/site.ts does the rest: it applies a stored choice, a press renders the other scheme
+ * and keeps `lc-theme` in local storage only when it differs from the system's, and pictures and
+ * videos follow.
+ */
+import { getCopy } from "../content/copy";
+import type { Locale } from "../i18n";
+
+interface Props {
+  locale: Locale;
+  class?: string;
+}
+
+const { locale, class: className } = Astro.props;
+const s = getCopy(locale).showcase;
+---
+
+<button type="button" class:list={["theme-switch", className]} data-theme-switch>
+  <span class="ts-dark">{s.toDark}</span>
+  <span class="ts-light">{s.toLight}</span>
+</button>

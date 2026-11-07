@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { pages, todoAllowed } from "./helpers";
+import { FORM_SERVICE_MARKER, pages, todoAllowed } from "./helpers";
 
 const releases = JSON.parse(
   readFileSync(join(process.cwd(), "src", "content", "releases.json"), "utf8"),
@@ -103,7 +103,10 @@ test.describe("forbidden content", () => {
       // No pricing outside the two pages that may mention editions.
       expect(all).not.toMatch(/[$€₪]\s?\d/);
       if (todoAllowed.has(p.page)) return;
-      expect(text, "visible TODO(operator) marker").not.toContain("TODO(operator)");
+      // W12: /privacy/'s one form-service marker belongs to builds with PUBLIC_FORM_ENDPOINT set
+      // (tests/flags.spec.ts holds where it shows and where it does not).
+      const visible = p.page === "privacy" ? text.replace(FORM_SERVICE_MARKER, "") : text;
+      expect(visible, "visible TODO(operator) marker").not.toContain("TODO(operator)");
     });
   }
 });
@@ -176,16 +179,11 @@ test.describe("the site at the newest release (W2)", () => {
     }
   });
 
-  test("no product-fact TODO(operator) in the copy files; only the Hebrew review marker", () => {
+  test("no TODO(operator) in the copy files (W12: the Hebrew was read, D-HEBREW-REVIEW)", () => {
     const copy = (f: string) =>
       readFileSync(join(process.cwd(), "src", "content", "copy", f), "utf8");
-    expect(copy("en.ts")).not.toContain("TODO(operator)");
-    const he = copy("he.ts")
-      .split("\n")
-      .filter((l) => l.includes("TODO(operator)"));
-    expect(he).toEqual([
-      " * TODO(operator): native Hebrew copy review of this file (docs/copy/he-review.md) before going public.",
-    ]);
+    for (const f of ["en.ts", "he.ts", "index.ts"])
+      expect(copy(f), f).not.toContain("TODO(operator)");
   });
 });
 
@@ -240,6 +238,11 @@ test.describe("accessibility statement", () => {
       videos: "Each has captions in English and in Hebrew",
       videosPage: "/videos/",
       wrong: [/based on the same guidelines/i, /WCAG\) 2\.1/, /not published yet/i],
+      coordinator:
+        "There is no accessibility coordinator: the regulations ask for one only of service providers with 25 or more employees, and we have fewer than 25.",
+      review:
+        "The latest accessibility review of this site is the automated check of 7 November 2026",
+      manual: /manual (?:accessibility )?review (?:was|of)|reviewed manually|screen reader review/i,
     },
     {
       path: "/he/accessibility/",
@@ -250,6 +253,10 @@ test.describe("accessibility statement", () => {
       videos: "לכל סרטון יש כתוביות בעברית ובאנגלית",
       videosPage: "/he/videos/",
       wrong: [/מבוסס על אותן הנחיות/, /WCAG 2\.1/, /עוד לא פורסמו/],
+      coordinator:
+        "אין לנו רכז נגישות: התקנות מחייבות רכז רק אצל נותני שירות שמעסיקים 25 עובדים או יותר, ואצלנו עובדים פחות מ־25.",
+      review: "סקירת הנגישות האחרונה של האתר היא הבדיקה האוטומטית מ־7 בנובמבר 2026",
+      manual: /סקירה ידנית|בדיקה ידנית/,
     },
   ]) {
     test(`${s.path} states IS 5568 Part 1 (2023) and the WCAG 2.2 check, with its date`, async ({
@@ -274,13 +281,37 @@ test.describe("accessibility statement", () => {
       // The adjustments (regulation 35ה): one list of eleven, the WCAG 2.2 ones among them.
       const items = page.locator("main h2 + ul").first().locator("li");
       await expect(items).toHaveCount(11);
-      // The contact for reporting a problem, and the coordinator left to the operator.
+      // The contact for reporting a problem, and (W12, D-COORDINATOR) no coordinator: fewer than
+      // 25 employees, so requests go to that address.
       await expect(page.locator('main a[href^="mailto:"]')).toHaveCount(1);
-      expect(text).toMatch(
-        /TODO\(operator\): the regulations require an accessibility coordinator/,
-      );
+      expect(text).toContain(s.coordinator);
+      expect(text).not.toContain("TODO(operator)");
+    });
+
+    test(`${s.path}: the latest review is the automated check of 7 November 2026 (W12)`, async ({
+      page,
+    }) => {
+      await page.goto(s.path);
+      const text = await page.evaluate(() => document.body.innerText);
+      expect(text).toContain(s.review);
+      // Not claimed: a manual review (none was done; it stays on docs/go-public.md).
+      expect(text).not.toMatch(s.manual);
     });
   }
+
+  test("W12: the statement and the privacy notice carry the same date in both languages", async ({
+    page,
+  }) => {
+    for (const which of ["accessibility", "privacy"]) {
+      const dates: string[] = [];
+      for (const path of [`/${which}/`, `/he/${which}/`]) {
+        await page.goto(path);
+        dates.push((await page.locator(".longform-updated time").getAttribute("datetime")) ?? "");
+      }
+      expect(dates[0], which).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(dates[1], which).toBe(dates[0]);
+    }
+  });
 
   test("W10: the long-form pages' lists show their markers (preflight removed them)", async ({
     page,
@@ -294,4 +325,52 @@ test.describe("accessibility statement", () => {
       expect(new Set(types), path).toEqual(new Set(["disc"]));
     }
   });
+});
+
+test.describe("the privacy notice (W12, D-PRIVACY-FACTS)", () => {
+  /** The operator's answers of 2026-11-07, as the page states them, and what must be gone. */
+  for (const s of [
+    {
+      path: "/privacy/",
+      facts: [
+        "We take messages by email only; this site has no form.",
+        "what you put in the email is what we receive",
+        "Cloudflare delivers this site to you.",
+        "Cloudflare processes your IP address and the details of your requests",
+        "Our own servers keep access logs, which may include IP addresses. We keep them for at most 30 days.",
+        "We keep your messages for 12 months after the last message, and then delete them.",
+        "You can ask to see, correct or delete what you sent us.",
+      ],
+      gone: [/design[- ]partner/i, /legal review/i, /static host/i],
+    },
+    {
+      path: "/he/privacy/",
+      facts: [
+        "פונים אלינו רק בדוא״ל — באתר אין טופס.",
+        "מה שיופיע בהודעה הוא מה שנקבל",
+        "האתר מגיע אליכם דרך Cloudflare.",
+        "Cloudflare מעבדת את כתובת ה־IP שלכם ואת פרטי הבקשות שלכם",
+        "השרתים שלנו שומרים יומני גישה, ויכולות להופיע בהם כתובות IP. אנחנו שומרים אותם 30 יום לכל היותר.",
+        "אנחנו שומרים את ההודעות שלכם 12 חודשים מההודעה האחרונה, ואז מוחקים אותן.",
+        "אפשר לבקש לראות את מה ששלחתם לנו, לתקן אותו או למחוק אותו.",
+      ],
+      gone: [/design[- ]partner/i, /שותפ(?:י|ים|ות)? (?:ה)?פיתוח/, /legal review/i],
+    },
+  ]) {
+    test(`${s.path} states the answers and nothing of the old notice`, async ({ page }) => {
+      await page.goto(s.path);
+      const text = (await page.evaluate(() => document.body.innerText)).replace(/\s+/g, " ");
+      for (const fact of s.facts) expect(text, fact).toContain(fact);
+      for (const g of s.gone) expect(text).not.toMatch(g);
+      // Cloudflare's own policy, as a plain link (no request: tests/origins.spec.ts allows it here).
+      await expect(
+        page.locator('main a[href="https://www.cloudflare.com/privacypolicy/"]'),
+      ).toHaveCount(1);
+      // The rights section's address, and the two pages whose buttons open the template.
+      await expect(page.locator('main a[href^="mailto:"]')).toHaveCount(1);
+      const prefix = s.path.startsWith("/he/") ? "/he" : "";
+      await expect(page.locator(`main a[href="${prefix}/pilot/#apply"]`)).toHaveCount(1);
+      await expect(page.locator(`main a[href="${prefix}/contact/"]`)).toHaveCount(1);
+    });
+  }
 });

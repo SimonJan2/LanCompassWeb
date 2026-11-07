@@ -3,6 +3,7 @@ import type { GetStaticPaths } from "astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import AnnotatedScreen from "../../components/AnnotatedScreen.astro";
 import CTABand from "../../components/CTABand.astro";
+import CompareSlider from "../../components/CompareSlider.astro";
 import HowItRuns from "../../components/HowItRuns.astro";
 import Icon from "../../components/Icon.astro";
 import SectionHeading from "../../components/SectionHeading.astro";
@@ -61,6 +62,22 @@ const figures = p.sections.map((s) =>
       </ul>
     </div>
   </nav>
+
+  {/* W13 (D-SHOWCASE B): both official themes, one window, before Fig. 1. */}
+  <CompareSlider locale={locale} />
+
+  {/* W13 (D-SHOWCASE C): each figure's "Survey | Night chart" control, written once; /product's
+      script (src/scripts/showcase.ts) puts a copy on every figure's frame. */}
+  <template data-fig-sets>
+    <div class="fig-sets" role="group" aria-label={copy.showcase.figure}>
+      <button type="button" data-set="survey">
+        {copy.showcase.survey}
+      </button>
+      <button type="button" data-set="night-chart">
+        {copy.showcase.night}
+      </button>
+    </div>
+  </template>
 
   <div class="container-site product-sections">
     {p.sections.map((s, index) => (
@@ -130,9 +147,14 @@ const figures = p.sections.map((s) =>
 
 <script>
   import "../../scripts/scrollspy.ts";
+  import "../../scripts/showcase.ts";
 </script>
 
-<style>
+<style is:global>
+  /* W13: global styles (no scoped attributes): the 273 data-astro-cid attributes a scoped style
+     wrote on this page's elements did not fit /he/product/'s first round trip once the slider
+     and the figures' controls came. The rules and their order are the scoped ones; every class
+     here is this page's own. */
   .product-hero {
     position: relative;
     isolation: isolate;
@@ -233,7 +255,7 @@ const figures = p.sections.map((s) =>
     font-size: var(--lc-text-lead);
   }
 
-  .capability-intro :global(code) {
+  .capability-intro code {
     color: var(--lc-ink);
   }
 
@@ -259,7 +281,7 @@ const figures = p.sections.map((s) =>
     font-size: var(--lc-text-small);
   }
 
-  .capability-bullets :global(.capability-check) {
+  .capability-bullets .capability-check {
     flex: none;
     margin-block-start: 0.25rem;
     color: var(--lc-documented-line);
@@ -277,7 +299,7 @@ const figures = p.sections.map((s) =>
     margin-block-start: 2.5rem;
   }
 
-  .capability-body :global(.capability-runs) {
+  .capability-body .capability-runs {
     margin-block-start: 2.5rem;
   }
 

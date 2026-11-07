@@ -2,6 +2,7 @@
 import Button from "./Button.astro";
 import Icon from "./Icon.astro";
 import LanguageSwitcher from "./LanguageSwitcher.astro";
+import ThemeSwitch from "./ThemeSwitch.astro";
 import { site } from "../config/site";
 import {
   pagePath,
@@ -37,6 +38,7 @@ const ui = useUi(locale);
   <dialog class="menu-sheet" aria-label={ui.nav.mobileLabel} data-menu-sheet>
     <div class="sheet-top">
       <span class="sheet-title">{ui.nav.menu}</span>
+      {site.theme === "auto" && <ThemeSwitch locale={locale} class="sheet-switch" />}
       <button type="button" class="menu-close" data-menu-close>
         <Icon name="close" size={22} inline />
         <span class="visually-hidden">{ui.nav.closeMenu}</span>

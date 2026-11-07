@@ -5,7 +5,8 @@ import { defineConfig, devices } from "@playwright/test";
  *   - dist-test       on :4321 — light; every PUBLIC_* flag empty except the contact email
  *   - dist-test-flags on :4322 — light; docs and form endpoint set (and PUBLIC_GITHUB_URL, which
  *                               must render nothing: DECISIONS.md D-GITHUB); no contact email,
- *                               so no /.well-known/security.txt (W6)
+ *                               so no /.well-known/security.txt (W6); a preview
+ *                               (PUBLIC_SITE_INDEXING=false, W12)
  *   - dist-test-dark  on :4323 — PUBLIC_SITE_THEME=dark (form endpoint set)
  *   - dist-test-auto  on :4324 — PUBLIC_SITE_THEME=auto (form endpoint set)
  *
@@ -32,6 +33,9 @@ const themed = [
   "pilot",
   "changelog",
   "docs",
+  // W13: the switch (auto builds; it checks that light and dark have none) and the showcase.
+  "theme-switch",
+  "showcase",
 ].map((name) => `${name}.spec.ts`);
 
 export default defineConfig({

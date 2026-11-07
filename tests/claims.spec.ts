@@ -173,7 +173,8 @@ const FIGURE_ALLOWLIST: { match: RegExp; reason: string }[] = [
   },
   { match: /^404$/, reason: "the HTTP status of the not-found page" },
   {
-    match: /WCAG 2\.1.*5568/,
+    // W12: the description names the standard as the statement does (IS 5568 Part 1, WCAG 2.2).
+    match: /5568 (?:Part|חלק) 1.*WCAG 2\.2/,
     reason: "the accessibility page's metadata: the standards this site meets (a legal page)",
   },
   {

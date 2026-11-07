@@ -3,6 +3,7 @@ import Button from "./Button.astro";
 import LanguageSwitcher from "./LanguageSwitcher.astro";
 import Logo from "./Logo.astro";
 import MobileNav from "./MobileNav.astro";
+import ThemeSwitch from "./ThemeSwitch.astro";
 import { site } from "../config/site";
 import {
   pagePath,
@@ -61,6 +62,7 @@ const links: { page: PageKey; label: string }[] = [
       </ul>
     </nav>
     <div class="header-actions">
+      {site.theme === "auto" && <ThemeSwitch locale={locale} />}
       <LanguageSwitcher locale={locale} page={page} paths={paths} />
       <Button href={`${pagePath(locale, "pilot")}#apply`} class="header-cta">
         {ui.nav.cta}

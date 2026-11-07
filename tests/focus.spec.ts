@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { readdirSync, statSync, writeFileSync } from "node:fs";
 import { join, relative } from "node:path";
-import { docsSample, pages, sectionPages, siteProject } from "./helpers";
+import { AUTO, docsSample, pages, sectionPages, siteProject } from "./helpers";
 
 /**
  * W10, WCAG 2.2 success criterion 2.4.11 Focus Not Obscured (Minimum, AA): a component that
@@ -244,5 +244,46 @@ test.describe("2.4.11 focus not obscured by the header", () => {
       return a.getBoundingClientRect().top < header.getBoundingClientRect().bottom;
     });
     expect(covered).toBe(true);
+  });
+
+  // W13: the light/dark switch (auto builds), the slider and each figure's set control take focus
+  // in order, show it, are never under the header, and work from the keyboard.
+  test("the switch, the slider and the figures' controls (auto build), en and he", async ({
+    page,
+  }) => {
+    test.setTimeout(240_000);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const hidden: string[] = [];
+    for (const path of ["/", "/he/", "/product/", "/he/product/", "/pilot/"]) {
+      const r = await walk(page, `${AUTO}${path}`);
+      hidden.push(...r.hidden);
+    }
+    expect(hidden).toEqual([]);
+    for (const path of ["/", "/he/"]) {
+      await page.goto(`${AUTO}${path}`);
+      const sw = page.locator(".header-actions > [data-theme-switch]");
+      for (let i = 0; i < 12; i++) {
+        if (await sw.evaluate((el) => el === document.activeElement)) break;
+        await page.keyboard.press("Tab");
+      }
+      await expect(sw).toBeFocused();
+      expect(await sw.evaluate((el) => getComputedStyle(el).outlineStyle)).not.toBe("none");
+      await page.keyboard.press("Enter");
+      expect(await page.evaluate(() => document.documentElement.dataset["theme"])).toBe("dark");
+      await page.keyboard.press(" ");
+      expect(await page.evaluate(() => document.documentElement.dataset["theme"])).toBe("auto");
+    }
+    await page.goto(`${AUTO}/product/`);
+    const range = page.locator("[data-compare] input");
+    await range.focus();
+    await expect(range).toBeFocused();
+    const knob = await page
+      .locator("[data-compare]")
+      .evaluate((el) => getComputedStyle(el, "::after").outlineStyle);
+    expect(knob).not.toBe("none");
+    const set = page.locator("#fig-1 .fig-sets button").last();
+    await set.focus();
+    await page.keyboard.press("Enter");
+    await expect(set).toHaveAttribute("aria-pressed", "true");
   });
 });

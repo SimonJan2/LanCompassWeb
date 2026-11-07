@@ -9,6 +9,10 @@ const DOCS_LINKS = [
   "https://github.com/netbox-community/devicetype-library",
 ];
 
+/** W12 (D-PRIVACY-FACTS): /privacy/ names who delivers the site and links that company's own
+ *  privacy policy — a reader's navigation, not a request the page makes. */
+const PRIVACY_LINKS = ["https://www.cloudflare.com/privacypolicy/"];
+
 /** Every page of a built site, as the path a browser asks for (W10: the crawl covers them all). */
 function builtPaths(dist: string): string[] {
   const root = join(process.cwd(), dist);
@@ -133,6 +137,7 @@ test.describe("no third parties", () => {
             // W9: the product's docs keep their own https:// links (a reader's navigation, not
             // a request the page makes): exactly these two, on the racks article only.
             if (/\/docs\/racks\/index\.html$/.test(file) && DOCS_LINKS.includes(url)) continue;
+            if (/\/privacy\/index\.html$/.test(file) && PRIVACY_LINKS.includes(url)) continue;
             offenders.push(`${file}: ${url}`);
           }
         }

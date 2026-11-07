@@ -1,0 +1,74 @@
+---
+/**
+ * W13 (DECISIONS.md D-SHOWCASE D): twin frames — one product screen in its two official themes
+ * (C-THM-1), side by side and offset like two sheets on a table, both whole. No motion, nothing to
+ * press. On /pilot/ under the hero ("What you will run"): the design studio, as the twin slot
+ * draws it (src/content/screen-slots.json): the atlas crop on a desktop, each frame sized so the
+ * crop is drawn at its own size or a little larger and stays sharp (D-LEGIBLE); the figure's
+ * phone crop on a phone, one frame under the other. Lazy, and the same in every build (both sets
+ * ship: astro.config.mjs → screensForTheme).
+ */
+import ScreenshotFrame from "./ScreenshotFrame.astro";
+import SectionHeading from "./SectionHeading.astro";
+import { getCopy } from "../content/copy";
+import type { Locale } from "../i18n";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const s = getCopy(locale).showcase;
+---
+
+<section class="twin" aria-labelledby="twin-title">
+  <SectionHeading title={s.twin.title} lead={s.twin.lead} id="twin-title" />
+  <div class="twin-pair">
+    <figure>
+      <ScreenshotFrame screen="design-studio" locale={locale} slot="twin" set="survey" />
+      <figcaption>{s.survey}</figcaption>
+    </figure>
+    <figure>
+      <ScreenshotFrame screen="design-studio" locale={locale} slot="twin" set="night-chart" />
+      <figcaption>{s.night}</figcaption>
+    </figure>
+  </div>
+</section>
+
+<style is:global>
+  .twin .twin-pair {
+    display: grid;
+    gap: 2rem;
+    margin-block-start: 2rem;
+  }
+
+  .twin figure {
+    margin: 0;
+  }
+
+  .twin figcaption {
+    margin-block-start: 0.625rem;
+    color: var(--lc-ink-muted);
+    font-size: var(--lc-text-small);
+  }
+
+  /* A desktop: two frames, the second a step lower, each picture drawn at 468 px — the atlas
+     crop's 456 app px at a little over 1:1, and two file pixels per CSS px (958 px served). */
+  @media (min-width: 960px) {
+    .twin .twin-pair {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2.5rem;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .twin .twin-pair > figure:last-child {
+      margin-block-start: 3rem;
+    }
+
+    .twin .shot picture {
+      inline-size: 468px;
+    }
+  }
+</style>

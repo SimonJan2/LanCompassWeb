@@ -1,5 +1,5 @@
 {
-  "$comment": "W11: the slots that draw a product screen, one entry per slot kind. drawn: the width the slot draws its picture at a 1,440- and a 390-px window (CSS px; null where the slot is not drawn), in a light and a dark build (the dark frame's card-indigo mat, night.css, takes 20 px), measured on a build (start: 50b33ed, night E's probe; result: this wave's build). crop: the app view a crop holds (CSS px of the product's 1,440 x 900 window), never wider than the slot draws it in either theme, 2 px to spare (DECISIONS.md D-LEGIBLE; the two sets share their clips, so an auto build marks both alike), 16:10 like the window (the loop's 2:1 band like its frame); phone: the crop a window below the breakpoint loads (D-PHONE-SCREENS), null where the desktop crop serves both widths or the slot is not drawn on a phone. full: the slot draws the whole window on a desktop. serve: the served WebP's width in pixels, twice the widest drawn width plus 2 px for sub-pixel layout, so a device-scale-2 screen gets two pixels per CSS px. quality: the served WebP's quality (default 80; What's new 70: its three images load before the English home's hero paints, and Lighthouse counts their bytes against the LCP budget). focus: per key and picture, the one thing the slot's caption or text names (selector: the first visible match, largest: the largest one; text: the first element whose text matches; card: its nearest bordered box at least this wide; union: several of these together; note: what the crop shows); scripts/capture-screenshots.mjs cuts a clip of the crop's size around it, pad px (default 16) outside it, inside the window: centred when the thing is smaller than the clip (fit start: from its start edge anyway), from its start edge when larger — its left in English, its right in Hebrew (edge end: the other one). Read by the capture script, src/lib/screens.ts and tests/legibility.spec.ts.",
+  "$comment": "W11: the slots that draw a product screen, one entry per slot kind. drawn: the width the slot draws its picture at a 1,440- and a 390-px window (CSS px; null where the slot is not drawn), in a light and a dark build (the dark frame's card-indigo mat, night.css, takes 20 px), measured on a build (start: 50b33ed, night E's probe; result: this wave's build). crop: the app view a crop holds (CSS px of the product's 1,440 x 900 window), never wider than the slot draws it in either theme, 2 px to spare (DECISIONS.md D-LEGIBLE; the two sets share their clips, so an auto build marks both alike), 16:10 like the window (the loop's 2:1 band like its frame); phone: the crop a window below the breakpoint loads (D-PHONE-SCREENS), null where the desktop crop serves both widths or the slot is not drawn on a phone. full: the slot draws the whole window on a desktop. serve: the served WebP's width in pixels, twice the widest drawn width plus 2 px for sub-pixel layout, so a device-scale-2 screen gets two pixels per CSS px. quality: the served WebP's quality (default 80; What's new 70: its three images load before the English home's hero paints, and Lighthouse counts their bytes against the LCP budget). focus: per key and picture, the one thing the slot's caption or text names (selector: the first visible match, largest: the largest one; text: the first element whose text matches; card: its nearest bordered box at least this wide; union: several of these together; note: what the crop shows); scripts/capture-screenshots.mjs cuts a clip of the crop's size around it, pad px (default 16) outside it, inside the window: centred when the thing is smaller than the clip (fit start: from its start edge anyway), from its start edge when larger — its left in English, its right in Hebrew (edge end: the other one). Read by the capture script, src/lib/screens.ts and tests/legibility.spec.ts. W13 (D-SHOWCASE): three slots draw both official sets in every build (both: true): sweep, compare and twin. Their pictures are no new capture: a whole window derived at the slot's serve width (scripts/capture-screenshots.mjs --derive), or another slot's crop reused as it is (from: that picture's name), so a re-capture cuts nothing twice; their drawn widths are measured on night F's builds (start: null, the slots are new).",
   "breakpoint": 960,
   "windows": [1440, 390],
   "slots": {
@@ -104,6 +104,50 @@
       },
       "crop": { "width": 733, "height": 458, "serve": 1513 },
       "phone": { "width": 330, "height": 206, "serve": 707 }
+    },
+    "sweep": {
+      "where": "W13 (D-SHOWCASE A): the home page's dusk sweep (/, /he/), Survey beneath and Night chart above; its still state shows both as twin frames",
+      "keys": ["map-ages"],
+      "both": true,
+      "drawn": {
+        "start": null,
+        "result": {
+          "light": { "1440": 1198, "390": 352.5 },
+          "dark": { "1440": 1178, "390": 332.5 }
+        }
+      },
+      "crop": null,
+      "full": { "width": 1440, "height": 900, "serve": 2398 },
+      "phone": { "width": 330, "height": 206, "serve": 707, "from": "figure-phone" }
+    },
+    "compare": {
+      "where": "W13 (D-SHOWCASE B): /product's slider before Fig. 1, the two sets of one window under a movable boundary",
+      "keys": ["dashboard"],
+      "both": true,
+      "drawn": {
+        "start": null,
+        "result": {
+          "light": { "1440": 1198, "390": 352.5 },
+          "dark": { "1440": 1178, "390": 332.5 }
+        }
+      },
+      "crop": null,
+      "full": { "width": 1440, "height": 900, "serve": 2398 },
+      "phone": { "width": 330, "height": 206, "serve": 707, "from": "figure-phone" }
+    },
+    "twin": {
+      "where": "W13 (D-SHOWCASE D): /pilot's twin frames under the hero, both sets side by side and offset (stacked on a phone)",
+      "keys": ["design-studio"],
+      "both": true,
+      "drawn": {
+        "start": null,
+        "result": {
+          "light": { "1440": 468, "390": 352.5 },
+          "dark": { "1440": 468, "390": 332.5 }
+        }
+      },
+      "crop": { "width": 456, "height": 285, "serve": 958, "from": "atlas" },
+      "phone": { "width": 330, "height": 206, "serve": 707, "from": "figure-phone" }
     }
   },
   "focus": {

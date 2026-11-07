@@ -13,7 +13,8 @@ import { pages, rendersDark, siteProject } from "./helpers";
  *    a crop; a whole window is drawn only at ≥ 0.8, and never below 960 px;
  *  - the loaded file has at least two pixels per CSS px it is drawn at (sharp at device scale 2);
  *  - below 960 px a slot with a phone crop loads it (currentSrc), above it the desktop crop;
- *  - the loaded file is the scheme's own set: Night chart where the page renders dark;
+ *  - the loaded file is the scheme's own set: Night chart where the page renders dark (W13: the
+ *    showcase's frames — the sweep, the slider, the twin frames — show a fixed set, both ways);
  *  - one candidate per <source>, and no srcset width list.
  */
 
@@ -33,6 +34,8 @@ interface Shot {
   src: string;
   drawn: number;
   natural: number;
+  /** W13: a showcase frame (the sweep, the slider, the twin frames) shows a fixed set. */
+  showcase: boolean;
 }
 
 /** Every shown screen image on the page, after every lazy one has loaded. */
@@ -64,6 +67,7 @@ async function shots(page: Page): Promise<Shot[]> {
           src: new URL(img.currentSrc).pathname,
           drawn: r.width,
           natural: img.naturalWidth,
+          showcase: !!s.closest(".sweep, .compare, .twin"),
         },
       ];
     }),
@@ -92,9 +96,11 @@ for (const p of pages) {
         const f = parse(s.src);
         expect(f, `${id}: a served screen`).not.toBeNull();
         expect(f!.key, id).toBe(s.key);
-        expect(f!.set, `${id}: the scheme's own set`).toBe(
-          rendersDark() ? "night-chart" : "survey",
-        );
+        // W13: the showcase shows both official sets in every build, by design.
+        if (!s.showcase)
+          expect(f!.set, `${id}: the scheme's own set`).toBe(
+            rendersDark() ? "night-chart" : "survey",
+          );
         const slot = f!.picture.replace(/-phone$/, "");
         const phone = f!.picture.endsWith("-phone");
         const hasPhone = slotTable.slots[slot]?.phone != null;

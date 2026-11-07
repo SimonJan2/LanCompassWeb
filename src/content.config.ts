@@ -10,7 +10,9 @@ const pages = defineCollection({
     title: z.string(),
     lead: z.string(),
     updated: z.string(),
-    /** Shows a visible TODO(operator) legal-review marker above the text. */
+    /** Whether a lawyer's reading is still pending. Since W12 nothing is rendered from it
+     *  (DECISIONS.md D-LEGAL-BANNERS: the banners are gone; the reading stays on the operator's
+     *  checklist, docs/go-public.md): the pages say `false`. */
     legalReview: z.boolean().default(false),
   }),
 });

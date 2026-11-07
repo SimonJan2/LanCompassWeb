@@ -59,12 +59,12 @@ export const en = {
     accessibility: {
       title: "Accessibility statement — LanCompass",
       description:
-        "How this site meets WCAG 2.1 AA and Israeli Standard 5568, and how to report a problem.",
+        "The standard this site is built to, Israeli Standard 5568 Part 1 at AA, tested against WCAG 2.2 AA; and how to report a problem.",
     },
     privacy: {
       title: "Privacy — LanCompass",
       description:
-        "This site sets no cookies and loads nothing from third parties. What the forms collect and why.",
+        "This site sets no cookies and loads nothing from other sites. How to reach us by email, who delivers the site, and how long anything is kept.",
     },
     notFound: {
       title: "Page not found — LanCompass",
@@ -1441,6 +1441,47 @@ export const en = {
     next: "Next",
     stale: "This translation may be outdated — the English article changed since",
     index: "All the docs",
+  },
+  /** W13 (DECISIONS.md D-SHOWCASE, D-SWITCH): the product's two official themes on the page, and
+   *  the site's light/dark switch. The themes' names and "official pair" cite C-THM-1. */
+  showcase: {
+    // C-THM-1
+    survey: "Survey",
+    // C-THM-1
+    night: "Night chart",
+    /** A — the home's dusk sweep (and its still state, twin frames). */
+    sweep: {
+      // C-THM-1
+      title: "The same map, by day and by night",
+      // C-THM-1
+      lead: "Survey and Night chart are the product’s two official themes: Survey by day, Night chart by night.",
+      // C-THM-1
+      day: "Survey · by day",
+      // C-THM-1
+      night: "Night chart · by night",
+    },
+    /** B — /product's slider: its name and its value, {s} and {n} in per cent. */
+    compare: {
+      // C-THM-1
+      title: "Both themes, one screen",
+      // C-THM-1
+      lead: "Move the line across the dashboard to compare Survey with Night chart.",
+      // C-THM-1
+      label: "Compare Survey and Night chart",
+      // C-THM-1
+      value: "Survey {s}%, Night chart {n}%",
+    },
+    /** C — the Survey | Night chart control on each /product figure. */
+    figure: "The theme of this picture",
+    /** D — /pilot's twin frames. */
+    twin: {
+      title: "What you will run",
+      // C-THM-1
+      lead: "The design studio in Survey and in Night chart, the product’s two official themes.",
+    },
+    /** E — the switch: its name says what a press does. */
+    toDark: "Switch to dark theme",
+    toLight: "Switch to light theme",
   },
 };
 

@@ -1,5 +1,5 @@
 // @ts-check
-import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "astro/config";
@@ -12,6 +12,8 @@ import { SECURITY_TXT_PATH, securityTxt } from "./src/lib/security-txt.ts";
 import { markRules } from "./src/lib/annotations.ts";
 import { productMarkdown } from "./src/lib/product-markdown.mjs";
 import { getCopy } from "./src/content/copy/index.ts";
+import { readIndexing } from "./src/lib/indexing.ts";
+import { bothSetFiles } from "./src/lib/screens.ts";
 
 const env = loadEnv(process.env.NODE_ENV ?? "production", process.cwd(), "PUBLIC_");
 const siteUrl = (env.PUBLIC_SITE_URL || "http://localhost:4321").replace(/\/$/, "");
@@ -21,6 +23,8 @@ if (!/^https?:\/\/[^/]/.test(siteUrl)) {
   );
 }
 const formEndpoint = env.PUBLIC_FORM_ENDPOINT || "";
+// W12 (DECISIONS.md D-INDEXING): false makes a preview build (src/config/site.ts → readIndexing).
+const siteIndexing = readIndexing(env.PUBLIC_SITE_INDEXING);
 const siteTheme = (env.PUBLIC_SITE_THEME || "light").trim().toLowerCase() || "light";
 if (!["light", "dark", "auto"].includes(siteTheme)) {
   throw new Error(
@@ -36,7 +40,12 @@ if (!["light", "dark", "auto"].includes(siteTheme)) {
  *  - light: the light tokens only, so the light site is unchanged;
  *  - dark:  everything, as written;
  *  - auto:  light tokens, dark tokens, src/styles/auto.css, and the mapping plus night.css
- *           re-emitted as :root[data-theme="auto"] inside @media (prefers-color-scheme: dark).
+ *           re-emitted as :root[data-theme="auto"] inside @media (prefers-color-scheme: dark);
+ *           W13 (DECISIONS.md D-SWITCH): then the same mapping and night.css once more, unwrapped,
+ *           as written (:root[data-theme="dark"]). The switch's code (src/scripts/site.ts) turns
+ *           data-theme="auto" into "light" or "dark" for a visitor who chose an override, so
+ *           "dark" renders exactly as the dark build and "light" (no dark block applies) as the
+ *           light build. Without an override nothing here applies: the page is today's auto.
  * Tailwind reads imported stylesheets from disk, so this runs on global.css, before Tailwind.
  * @returns {import("vite").Plugin}
  */
@@ -58,11 +67,9 @@ function themeCss() {
       let css = light;
       if (siteTheme === "dark") css = `${tokens}\n${await read("night.css")}`;
       if (siteTheme === "auto") {
-        const rules = `${mapping}\n${await read("night.css")}`.replaceAll(
-          '[data-theme="dark"]',
-          '[data-theme="auto"]',
-        );
-        css = `${light}\n${darkTokens}\n${await read("auto.css")}\n@media (prefers-color-scheme: dark) {\n${rules}\n}`;
+        const dark = `${mapping}\n${await read("night.css")}`;
+        const rules = dark.replaceAll('[data-theme="dark"]', '[data-theme="auto"]');
+        css = `${light}\n${darkTokens}\n${await read("auto.css")}\n@media (prefers-color-scheme: dark) {\n${rules}\n}\n${dark}`;
       }
       const marker = '@import "./tokens.css";';
       if (!code.includes(marker)) throw new Error(`themeCss: ${marker} not found in global.css`);
@@ -179,6 +186,33 @@ function headersFormAction() {
 }
 
 /**
+ * W12 (DECISIONS.md D-INDEXING): a preview build (PUBLIC_SITE_INDEXING=false) adds
+ * `X-Robots-Tag: noindex` to the built `_headers` file's `/*` block, the block every response gets
+ * (Netlify, Cloudflare Pages; docker/render-nginx-headers.mjs turns the same block into nginx's
+ * headers, so the image sends it on pages, assets, images and 404s alike). An indexed build's
+ * `_headers` is unchanged. No HTML changes either way.
+ * @returns {import("astro").AstroIntegration}
+ */
+function headersNoindex() {
+  return {
+    name: "lancompass:headers-noindex",
+    hooks: {
+      "astro:build:done": async ({ dir }) => {
+        if (siteIndexing) return;
+        const file = fileURLToPath(new URL("_headers", dir));
+        const lines = (await readFile(file, "utf8")).split("\n");
+        const start = lines.indexOf("/*");
+        if (start < 0) throw new Error("headersNoindex: no /* block in _headers");
+        let end = start + 1;
+        while (end < lines.length && /^\s+\S/.test(lines[end] ?? "")) end++;
+        lines.splice(end, 0, "  X-Robots-Tag: noindex");
+        await writeFile(file, lines.join("\n"));
+      },
+    },
+  };
+}
+
+/**
  * W6: writes /.well-known/security.txt (RFC 9116) only when PUBLIC_CONTACT_EMAIL and
  * PUBLIC_SITE_URL are both set (DECISIONS.md D-CONTACT); otherwise the build has no such file.
  * Expires is 180 days after the build. See src/lib/security-txt.ts.
@@ -204,23 +238,29 @@ function securityTxtFile() {
 
 /**
  * W11: public/screens/<set>/ holds both capture sets (Survey, Night chart). A light build serves
- * only Survey and a dark build only Night chart, so the other set's folder is left out of the
- * build; an auto build keeps both (src/lib/screens.ts → screenSets).
+ * only Survey and a dark build only Night chart, so the other set's files are left out of the
+ * build; an auto build keeps both (src/lib/screens.ts → screenSets). W13 (D-SHOWCASE): every
+ * build shows both official themes in the showcase (the sweep, the slider, the twin frames) and
+ * lets each /product figure switch to the other set, so a light or dark build keeps exactly the
+ * other set's files those use (src/lib/screens.ts → bothSetFiles) and leaves out the rest.
  * @returns {import("astro").AstroIntegration}
  */
 function screensForTheme() {
   /** @type {Record<string, string[]>} */
   const keep = { light: ["survey"], dark: ["night-chart"], auto: ["survey", "night-chart"] };
+  const both = new Set(bothSetFiles());
   return {
     name: "lancompass:screens-for-theme",
     hooks: {
       "astro:build:done": async ({ dir }) => {
         for (const set of ["survey", "night-chart"]) {
           if (keep[siteTheme]?.includes(set)) continue;
-          await rm(fileURLToPath(new URL(`screens/${set}/`, dir)), {
-            recursive: true,
-            force: true,
-          });
+          for (const locale of localeCodes) {
+            const folder = fileURLToPath(new URL(`screens/${set}/${locale}/`, dir));
+            for (const name of await readdir(folder).catch(() => [])) {
+              if (!both.has(name)) await rm(join(folder, name), { force: true });
+            }
+          }
         }
       },
     },
@@ -251,6 +291,7 @@ export default defineConfig({
       filter: (page) => !/\/404\/?$/.test(page) && !/\/design-partners\/?$/.test(page),
     }),
     headersFormAction(),
+    headersNoindex(),
     localized404(),
     securityTxtFile(),
     screensForTheme(),
@@ -265,5 +306,8 @@ export default defineConfig({
     plugins: [themeCss(), figureMarksCss(), tailwindcss()],
     // Never inline scripts into HTML: the CSP has no 'unsafe-inline' for scripts.
     build: { assetsInlineLimit: 0 },
+    // W13 (D-SWITCH): the switch's code in src/scripts/site.ts runs in an auto build only; in a
+    // light or dark build this constant is false and the minifier drops that code entirely.
+    define: { __LC_AUTO__: JSON.stringify(siteTheme === "auto") },
   },
 });

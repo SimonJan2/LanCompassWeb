@@ -2,7 +2,7 @@
 /** Builds the sites the Playwright suite serves (see playwright.config.ts). */
 import { execFileSync } from "node:child_process";
 
-const empty = { PUBLIC_DOCS_URL: "", PUBLIC_FORM_ENDPOINT: "" };
+const empty = { PUBLIC_DOCS_URL: "", PUBLIC_FORM_ENDPOINT: "", PUBLIC_SITE_INDEXING: "" };
 /** A site in one theme, on one port: every flag empty except the contact email, plus
  *  (for the dark and auto builds) the form endpoint, so their forms are tested too. */
 const themed = (outDir, port, theme, extra = {}) => ({
@@ -32,6 +32,9 @@ export const builds = [
       PUBLIC_GITHUB_URL: "https://github.com/example/lancompass",
       PUBLIC_FORM_ENDPOINT: "https://forms.example.com/submit",
       PUBLIC_SITE_THEME: "light",
+      // W12 (D-INDEXING): a preview build: X-Robots-Tag: noindex in _headers, no sitemap in
+      // robots.txt (tests/flags.spec.ts). The other builds index, as the default does.
+      PUBLIC_SITE_INDEXING: "false",
       // W9: one fixture docs page the product marks as an outdated translation
       // (tests/fixtures/docs/he/stale-fixture.md), so the notice is rendered and tested
       // (tests/docs.spec.ts). No 0.7.0 page needs it, and no other build reads the fixture.

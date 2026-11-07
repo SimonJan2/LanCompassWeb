@@ -37,6 +37,9 @@ interface Props {
   decorative?: boolean;
   /** Editorial crop: the frame's shape. Captures are 16:10; "wide" crops to 2:1 from the top. */
   crop?: "full" | "wide";
+  /** W13 (D-SHOWCASE): one set, whatever the build's theme — the showcase shows both official
+   *  themes side by side, so its pictures never follow the page's scheme. */
+  set?: ScreenSet;
   class?: string;
 }
 
@@ -48,14 +51,19 @@ const {
   eager = false,
   decorative = false,
   crop = "full",
+  set,
   class: className,
 } = Astro.props;
 const ui = useUi(locale);
 const name = ui.screenshot.screens[screen];
 /** The atlas previews stay in the light set in auto: their nine Night chart twins would not fit
- *  the home page's first round trip, so under a dark scheme they step aside (AtlasIndex.astro). */
-const sets: ScreenSet[] =
-  slot === "atlas" && site.theme === "auto" ? ["survey"] : screenSets(site.theme);
+ *  the home page's first round trip, so under a dark scheme they step aside (AtlasIndex.astro);
+ *  under a dark override the theme switch shows their Night chart files (src/scripts/site.ts). */
+const sets: ScreenSet[] = set
+  ? [set]
+  : slot === "atlas" && site.theme === "auto"
+    ? ["survey"]
+    : screenSets(site.theme);
 const [lightSet, darkSet] = sets;
 const light = slotPictures(slot, lightSet!, screenLocale, screen);
 const dark = darkSet ? slotPictures(slot, darkSet, screenLocale, screen) : null;

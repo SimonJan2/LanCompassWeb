@@ -18,8 +18,12 @@ services:
         PUBLIC_CONTACT_EMAIL: ${PUBLIC_CONTACT_EMAIL:-}
         PUBLIC_FORM_ENDPOINT: ${PUBLIC_FORM_ENDPOINT:-}
         PUBLIC_DOCS_URL: ${PUBLIC_DOCS_URL:-}
-        # light (default) | dark | auto. Change it in .env, then: docker compose up -d --build
-        PUBLIC_SITE_THEME: ${PUBLIC_SITE_THEME:-light}
+        # auto (default, the published theme: DECISIONS.md D-THEME) | light | dark. Change it in
+        # .env, then: docker compose up -d --build
+        PUBLIC_SITE_THEME: ${PUBLIC_SITE_THEME:-auto}
+        # true (default) | false. false = a preview: every response says X-Robots-Tag: noindex
+        # and robots.txt lists no sitemap. Remove it (or set true) when the site leaves preview.
+        PUBLIC_SITE_INDEXING: ${PUBLIC_SITE_INDEXING:-true}
         VERSION: ${LANCOMPASS_WEB_VERSION:-0.1.0}
         REVISION: ${LANCOMPASS_WEB_REVISION:-unknown}
     image: lancompass-web:${LANCOMPASS_WEB_VERSION:-0.1.0}

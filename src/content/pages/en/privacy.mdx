@@ -1,42 +1,47 @@
 ---
 eyebrow: Privacy
 title: Privacy notice
-lead: This site sets no cookies, runs no analytics and loads nothing from third parties. The only personal data it handles is what you choose to send us.
-updated: "2026-10-11"
-legalReview: true
+lead: This site sets no cookies, runs no analytics and loads nothing from other sites. Apart from what you choose to send us, the only personal data involved is your IP address and the details of your requests, handled as this page describes.
+updated: "2026-11-07"
+legalReview: false
 ---
 import ContactEmail from "../../../components/ContactEmail.astro";
+import { site } from "../../../config/site";
 
 ## What this site does not do
 
-- It sets **no cookies** and uses no local storage to track you.
-- It loads **nothing from third parties**: fonts, images and scripts are served from this site. There are no embeds, trackers or analytics.
+- It sets **no cookies** and keeps nothing in your browser to track you.
+- It loads **nothing from other sites**: fonts, images and scripts are served from this site’s own address. There are no embeds, trackers or analytics.
 - It does not build a profile of you.
 
 Because there are no cookies, there is no cookie banner.
 
-## What the forms collect, and why
+{site.theme === "auto" && <p>If you use the light/dark switch, this browser keeps your choice in its local storage (<code>lc-theme</code>); it is never sent to us, and clearing the site’s data removes it.</p>}
 
-The design-partner application asks for your name, organisation, role, work email, country, the size of your network, your main vendors, whether the network is air-gapped, and a message. The contact form asks for your name, work email, organisation and a message.
+## How to reach us
 
-We use this information only to answer you and, for design-partner applications, to judge whether LanCompass fits your network. We don’t sell it, and we don’t use it for advertising.
+We take messages by email only; this site has no form. The buttons on [the pilot page](/pilot/#apply) and [the contact page](/contact/) open your mail app with a short template to fill in. For a pilot request it asks for your name, organisation, role, country, the size of your network, your main vendors, whether the network is air-gapped, and a message; for anything else, your name, organisation and a message. Your email address comes with the message. Fill in only what you want to share: what you put in the email is what we receive.
 
-If you write to us by email instead, we receive what you put in the email.
+We use it only to answer you and, for a pilot request, to judge whether LanCompass fits your network. We don’t sell it, and we don’t use it for advertising.
 
-<p><span class="todo-operator">TODO(operator): legal review — name the service that receives form submissions (PUBLIC_FORM_ENDPOINT), where it stores them, and for how long.</span></p>
+{site.formEndpoint && <p><span class="todo-operator">TODO(operator): name the form service on this page before using a form</span></p>}
 
-## How long we keep it
+## Who delivers this site
 
-We keep messages for as long as we need them to answer you and to run the design-partner programme, and then delete them. <span class="todo-operator">TODO(operator): legal review — state the retention period.</span>
+Cloudflare delivers this site to you. To deliver and protect it, Cloudflare processes your IP address and the details of your requests, under [its own privacy policy](https://www.cloudflare.com/privacypolicy/).
+
+## Our servers’ access logs
+
+Our own servers keep access logs, which may include IP addresses. We keep them for at most 30 days.
+
+## How long we keep your messages
+
+We keep your messages for 12 months after the last message, and then delete them.
 
 ## Your rights
 
-You can ask to see, correct or delete the information you sent us. Write to <ContactEmail subject="Privacy request" />.
-
-## Server logs
-
-<p><span class="todo-operator">TODO(operator): legal review — describe what the static host logs (for example IP addresses in access logs) once the host is chosen.</span></p>
+You can ask to see, correct or delete what you sent us. Write to <ContactEmail subject="Privacy request" />.
 
 ## Changes
 
-If this notice changes, the date at the top of the page changes with it.
+This version of the notice is dated 7 November 2026. If it changes, the date at the top of the page changes with it.

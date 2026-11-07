@@ -1,0 +1,135 @@
+---
+/**
+ * W13 (DECISIONS.md D-SHOWCASE B): "drag the horizon" on /product/, before Fig. 1. One window of
+ * the product (the dashboard) in its two official themes (C-THM-1), Survey beneath and Night chart
+ * above, with a boundary between them that a native range input moves: a pointer or a finger, the
+ * arrow keys, Home and End. The input's value is Survey's share of the frame; its accessible name
+ * and its value text say so in the page's language. The boundary follows the thumb in both
+ * directions (from the left in English, from the right in Hebrew).
+ *
+ * The script (src/scripts/showcase.ts, /product's own) enables the input and writes one custom
+ * property through the CSSOM (style.setProperty: no style attribute in the markup, which the CSP
+ * forbids). Without JavaScript the frame rests at half and half and the input stays disabled, so
+ * it cannot take focus. The pictures are the compare slot's (src/content/screen-slots.json): the
+ * whole window on a desktop (≥ 0.8, D-LEGIBLE), the figure's phone crop on a phone; lazy, the same
+ * in every build. Global, prefixed styles (no scoped attributes on /product's first round trip).
+ */
+import ScreenshotFrame from "./ScreenshotFrame.astro";
+import SectionHeading from "./SectionHeading.astro";
+import { getCopy } from "../content/copy";
+import { fill, type Locale } from "../i18n";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const s = getCopy(locale).showcase;
+---
+
+<section class="compare container-site" aria-labelledby="compare-title">
+  <SectionHeading title={s.compare.title} lead={s.compare.lead} id="compare-title" />
+  <div class="compare-frame" data-compare>
+    <ScreenshotFrame screen="dashboard" locale={locale} slot="compare" set="survey" />
+    <ScreenshotFrame screen="dashboard" locale={locale} slot="compare" set="night-chart" />
+    <input
+      type="range"
+      disabled
+      aria-label={s.compare.label}
+      aria-valuetext={fill(s.compare.value, { s: "50", n: "50" })}
+      data-text={s.compare.value}
+    />
+  </div>
+  {/* Which side is which, for the eye; the slider's name and value text say it to a reader. */}
+  <p class="compare-legend" aria-hidden="true">
+    <span>{s.survey}</span>
+    <span>{s.night}</span>
+  </p>
+</section>
+
+<style is:global>
+  .compare {
+    padding-block: clamp(3rem, 2.5rem + 3vw, 5rem) 1rem;
+  }
+
+  /* The two windows share one cell; the second (Night chart) is drawn on the inline-end side of
+     the boundary, --compare per cent from the inline start. */
+  .compare .compare-frame {
+    --compare: 50%;
+    position: relative;
+    display: grid;
+    margin-block-start: 2rem;
+  }
+
+  .compare .compare-frame > .shot {
+    grid-area: 1 / 1;
+  }
+
+  .compare .compare-frame > .shot + .shot {
+    -webkit-mask-image: linear-gradient(to right, transparent var(--compare), #000 var(--compare));
+    mask-image: linear-gradient(to right, transparent var(--compare), #000 var(--compare));
+  }
+
+  [dir="rtl"] .compare .compare-frame > .shot + .shot {
+    -webkit-mask-image: linear-gradient(to left, transparent var(--compare), #000 var(--compare));
+    mask-image: linear-gradient(to left, transparent var(--compare), #000 var(--compare));
+  }
+
+  /* The boundary and its knob, drawn (no markup); the knob shows the input's focus. */
+  .compare .compare-frame::before,
+  .compare .compare-frame::after {
+    position: absolute;
+    inset-inline-start: var(--compare);
+    content: "";
+    pointer-events: none;
+  }
+
+  .compare .compare-frame::before {
+    inset-block: 0;
+    inline-size: 2px;
+    margin-inline-start: -1px;
+    background: var(--lc-paper-raised);
+    box-shadow: 0 0 0 1px var(--lc-ink);
+  }
+
+  .compare .compare-frame::after {
+    inset-block-start: 50%;
+    inline-size: 2.25rem;
+    block-size: 2.25rem;
+    margin-block-start: -1.125rem;
+    margin-inline-start: -1.125rem;
+    border: 2px solid var(--lc-ink);
+    border-radius: 50%;
+    background: var(--lc-paper-raised);
+  }
+
+  .compare .compare-frame:has(input:focus-visible)::after {
+    outline: 3px solid var(--lc-focus);
+    outline-offset: 2px;
+  }
+
+  /* The input covers the frame, unseen: a press anywhere moves the boundary there, a drag follows,
+     and a vertical swipe still scrolls the page. */
+  .compare .compare-frame input {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: ew-resize;
+    touch-action: pan-y;
+  }
+
+  .compare .compare-frame input:disabled {
+    cursor: default;
+  }
+
+  .compare .compare-legend {
+    display: flex;
+    justify-content: space-between;
+    margin-block-start: 0.75rem;
+    color: var(--lc-ink-muted);
+    font-size: var(--lc-text-small);
+  }
+</style>

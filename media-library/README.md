@@ -19,7 +19,9 @@ caption names, scaled from a render at device scale 3 to twice the width the slo
 enlarged), in both interface languages and the product's two official themes.
 `scripts/capture-screenshots.mjs` writes them here and derives the served WebP files in
 `public/screens/<set>/<locale>/` from them (`--derive` does that alone). W3's 760 × 475 focus
-crops (`<key>.focus.png`) are gone: no slot drew them at a readable size.
+crops (`<key>.focus.png`) are gone: no slot drew them at a readable size. W13's showcase slots
+(`sweep`, `compare`, `twin`) add no PNG here: their whole windows are derived from `<key>.png`
+(`map-ages.sweep.webp`, `dashboard.compare.webp`), and their crops are other slots' (`from`).
 
 | Theme       | Folder                 | Use                                   |
 | ----------- | ---------------------- | ------------------------------------- |

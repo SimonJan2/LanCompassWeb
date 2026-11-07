@@ -1,11 +1,142 @@
 /*
  * PUBLIC_SITE_THEME=auto: both palettes ship and the visitor's OS picks one, with no
  * JavaScript. Included only in an `auto` build (astro.config.mjs → themeCss); the dark
- * mapping follows it inside @media (prefers-color-scheme: dark).
+ * mapping follows it inside @media (prefers-color-scheme: dark), and since W13 once more under
+ * :root[data-theme="dark"], for a visitor whose override src/scripts/site.ts applies.
  */
 :root[data-theme="auto"] {
   color-scheme: light dark;
 }
 
 /* Videos: one player per slot since W5; the Night chart recording and poster sit behind
-   prefers-color-scheme: dark sources (VideoSlot.astro), so no rule is needed here. */
+   prefers-color-scheme: dark sources (VideoSlot.astro), so no rule is needed here. Under an
+   override the switch's script points those sources at the override's set (src/scripts/site.ts). */
+
+/* A figure's "Open the full screen" (AnnotatedScreen.astro): one link per set, the page's own
+   shown — the system's scheme, or the visitor's override (W13). */
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] .fig .fig-full-survey {
+    display: none;
+  }
+}
+
+@media not (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] .fig .fig-full-night-chart {
+    display: none;
+  }
+}
+
+:root[data-theme="dark"] .fig .fig-full-survey,
+:root[data-theme="light"] .fig .fig-full-night-chart {
+  display: none;
+}
+
+/*
+ * W13 (DECISIONS.md D-SWITCH): the switch (ThemeSwitch.astro). Shown once the site's script has
+ * run (html[data-js]), its box kept so nothing moves. It offers the opposite of the scheme on
+ * screen: a moon while the page is light, a sun while it is dark, both drawn here (no markup, no
+ * image request), and the visually hidden name that matches.
+ */
+.theme-switch {
+  position: relative;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  padding: 0;
+  border: 1px solid var(--lc-rule-strong);
+  border-radius: var(--lc-radius-sm);
+  background: transparent;
+  color: var(--lc-ink-muted);
+  cursor: pointer;
+}
+
+.theme-switch:hover {
+  color: var(--lc-ink);
+}
+
+:root:not([data-js]) .theme-switch {
+  visibility: hidden;
+}
+
+.theme-switch span {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* The moon: a crescent cut by an inset ring of the button's own colour. */
+.theme-switch::before {
+  inline-size: 1.125rem;
+  block-size: 1.125rem;
+  border-radius: 50%;
+  box-shadow: inset -0.375rem -0.25rem 0 0 currentColor;
+  content: "";
+  rotate: 200deg;
+}
+
+.theme-switch .ts-light {
+  display: none;
+}
+
+/* The sun: a disc and eight short rays, each a copy of the disc shrunk and moved out. */
+:root[data-theme="dark"] .theme-switch::before {
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  background: currentColor;
+  box-shadow:
+    0 -0.5rem 0 -0.125rem currentColor,
+    0 0.5rem 0 -0.125rem currentColor,
+    0.5rem 0 0 -0.125rem currentColor,
+    -0.5rem 0 0 -0.125rem currentColor,
+    0.36rem 0.36rem 0 -0.125rem currentColor,
+    -0.36rem -0.36rem 0 -0.125rem currentColor,
+    0.36rem -0.36rem 0 -0.125rem currentColor,
+    -0.36rem 0.36rem 0 -0.125rem currentColor;
+  rotate: none;
+}
+
+:root[data-theme="dark"] .theme-switch .ts-dark {
+  display: none;
+}
+
+:root[data-theme="dark"] .theme-switch .ts-light {
+  display: inline;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] .theme-switch::before {
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    background: currentColor;
+    box-shadow:
+      0 -0.5rem 0 -0.125rem currentColor,
+      0 0.5rem 0 -0.125rem currentColor,
+      0.5rem 0 0 -0.125rem currentColor,
+      -0.5rem 0 0 -0.125rem currentColor,
+      0.36rem 0.36rem 0 -0.125rem currentColor,
+      -0.36rem -0.36rem 0 -0.125rem currentColor,
+      0.36rem -0.36rem 0 -0.125rem currentColor,
+      -0.36rem 0.36rem 0 -0.125rem currentColor;
+    rotate: none;
+  }
+
+  :root[data-theme="auto"] .theme-switch .ts-dark {
+    display: none;
+  }
+
+  :root[data-theme="auto"] .theme-switch .ts-light {
+    display: inline;
+  }
+}
+
+/* In the mobile menu's sheet: beside its close button. */
+.mobile-nav .sheet-switch {
+  margin-inline: auto 0.75rem;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+}

@@ -1,0 +1,152 @@
+---
+/**
+ * W13 (DECISIONS.md D-SHOWCASE A): the dusk sweep on the home page, after What's new. One screen
+ * of the product (the map, with the age of every line) in its two official themes (C-THM-1):
+ * Survey beneath, Night chart above. As the visitor scrolls, the stage stays put in a taller
+ * track and night sweeps across it: a view timeline on the track moves a registered custom
+ * property, which moves the soft edge of the Night chart picture's mask. Night enters from the
+ * inline end: from the right in English, from the left in Hebrew. CSS only, no script.
+ *
+ * The still state is D's twin frames: both pictures whole, one under the other, each with its
+ * caption — under reduced motion, in a browser without scroll timelines, and in print.
+ *
+ * The pictures are the sweep slot's (src/content/screen-slots.json): the whole window on a
+ * desktop (drawn at ≥ 0.8, D-LEGIBLE), the figure's phone crop on a phone; lazy, and the same in
+ * every build (both sets ship: astro.config.mjs → screensForTheme). Styles are global and
+ * prefixed (no scoped attributes: the home page's first round trip has few bytes to spare).
+ */
+import ScreenshotFrame from "./ScreenshotFrame.astro";
+import SectionHeading from "./SectionHeading.astro";
+import { getCopy } from "../content/copy";
+import type { Locale } from "../i18n";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const s = getCopy(locale).showcase.sweep;
+---
+
+<section class="section sweep" aria-labelledby="sweep-title">
+  <div class="container-site">
+    <SectionHeading title={s.title} lead={s.lead} id="sweep-title" />
+  </div>
+  <div class="sweep-track">
+    <div class="container-site sweep-stage">
+      <figure class="sweep-day">
+        <ScreenshotFrame screen="map-ages" locale={locale} slot="sweep" set="survey" />
+        <figcaption>{s.day}</figcaption>
+      </figure>
+      <figure class="sweep-night">
+        <ScreenshotFrame screen="map-ages" locale={locale} slot="sweep" set="night-chart" />
+        <figcaption>{s.night}</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* The still state (D's twin frames): both pictures whole, one under the other. */
+  .sweep .sweep-stage {
+    display: grid;
+    gap: 2.5rem;
+    margin-block-start: clamp(2rem, 1.5rem + 2vw, 3rem);
+  }
+
+  .sweep figure {
+    margin: 0;
+  }
+
+  .sweep figcaption {
+    margin-block-start: 0.75rem;
+    color: var(--lc-ink-muted);
+    font-size: var(--lc-text-small);
+  }
+
+  @property --lc-dusk {
+    syntax: "<percentage>";
+    inherits: false;
+    initial-value: -10%;
+  }
+
+  @keyframes lc-dusk {
+    from {
+      --lc-dusk: -10%;
+    }
+
+    to {
+      --lc-dusk: 100%;
+    }
+  }
+
+  /* The sweep: only on a screen, for a visitor who has not asked for less motion, in a browser
+     with scroll timelines. The track gives the scroll its length; the stage stays put inside it. */
+  @media screen and (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .sweep .sweep-track {
+        block-size: 220vh;
+        view-timeline: --lc-sweep block;
+      }
+
+      .sweep .sweep-stage {
+        position: sticky;
+        inset-block-start: 5.5rem;
+        gap: 0;
+      }
+
+      .sweep .sweep-stage > figure {
+        grid-area: 1 / 1;
+      }
+
+      .sweep .sweep-night figcaption {
+        text-align: end;
+      }
+
+      /* Night chart is drawn where its mask is opaque: from the inline end up to --lc-dusk,
+         with a soft edge. */
+      .sweep .sweep-night .shot {
+        -webkit-mask-image: linear-gradient(
+          to left,
+          #000 var(--lc-dusk),
+          transparent calc(var(--lc-dusk) + 8%)
+        );
+        mask-image: linear-gradient(
+          to left,
+          #000 var(--lc-dusk),
+          transparent calc(var(--lc-dusk) + 8%)
+        );
+        animation: lc-dusk linear both;
+      }
+
+      /* A separate rule on purpose (global.css → .reveal): the minifier would otherwise fold the
+         timeline into the animation shorthand, which browsers reject. As specific as the rule
+         above and after it: the shorthand resets the timeline. */
+      .sweep [class~="sweep-night"] .shot {
+        animation-timeline: --lc-sweep;
+        animation-range: contain 10% contain 90%;
+      }
+
+      [dir="rtl"] .sweep .sweep-night .shot {
+        -webkit-mask-image: linear-gradient(
+          to right,
+          #000 var(--lc-dusk),
+          transparent calc(var(--lc-dusk) + 8%)
+        );
+        mask-image: linear-gradient(
+          to right,
+          #000 var(--lc-dusk),
+          transparent calc(var(--lc-dusk) + 8%)
+        );
+      }
+    }
+  }
+
+  @media screen and (max-width: 959px) and (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .sweep .sweep-track {
+        block-size: 160vh;
+      }
+    }
+  }
+</style>

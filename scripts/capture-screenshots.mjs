@@ -10,6 +10,12 @@
  *   LANCOMPASS_CAPTURE_THEME=survey node scripts/capture-screenshots.mjs [--check] \
  *     [--keys dashboard,rack] [--locales en,he] [--probe <key>]
  *   LANCOMPASS_CAPTURE_THEME=survey node scripts/capture-screenshots.mjs --derive
+ *   LANCOMPASS_CAPTURE_THEME=survey node scripts/capture-screenshots.mjs --derive --slots sweep,compare
+ *
+ * W13: three slots draw both sets in every build (screen-slots.json → both): the sweep, the
+ * slider (compare) and the twin frames. Their whole windows are derived at the slot's serve width;
+ * their other pictures reuse another slot's crop (`from`), so nothing is cut twice. `--slots`
+ * limits a run to some slot kinds.
  *
  * The browser renders the product's 1440 × 900 CSS px window at device scale 3. Per key and
  * locale it writes into media-library/screens/<set>/<locale>/:
@@ -58,6 +64,10 @@ const option = (name) => (args.includes(name) ? args[args.indexOf(name) + 1] : n
 const check = flag("--check");
 const probe = option("--probe");
 const deriveOnly = flag("--derive");
+/** W13: `--slots sweep,compare` limits the run to those slot kinds (a derive of new slots writes
+ *  only their files and leaves every served file it has already written untouched). */
+const slotsOption = option("--slots");
+const slotsWanted = (slot) => !slotsOption || slotsOption.split(",").includes(slot);
 
 const base = (process.env.LANCOMPASS_DEMO_URL || "http://127.0.0.1:4186").replace(/\/$/, "");
 const user = process.env.LANCOMPASS_DEMO_USER || "";
@@ -103,18 +113,20 @@ if (!slotTable) {
 function picturesOf(key) {
   const out = [];
   for (const [slot, s] of Object.entries(slotTable.slots)) {
-    if (!s.keys.includes(key)) continue;
-    if (s.crop) out.push({ name: slot, slot, ...s.crop });
-    if (s.phone) out.push({ name: `${slot}-phone`, slot, ...s.phone });
+    if (!s.keys.includes(key) || !slotsWanted(slot)) continue;
+    // W13: a picture with `from` reuses another slot's crop as it is: nothing to cut.
+    if (s.crop && !s.crop.from) out.push({ name: slot, slot, ...s.crop });
+    if (s.phone && !s.phone.from) out.push({ name: `${slot}-phone`, slot, ...s.phone });
   }
   return out;
 }
 
-/** The served files a key needs beyond its crops: the loop's window, a figure's full window. */
+/** The served files a key needs beyond its crops: the whole window of the loop, the sweep and the
+ *  slider (W13) at their serve width, and a figure's full window. */
 function wholeWindowsOf(key) {
   const out = [];
   for (const [slot, s] of Object.entries(slotTable.slots)) {
-    if (!s.keys.includes(key)) continue;
+    if (!s.keys.includes(key) || !slotsWanted(slot)) continue;
     if (s.full) out.push({ file: `${key}.${slot}.webp`, serve: s.full.serve });
     if (slot === "figure") out.push({ file: `${key}.webp`, serve: VIEW.width * FULL });
   }

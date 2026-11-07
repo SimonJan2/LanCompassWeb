@@ -42,13 +42,26 @@ build on 4323 and the auto build on 4324.
 All optional; copy `.env.example` to `.env` or set them in the build environment. An empty
 value switches the feature off. They are read at build time by `src/config/site.ts`.
 
-| Variable               | Effect                                                                                                                                |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `PUBLIC_SITE_URL`      | Origin for canonical URLs, hreflang, sitemap, Open Graph. Default `http://localhost:4321`.                                            |
-| `PUBLIC_CONTACT_EMAIL` | mailto fallback for the forms, disclosure and accessibility contact. Empty → visible `TODO(operator)` marker.                         |
-| `PUBLIC_FORM_ENDPOINT` | Forms POST here. Empty → each form is replaced by a mailto: button. Its origin is added to CSP `form-action`.                         |
-| `PUBLIC_DOCS_URL`      | "Docs" in the navigation and footer. Empty → not rendered.                                                                            |
-| `PUBLIC_SITE_THEME`    | `light` (default): survey paper. `dark`: the Night chart. `auto`: both ship, the visitor's OS picks. Any other value fails the build. |
+| Variable               | Effect                                                                                                                                                                                      |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PUBLIC_SITE_URL`      | Origin for canonical URLs, hreflang, sitemap, Open Graph. Default `http://localhost:4321`.                                                                                                  |
+| `PUBLIC_CONTACT_EMAIL` | mailto fallback for the forms, disclosure and accessibility contact. Empty → visible `TODO(operator)` marker.                                                                               |
+| `PUBLIC_FORM_ENDPOINT` | Forms POST here. Empty → each form is replaced by a mailto: button. Its origin is added to CSP `form-action`.                                                                               |
+| `PUBLIC_DOCS_URL`      | "Docs" in the navigation and footer. Empty → not rendered.                                                                                                                                  |
+| `PUBLIC_SITE_THEME`    | `light` (default): survey paper. `dark`: the Night chart. `auto`: both ship, the visitor's OS picks. Any other value fails the build.                                                       |
+| `PUBLIC_SITE_INDEXING` | `true` (default; empty is `true`). `false`: a preview — every response carries `X-Robots-Tag: noindex` and `robots.txt` lists no sitemap. No HTML changes. Any other value fails the build. |
+
+### Preview mode
+
+W12 (DECISIONS.md D-INDEXING): while the site lives at a preview address
+(`https://lancompass.simonlab.xyz`), the deploy sets `PUBLIC_SITE_INDEXING=false`. The build then
+adds `X-Robots-Tag: noindex` to the `/*` block of `dist/_headers` (`astro.config.mjs` →
+`headersNoindex`), which Netlify and Cloudflare Pages apply to every response and the Docker
+image turns into nginx headers (`docker/render-nginx-headers.mjs`): pages, assets, images,
+feeds and 404s alike. `robots.txt` still allows every crawler (a crawler has to fetch a page to
+read its `noindex`) and leaves out its `Sitemap:` line. Not one HTML byte changes. To leave
+preview: set `PUBLIC_SITE_URL` to the LanCompass domain, remove `PUBLIC_SITE_INDEXING`, rebuild,
+and add a 301 from the preview address to the domain at the edge (`docs/go-public.md`).
 
 ### Theme
 
@@ -63,8 +76,37 @@ The colour theme is a build-time choice, like every `PUBLIC_*` value: set
   `theme-color`.
 - `auto` ships both palettes. CSS switches with `prefers-color-scheme`, screenshots switch
   with `<picture><source media>` (only the matching image is fetched), each video slot
-  renders one player per scheme and hides the other, and there are two `theme-color` metas.
-  Social cards stay paper. There is no JavaScript theme logic and no toggle.
+  renders one player whose Night chart recording sits behind a dark `<source>`, and there are
+  two `theme-color` metas. Social cards stay paper. Since W13 (DECISIONS.md D-THEME, D-SWITCH)
+  `auto` is the published theme (`.env.example`, `compose.yaml`) and carries a two-state
+  light/dark switch, described below; `light` and `dark` have none.
+
+**The switch** (W13, `auto` only): `src/components/ThemeSwitch.astro` in the header, beside the
+language menu, and in the mobile menu. It offers the opposite of the scheme on screen (a moon or
+a sun drawn in CSS, and a name such as "Switch to dark theme"). A press renders the other
+scheme; `localStorage["lc-theme"]` keeps the choice only when it differs from the system's, and
+choosing the system's scheme again removes it. The switch's code in `src/scripts/site.ts`
+(dropped from light and dark builds at build time: `__LC_AUTO__`) applies a stored choice by
+turning `<html data-theme="auto">` into `light` or `dark`; the auto stylesheet carries the dark
+rules once more under `:root[data-theme="dark"]`, so an override renders exactly as the pure
+build. It does so when the site's module runs, not before the first paint: a blocking boot script
+in `<head>` (the first design) cost the English home and `/docs/topology/` their 1.8 s LCP budget,
+so a visitor who chose an override may see the system's scheme for a moment — nobody else sees
+any change. It points every scheme-keyed `<source>` and `theme-color` at the override's set,
+follows other tabs (`storage`), and still switches the page when storage is blocked; on the home
+(`src/scripts/home-theme.ts`) the atlas previews show their Night chart files under a dark
+override and a video that has not played loads the override's recording on its first play.
+Without JavaScript the button is not shown and the system's scheme decides, as before. `/privacy`
+names the one key it may keep.
+
+**Both themes on the page** (W13, D-SHOWCASE, every build): the home's dusk sweep after What's new
+(`DuskSweep.astro`: a stage that stays put, a scroll-driven mask, CSS only; twin frames under reduced
+motion), `/product`'s slider before Fig. 1 (`CompareSlider.astro`, a native range input), a
+"Survey | Night chart" control on each `/product` figure (cloned from one `<template>` by
+`src/scripts/showcase.ts`; the other set's crop loads only when chosen), and twin frames under
+`/pilot`'s hero (`TwinFrames.astro`). Their pictures are the slots `sweep`, `compare` and `twin`
+in `src/content/screen-slots.json`; a light or dark build keeps exactly the other set's files they
+use (`astro.config.mjs` → `screensForTheme`).
 
 How it is built: `<html data-theme>` carries the theme. `src/styles/tokens.css` holds the light
 tokens and, after its `@night` marker, every dark value once as a tagged `--lc-dark-*` token
@@ -92,7 +134,9 @@ clean exit, the design-partner offer and the application form at `#apply`) and `
 (the evaluation, the licence, its states, read-only, editions and prices, buyers' questions).
 Every call to action goes to `/pilot/#apply`. The old `/design-partners/` answers 301 in
 `docker/nginx/site.conf`; for any other host the build leaves a meta-refresh page there (not in
-the sitemap). Both pages carry a visible legal-review marker until the wording is reviewed.
+the sitemap). W12 removed their legal-review banners (DECISIONS.md D-LEGAL-BANNERS): a
+lawyer's reading of `/privacy`, `/accessibility`, `/licensing` and `/pilot` stays on the
+operator's checklist (`docs/go-public.md`), not on the pages.
 
 Release notes (W8): `/changelog/` lists every release, newest first, and `/changelog/<version>/`
 shows its notes — the product's own `CHANGELOG.md` section, verbatim (the wave numbers dropped,
@@ -156,7 +200,11 @@ theme: `survey` (Survey, the product's default light theme: the light site's set
 `--check` walks every key and slot without writing a file and fails on a missing route, element
 or focus; `--keys a,b` and `--locales en` narrow a run; `--probe <key>` prints the page's
 `data-*` attributes and each slot's focus and clip, and saves a screenshot to `.tmp/probe/`;
-`--derive` rewrites the served files from the record without a browser.
+`--derive` rewrites the served files from the record without a browser, and `--slots a,b` limits
+a run to some slot kinds (W13 derived the showcase's whole windows with
+`--derive --keys map-ages,dashboard --slots sweep,compare`, rewriting no other file). W13's three
+showcase slots (`sweep`, `compare`, `twin`) draw both sets in every build; their other pictures
+reuse another slot's crop as it is (`from` in the slot table), so a capture cuts nothing twice.
 
 `scripts/record-video.mjs <key>` records one product video on the same capture stack
 (navigation, hover, scrolling, the Q key, opening a card or a preview). Its one kind of write
@@ -332,14 +380,14 @@ docker/smoke.sh http://localhost:8088 dark   # the same against a dark build
 docker compose down
 ```
 
-| File                                                | Role                                                                                                                                                                                                                                                                                                                                              |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Dockerfile`                                        | Build stage (`npm ci --omit=dev`, `astro build`) and nginx runtime stage with OCI labels and a health check.                                                                                                                                                                                                                                      |
-| `compose.yaml`                                      | One `web` service: read-only filesystem with a `/tmp` tmpfs, all capabilities dropped, `no-new-privileges`, CPU and memory limits, log rotation, health check.                                                                                                                                                                                    |
-| `docker/nginx/nginx.conf`, `docker/nginx/site.conf` | Trailing-slash redirects, per-locale 404 pages, gzip, immutable caching for `/_astro/`, `/healthz`.                                                                                                                                                                                                                                               |
-| `docker/render-nginx-headers.mjs`                   | Turns the built `dist/_headers` into nginx `add_header` lines at image build, so `public/_headers` stays the single source of the CSP and the form endpoint's origin is included.                                                                                                                                                                 |
-| `docker/smoke.sh`                                   | Checks a running container.                                                                                                                                                                                                                                                                                                                       |
-| `tests/container.spec.ts`                           | Loads every page under the real headers and fails on any CSP violation or console error: `DOCKER_BASE_URL=http://localhost:8088 npx playwright test tests/container.spec.ts`. W10: also every header `docs/headers.md` lists, behind a TLS proxy and without one; with `EXPECT_SITE_URL` set to the image's `PUBLIC_SITE_URL`, the absolute URLs. |
+| File                                                | Role                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Dockerfile`                                        | Build stage (`npm ci --omit=dev`, `astro build`) and nginx runtime stage with OCI labels and a health check.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `compose.yaml`                                      | One `web` service: read-only filesystem with a `/tmp` tmpfs, all capabilities dropped, `no-new-privileges`, CPU and memory limits, log rotation, health check.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `docker/nginx/nginx.conf`, `docker/nginx/site.conf` | Trailing-slash redirects, per-locale 404 pages, gzip, immutable caching for `/_astro/`, `/healthz`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `docker/render-nginx-headers.mjs`                   | Turns the built `dist/_headers` into nginx `add_header` lines at image build, so `public/_headers` stays the single source of the CSP and the form endpoint's origin is included.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `docker/smoke.sh`                                   | Checks a running container.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `tests/container.spec.ts`                           | Loads every page under the real headers and fails on any CSP violation or console error: `DOCKER_BASE_URL=http://localhost:8088 npx playwright test tests/container.spec.ts`. W10: also every header `docs/headers.md` lists, behind a TLS proxy and without one; with `EXPECT_SITE_URL` set to the image's `PUBLIC_SITE_URL`, the absolute URLs. W12: `EXPECT_NOINDEX=1` for an image built with `PUBLIC_SITE_INDEXING=false` (then `X-Robots-Tag: noindex` on every response and no sitemap in `robots.txt`; without it, no such header), and `EXPECT_NO_MARKERS=1` for an image built with the contact address (then no page in its sitemap shows a `TODO(operator)` marker). |
 
 `PUBLIC_*` values are **build arguments**: set them in `.env` (compose reads it) and rebuild with
 `--build`. `PUBLIC_SITE_URL` defaults to `http://localhost:<port>`; set the real origin for
@@ -357,5 +405,6 @@ LAN address without TLS.
 
 Any static host. Apply the headers in `public/_headers` (Netlify, Cloudflare Pages), the
 nginx equivalents in `docs/headers.md`, or run the Docker image above, which applies them
-itself. Keep the site on a private preview URL until the trademark search is cleared, and until
-every box of [`docs/go-public.md`](docs/go-public.md) is ticked.
+itself. Since W12 the site is public at a preview address that asks search engines not to index
+it (`PUBLIC_SITE_INDEXING=false`, above); it moves to the LanCompass domain once the operator's
+remaining steps in [`docs/go-public.md`](docs/go-public.md) are done.

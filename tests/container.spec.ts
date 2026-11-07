@@ -157,8 +157,13 @@ test.describe("container: enforced CSP", () => {
     }
     const feed = await (await request.get(`${base}/changelog/feed.xml`)).text();
     expect(feed).toContain(`<id>${site}/changelog/0.7.0/</id>`);
-    expect(await (await request.get(`${base}/robots.txt`)).text()).toContain(
-      `Sitemap: ${site}/sitemap-index.xml`,
+    // W12: a preview image (EXPECT_NOINDEX=1) lists no sitemap; the sitemap itself still uses
+    // the image's site URL.
+    const robots = await (await request.get(`${base}/robots.txt`)).text();
+    if (process.env["EXPECT_NOINDEX"] === "1") expect(robots).not.toMatch(/^Sitemap:/m);
+    else expect(robots).toContain(`Sitemap: ${site}/sitemap-index.xml`);
+    expect(await (await request.get(`${base}/sitemap-0.xml`)).text()).toContain(
+      `<loc>${site}/</loc>`,
     );
     const txt = await request.get(`${base}/.well-known/security.txt`);
     if (txt.status() === 200) {
@@ -190,6 +195,121 @@ test.describe("container: enforced CSP", () => {
       expect(await txt.text()).toMatch(/^Contact: mailto:/);
     } else {
       expect(txt.status()).toBe(404);
+    }
+  });
+
+  /** W12 (D-INDEXING): an image built with PUBLIC_SITE_INDEXING=false (EXPECT_NOINDEX=1) sends
+   *  `X-Robots-Tag: noindex` on every response nginx makes — a page, a docs page, a stylesheet, an
+   *  image, a video, a feed, robots.txt, the sitemap, a redirect and a 404 — and an indexed image
+   *  sends none. */
+  test("W12: X-Robots-Tag: noindex on every response of a preview image, on none otherwise", async ({
+    request,
+  }) => {
+    const noindex = process.env["EXPECT_NOINDEX"] === "1";
+    const home = await (await request.get(`${base}/`)).text();
+    const asset = home.match(/\/_astro\/[^"]+\.css/)?.[0];
+    expect(asset).toBeTruthy();
+    const cases: [string, number][] = [
+      ["/", 200],
+      ["/he/", 200],
+      ["/docs/topology/", 200],
+      [asset!, 200],
+      ["/media/survey/drift-review-queue.en.webp", 200],
+      ["/media/survey/drift-review-queue.en.webm", 200],
+      ["/og/en/home.png", 200],
+      ["/changelog/feed.xml", 200],
+      ["/robots.txt", 200],
+      ["/sitemap-index.xml", 200],
+      ["/design-partners/", 301],
+      ["/product", 301],
+      ["/no-such-page/", 404],
+      ["/he/no-such-page/", 404],
+    ];
+    for (const [path, status] of cases) {
+      const res = await request.get(`${base}${path}`, { maxRedirects: 0 });
+      expect(res.status(), path).toBe(status);
+      expect(res.headers()["x-robots-tag"], path).toBe(noindex ? "noindex" : undefined);
+    }
+    // robots.txt keeps crawling allowed either way: a crawler must fetch a page to see noindex.
+    const robots = await (await request.get(`${base}/robots.txt`)).text();
+    expect(robots).toMatch(/^User-agent: \*\nAllow: \/$/m);
+    expect(robots).not.toMatch(/^Disallow:/m);
+    if (noindex) expect(robots).not.toMatch(/^Sitemap:/m);
+    else expect(robots).toMatch(/^Sitemap: /m);
+  });
+
+  /** W12: an image built with the contact address (EXPECT_NO_MARKERS=1, the operator build) shows
+   *  no visible TODO(operator) marker on any page of its sitemap, and every mailto: is to that
+   *  address. */
+  test("W12: no visible TODO(operator) marker on any page in the sitemap", async ({
+    page,
+    request,
+  }) => {
+    test.skip(
+      process.env["EXPECT_NO_MARKERS"] !== "1",
+      "set EXPECT_NO_MARKERS=1 for an image built with PUBLIC_CONTACT_EMAIL",
+    );
+    test.setTimeout(600_000);
+    const sitemap = await (await request.get(`${base}/sitemap-0.xml`)).text();
+    const paths = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]!).pathname);
+    expect(paths.length).toBeGreaterThanOrEqual(162);
+    const shown: string[] = [];
+    const mailto = new Set<string>();
+    for (const path of [...paths, "/no-such-page/", "/he/no-such-page/"]) {
+      await page.goto(`${base}${path}`, { waitUntil: "domcontentloaded" });
+      const text = await page.evaluate(() => document.body.innerText);
+      if (text.includes("TODO(operator)")) shown.push(path);
+      for (const href of await page
+        .locator('a[href^="mailto:"]')
+        .evaluateAll((els) => els.map((a) => a.getAttribute("href") ?? "")))
+        mailto.add(href.replace(/\?.*$/, ""));
+    }
+    expect(shown).toEqual([]);
+    const email = process.env["EXPECT_CONTACT_EMAIL"];
+    if (email) expect([...mailto]).toEqual([`mailto:${email}`]);
+  });
+
+  /** W13 (D-SWITCH, D-SHOWCASE): under the real CSP, an auto image's switch and the showcase's
+   *  scripts cause no violation and no error — under each override, after a press of the switch,
+   *  a move of the slider and a figure's set chosen. */
+  test("W13: no CSP violation or console error under either override (auto image)", async ({
+    browser,
+  }) => {
+    test.skip(
+      !(await (await fetch(`${base}/`)).text()).includes('data-theme="auto"'),
+      "an auto image only",
+    );
+    for (const override of ["light", "dark"]) {
+      for (const scheme of ["light", "dark"] as const) {
+        const context = await browser.newContext({ colorScheme: scheme });
+        const page = await context.newPage();
+        const problems: string[] = [];
+        page.on("console", (m) => {
+          if (m.type() === "error") problems.push(m.text());
+        });
+        page.on("pageerror", (e) => problems.push(e.message));
+        await page.addInitScript((value) => {
+          localStorage.setItem("lc-theme", value);
+          document.addEventListener("securitypolicyviolation", (e) =>
+            console.error(`CSP: ${e.violatedDirective} ${e.blockedURI}`),
+          );
+        }, override);
+        for (const path of ["/", "/he/product/", "/pilot/"]) {
+          await page.goto(`${base}${path}`, { waitUntil: "networkidle" });
+          expect(await page.evaluate(() => document.documentElement.dataset["theme"])).toBe(
+            override,
+          );
+          await page.locator(".header-actions > [data-theme-switch]").click();
+          if (path === "/he/product/") {
+            await page.locator("[data-compare] input").fill("30");
+            await page.locator("#fig-1 .fig-sets button").last().click();
+          }
+          await page.mouse.wheel(0, 20000);
+          await page.waitForLoadState("networkidle");
+        }
+        expect(problems, `${override} override, ${scheme} system`).toEqual([]);
+        await context.close();
+      }
     }
   });
 });

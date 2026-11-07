@@ -232,16 +232,50 @@ const label = fill(ui.figure.label, { n: String(n) });
     font-weight: 600;
   }
 
-  /* auto: the full window of the scheme's own set. */
-  @media (prefers-color-scheme: dark) {
-    .fig .fig-full-survey {
-      display: none;
-    }
+  /* auto: the full window of the page's own set — the rules live in src/styles/auto.css (W13),
+     which an auto build alone carries, keyed on the system's scheme or the visitor's override. */
+
+  /* W13 (D-SHOWCASE C): "Survey | Night chart" on the frame's bar, at its right end in both
+     languages (the window's dots are at its left whatever the direction), put there by /product's
+     script (src/scripts/showcase.ts) — so it is never shown without JavaScript — and sized to
+     the bar: each choice at least 24 × 24 px. */
+  .fig .shot {
+    position: relative;
   }
 
-  @media not (prefers-color-scheme: dark) {
-    .fig .fig-full-night-chart {
-      display: none;
-    }
+  .fig .fig-sets {
+    position: absolute;
+    top: 1px;
+    right: 0.375rem;
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .fig .fig-sets button {
+    min-block-size: 1.5rem;
+    min-inline-size: 1.5rem;
+    padding: 0 0.5rem;
+    border: 1px solid transparent;
+    border-radius: var(--lc-radius-sm);
+    background: transparent;
+    color: var(--lc-ink-muted);
+    font: inherit;
+    font-size: var(--lc-text-xs);
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .fig .fig-sets button:hover {
+    color: var(--lc-ink);
+  }
+
+  .fig .fig-sets button[aria-pressed="true"] {
+    border-color: var(--lc-ink);
+    color: var(--lc-ink);
+  }
+
+  /* The frame clips what overflows it: the focus ring stays inside the button. */
+  .fig .fig-sets button:focus-visible {
+    outline-offset: -2px;
   }
 </style>

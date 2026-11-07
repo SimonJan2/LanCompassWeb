@@ -52,7 +52,6 @@ const formatDate = (iso: string) =>
 
 let Content: Awaited<ReturnType<typeof render>>["Content"] | null = null;
 let hero: SectionPage["hero"];
-let legalReview = false;
 let meta: { title: string; description: string };
 let mdxPage: MdxPage["page"] | null = null;
 if (section) {
@@ -65,7 +64,6 @@ if (section) {
   if (!entry) throw new Error(`Missing src/content/pages/${locale}/${page}.mdx`);
   ({ Content } = await render(entry));
   meta = getCopy(locale).meta[page];
-  legalReview = entry.data.legalReview;
   hero = {
     eyebrow: entry.data.eyebrow,
     title: entry.data.title,
@@ -95,13 +93,6 @@ const updated = hero.dateText ?? formatDate(hero.date);
         {hero.dateLabel}: <time datetime={hero.date}>{updated}</time>
         {hero.after && <Fragment set:html={hero.after} />}
       </p>
-      {legalReview && (
-        <p class="longform-review">
-          <span class="todo-operator">
-            TODO(operator): legal review of this page before going public.
-          </span>
-        </p>
-      )}
     </div>
   </section>
   <section class="section-tight">
@@ -144,10 +135,6 @@ const updated = hero.dateText ?? formatDate(hero.date);
 
   :lang(he) .longform-updated {
     font-family: var(--lc-font-sans);
-  }
-
-  .longform-review {
-    margin-block-start: 1rem;
   }
 
   .longform-body {

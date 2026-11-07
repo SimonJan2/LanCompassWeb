@@ -96,3 +96,70 @@ headerOnScroll();
 mobileMenu();
 disclosures();
 captionLanguage();
+
+/**
+ * W13 (DECISIONS.md D-SWITCH): the light/dark switch, in an auto build only (__LC_AUTO__ is false
+ * in a light or dark build, and this block is dropped there). It first applies a stored override
+ * (`data-theme` "light" or "dark" in place of "auto") and sets `data-js`, which shows the switch.
+ * Not before the first paint: the brief's blocking boot script in <head> cost the English home and
+ * /docs/topology/ their LCP budget in auto (1,803 ms against 1,800, early or late in <head>), so
+ * this is its fallback, step 3 — a brief flash, only for a visitor who chose an override. A press
+ * renders the opposite of the scheme on screen; `lc-theme` is kept only when that
+ * differs from the system's scheme and removed when it matches (a storage error still switches
+ * this view); another tab follows through the `storage` event. Under an override, every media
+ * query on the scheme (the pictures' and videos' Night chart sources, the theme-color metas)
+ * becomes `all` without its scheme part for the override's own scheme and `not all` for the other,
+ * and itself again when the override goes. Without an override the system's scheme decides, as
+ * before: CSS and the media queries follow it on their own. What only one page has watches
+ * `data-theme` there: the home's atlas previews and videos (src/scripts/home-theme.ts), /product's
+ * figures (src/scripts/showcase.ts). Kept small on purpose: the form pages and /product carry it
+ * within their 2,048 B (gzip) of JavaScript.
+ */
+if (__LC_AUTO__) {
+  const root = document.documentElement;
+  const dark = matchMedia("(prefers-color-scheme: dark)");
+  const keyed: [HTMLSourceElement | HTMLMetaElement, string][] = [];
+  document
+    .querySelectorAll<HTMLSourceElement | HTMLMetaElement>("[media*=prefers-color-scheme]")
+    .forEach((el) => keyed.push([el, el.media]));
+  const apply = (o: string | null) => {
+    for (const [el, m] of keyed)
+      el.media = !o
+        ? m
+        : m.includes(o + ")")
+          ? m.replace(/\(prefers-color-scheme: \w+\)( and )?/, "") || "all"
+          : "not all";
+    // Last, so whatever watches data-theme sees the sources already pointed (the home's atlas
+    // and videos: src/scripts/home-theme.ts; /product's figures: src/scripts/showcase.ts).
+    root.dataset["theme"] = o || "auto";
+  };
+  /** Only "light" and "dark" are overrides; anything else (or nothing) is none. */
+  const stored = (v: string | null | undefined) => (v == "light" || v == "dark" ? v : null);
+  document.querySelectorAll("[data-theme-switch]").forEach((button) =>
+    button.addEventListener("click", () => {
+      const system = dark.matches ? "dark" : "light";
+      // The system's scheme on screen → an override of the other; an override on screen → none.
+      const o =
+        (stored(root.dataset["theme"]) || system) == system
+          ? system == "dark"
+            ? "light"
+            : "dark"
+          : null;
+      try {
+        if (o) localStorage.setItem("lc-theme", o);
+        else localStorage.removeItem("lc-theme");
+      } catch {
+        // No storage (a private window, blocked site data): this view still switches.
+      }
+      apply(o);
+    }),
+  );
+  addEventListener("storage", () => apply(stored(localStorage.getItem("lc-theme"))));
+  try {
+    const o = stored(localStorage.getItem("lc-theme"));
+    if (o) apply(o);
+  } catch {
+    // No storage: no override; the system's scheme decides.
+  }
+  root.dataset["js"] = "";
+}

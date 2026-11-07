@@ -12,6 +12,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import Form from "../../components/form/Form.astro";
 import Prose from "../../components/Prose.astro";
 import SectionHeading from "../../components/SectionHeading.astro";
+import TwinFrames from "../../components/TwinFrames.astro";
 import Contours from "../../components/motifs/Contours.astro";
 import { getCopy } from "../../content/copy";
 import { localeStaticPaths, pagePath, type Locale } from "../../i18n";
@@ -37,13 +38,13 @@ const p = copy.pilot;
     <Contours map="quiet" eager />
     <div class="container-site">
       <SectionHeading eyebrow={p.eyebrow} title={p.title} lead={p.lead} level={1} />
-      <p class="pl-review">
-        <span class="todo-operator">
-          TODO(operator): legal review of this page before going public.
-        </span>
-      </p>
     </div>
   </section>
+
+  {/* W13 (D-SHOWCASE D): what a pilot runs, in both official themes, under the hero. */}
+  <div class="container-site pl-twin">
+    <TwinFrames locale={locale} />
+  </div>
 
   <div class="container-site pl-body">
     <Prose class="pl-prose">
@@ -199,8 +200,8 @@ const p = copy.pilot;
     border-block-end: 1px solid var(--lc-rule);
   }
 
-  .pl-review {
-    margin-block-start: 1.25rem;
+  .pl-twin {
+    padding-block-start: 3rem;
   }
 
   .pl-body {
@@ -335,8 +336,7 @@ const p = copy.pilot;
   }
 
   @media print {
-    .pl-apply,
-    .pl-review {
+    .pl-apply {
       display: none;
     }
   }

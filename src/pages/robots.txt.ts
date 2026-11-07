@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { site } from "../config/site";
 import { absoluteUrl } from "../i18n";
 
 /**
@@ -7,9 +8,15 @@ import { absoluteUrl } from "../i18n";
  * named and left allowed, with a comment that this is the operator's choice. A crawler obeys only
  * the most specific group that names it, so a rule added later goes in every group. No llms.txt
  * (a proposal, not a standard; W2 research §7.9). tests/seo.spec.ts holds the groups.
+ *
+ * W12 (D-INDEXING): a preview build (PUBLIC_SITE_INDEXING=false) keeps crawling allowed, so a
+ * crawler can fetch a page and read its `X-Robots-Tag: noindex`, and lists no sitemap.
  */
 const lines = [
   "# LanCompass. Every page is public, and every agent may read it.",
+  ...(site.indexing
+    ? []
+    : ["# This address is a preview: every response says X-Robots-Tag: noindex, so no sitemap."]),
   "",
   "# Search engines and agents a person sends to read a page.",
   "User-agent: Googlebot",
@@ -31,8 +38,7 @@ const lines = [
   "User-agent: *",
   "Allow: /",
   "",
-  `Sitemap: ${absoluteUrl("/sitemap-index.xml")}`,
-  "",
+  ...(site.indexing ? [`Sitemap: ${absoluteUrl("/sitemap-index.xml")}`, ""] : []),
 ];
 
 export const GET: APIRoute = () =>

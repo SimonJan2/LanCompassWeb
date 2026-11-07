@@ -30,11 +30,14 @@ ARG PUBLIC_FORM_ENDPOINT=""
 ARG PUBLIC_DOCS_URL=""
 # light (default) | dark | auto — see README → Configuration.
 ARG PUBLIC_SITE_THEME=light
+# true (default) | false: false is a preview — X-Robots-Tag: noindex everywhere, no sitemap in robots.txt.
+ARG PUBLIC_SITE_INDEXING=true
 ENV PUBLIC_SITE_URL=${PUBLIC_SITE_URL} \
     PUBLIC_CONTACT_EMAIL=${PUBLIC_CONTACT_EMAIL} \
     PUBLIC_FORM_ENDPOINT=${PUBLIC_FORM_ENDPOINT} \
     PUBLIC_DOCS_URL=${PUBLIC_DOCS_URL} \
-    PUBLIC_SITE_THEME=${PUBLIC_SITE_THEME}
+    PUBLIC_SITE_THEME=${PUBLIC_SITE_THEME} \
+    PUBLIC_SITE_INDEXING=${PUBLIC_SITE_INDEXING}
 
 RUN npx astro build \
  && node docker/render-nginx-headers.mjs dist/_headers /app/security-headers.conf \

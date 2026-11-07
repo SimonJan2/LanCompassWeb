@@ -121,7 +121,9 @@ test.describe("keyboard", () => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/");
     const seen: string[] = [];
-    for (let i = 0; i < 8; i++) {
+    // Nine stops reach the header's last control: the skip link, the logo, four links, the
+    // language menu and "Start a pilot" — and, in an auto build, the light/dark switch (W13).
+    for (let i = 0; i < 9; i++) {
       await page.keyboard.press("Tab");
       seen.push(
         await page.evaluate(() => (document.activeElement as HTMLElement).innerText.trim()),

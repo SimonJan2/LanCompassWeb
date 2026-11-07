@@ -2,6 +2,8 @@
  * Site configuration. Every value comes from a `PUBLIC_*` environment variable
  * at build time (see `.env.example`); an empty value switches the feature off.
  */
+import { readIndexing } from "../lib/indexing";
+
 function read(value: string | undefined): string {
   return (value ?? "").trim();
 }
@@ -41,6 +43,8 @@ export const site = {
   docsUrl: readUrl(env.PUBLIC_DOCS_URL),
   /** light (default): survey paper · dark: Night chart · auto: follows the visitor's OS. */
   theme: readTheme(env.PUBLIC_SITE_THEME),
+  /** false: a preview that asks search engines not to index it (robots.txt; X-Robots-Tag). */
+  indexing: readIndexing(env.PUBLIC_SITE_INDEXING),
   name: "LanCompass",
 } as const;
 

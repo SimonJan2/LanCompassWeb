@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
-import { FLAGS, layOutInFull, siteProject } from "./helpers";
+import { AUTO, FLAGS, layOutInFull, siteProject } from "./helpers";
 
 /**
  * W10, WCAG 2.2 success criterion 2.5.8 Target Size (Minimum, AA): every link, button and form
@@ -138,6 +138,23 @@ test.describe("2.5.8 target size: 24 × 24 CSS px or the spacing exception", () 
       await page.setViewportSize({ width, height: 900 });
       for (const path of ["/pilot/", "/contact/", "/he/pilot/", "/he/contact/"]) {
         await page.goto(`${FLAGS}${path}`);
+        for (const b of await smallTargets(page)) bad.push(`${width} ${path} ${b}`);
+      }
+    }
+    expect(bad).toEqual([]);
+  });
+
+  // W13: the light/dark switch lives in auto builds only; the slider and each figure's
+  // "Survey | Night chart" control in every build (the light build above covers them too).
+  test("the switch, the slider and the figures' controls (auto build), both locales, both widths", async ({
+    page,
+  }) => {
+    const bad: string[] = [];
+    for (const width of [1440, 390]) {
+      await page.setViewportSize({ width, height: width === 390 ? 844 : 900 });
+      for (const path of ["/", "/product/", "/he/", "/he/product/", "/pilot/"]) {
+        await page.goto(`${AUTO}${path}`);
+        await expect(page.locator(".header-actions > [data-theme-switch]")).toBeVisible();
         for (const b of await smallTargets(page)) bad.push(`${width} ${path} ${b}`);
       }
     }

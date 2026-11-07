@@ -5,6 +5,7 @@ import AtlasIndex from "../../components/AtlasIndex.astro";
 import Button from "../../components/Button.astro";
 import ComparisonRow from "../../components/ComparisonRow.astro";
 import Datasheet from "../../components/Datasheet.astro";
+import DuskSweep from "../../components/DuskSweep.astro";
 import Eyebrow from "../../components/Eyebrow.astro";
 import FeatureCard from "../../components/FeatureCard.astro";
 import Icon, { type IconName } from "../../components/Icon.astro";
@@ -152,6 +153,9 @@ const atlasRows = h.atlas.rows.map((row) => ({
       </div>
     </div>
   </section>
+
+  <!-- W13 (D-SHOWCASE A): both official themes, swept by scroll. -->
+  <DuskSweep locale={locale} />
 
   <!-- 045° The loop -->
   <section class="section defer-render" id="how-it-works" aria-labelledby="loop-title">

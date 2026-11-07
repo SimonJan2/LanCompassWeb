@@ -42,7 +42,26 @@ for path in /changelog/feed.xml /he/changelog/feed.xml; do
   check "$path is Atom" "application/atom+xml; charset=utf-8" "$(header content-type "$BASE$path")"
 done
 
+# W12 (D-INDEXING): a preview image (PUBLIC_SITE_INDEXING=false) lists no sitemap in robots.txt
+# and says noindex on every response; an indexed image does neither. The two must agree.
+if curl -s "$BASE/robots.txt" | grep -q '^Sitemap: '; then
+  check "indexed: no X-Robots-Tag on /" "" "$(header x-robots-tag "$BASE/")"
+  check "indexed: no X-Robots-Tag on a 404" "" "$(header x-robots-tag "$BASE/no-such-page/")"
+else
+  check "preview: X-Robots-Tag on /" noindex "$(header x-robots-tag "$BASE/")"
+  check "preview: X-Robots-Tag on /he/" noindex "$(header x-robots-tag "$BASE/he/")"
+  check "preview: X-Robots-Tag on an image" noindex "$(header x-robots-tag "$BASE/og/he/home.png")"
+  check "preview: X-Robots-Tag on a 404" noindex "$(header x-robots-tag "$BASE/no-such-page/")"
+  check "preview: robots.txt still allows crawling (no Disallow)" 0 "$(curl -s "$BASE/robots.txt" | grep -c '^Disallow:')"
+fi
 check "<html data-theme> is $THEME" 1 "$(curl -s "$BASE/" | grep -c "<html [^>]*data-theme=\"$THEME\"")"
+# W13 (D-SWITCH): an auto image has the light/dark switch in its header and mobile menu; a light
+# or dark image has none.
+if [ "$THEME" = "auto" ]; then
+  check "auto: the switch, in the header and the mobile menu" 2 "$(curl -s "$BASE/he/" | grep -o 'data-theme-switch' | wc -l | tr -d ' ')"
+else
+  check "$THEME: no switch" 0 "$(curl -s "$BASE/he/" | grep -o 'data-theme-switch' | wc -l | tr -d ' ')"
+fi
 check "he page is rtl" 1 "$(curl -s "$BASE/he/" | grep -c '<html lang="he" dir="rtl"')"
 check "unknown URL → 404" 404 "$(status "$BASE/no-such-page/")"
 check "unknown /he/ URL → 404" 404 "$(status "$BASE/he/no-such-page/")"

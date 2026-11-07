@@ -12,6 +12,8 @@ import {
 
 export const DEFAULT = "http://127.0.0.1:4321";
 export const FLAGS = "http://127.0.0.1:4322";
+/** W13: the auto test build (playwright.config.ts), for the switch's checks from any project. */
+export const AUTO = "http://127.0.0.1:4324";
 export const FLAG_VALUES = {
   docs: "https://docs.example.com/",
   form: "https://forms.example.com/submit",
@@ -103,10 +105,17 @@ export function builtHtml(dir: string): { file: string; html: string }[] {
   return out;
 }
 
-/** Pages allowed to show a TODO(operator) marker in visible text (listed in the W1 session report):
- *  the legal pages, and since W7 the pilot and licensing pages, which carry the legal-review
- *  marker until the operator's lawyer has read them (night C report). */
-export const todoAllowed = new Set<PageKey>(["privacy", "accessibility", "pilot", "licensing"]);
+/** Pages allowed to show a TODO(operator) marker in visible text. W12 emptied it: the legal-review
+ *  banners are gone (DECISIONS.md D-LEGAL-BANNERS) and the statements' questions are answered, so
+ *  the only markers left are the contact ones, which show only in a build without
+ *  PUBLIC_CONTACT_EMAIL (the flags build; tests/flags.spec.ts) — every build content.spec visits
+ *  has an address — and /privacy/'s form-service marker below. */
+export const todoAllowed = new Set<PageKey>();
+
+/** W12: /privacy/ describes email only; a build with PUBLIC_FORM_ENDPOINT set (the flags, dark and
+ *  auto test builds) shows this one marker there, until the operator names the form service. */
+export const FORM_SERVICE_MARKER =
+  "TODO(operator): name the form service on this page before using a form";
 
 /** What a Playwright project serves (playwright.config.ts → projects[].metadata). */
 export interface SiteProject {
